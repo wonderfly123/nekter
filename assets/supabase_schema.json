@@ -1,0 +1,824 @@
+[
+  {
+    "schema_json": [
+      {
+        "table": "zendesk_org_mapping",
+        "columns": [
+          {
+            "name": "zendesk_org_id",
+            "type": "bigint",
+            "nullable": false
+          },
+          {
+            "name": "zendesk_org_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "domain",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "tier",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "opportunities",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_opp_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "stage",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+            "nullable": true
+          },
+          {
+            "name": "close_date",
+            "type": "date",
+            "nullable": true
+          },
+          {
+            "name": "is_closed",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "is_won",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "type",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "lost_reason",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "lost_reason_detail",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "last_activity_date",
+            "type": "date",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": [
+          {
+            "column": "sf_account_id",
+            "references_table": "accounts",
+            "references_column": "sf_account_id"
+          }
+        ]
+      },
+      {
+        "table": "accounts",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "name",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "type",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "arr",
+            "type": "numeric",
+            "nullable": true
+          },
+          {
+            "name": "industry",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "employee_count",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "owner_email",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "csm_email",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "last_activity_date",
+            "type": "date",
+            "nullable": true
+          },
+          {
+            "name": "days_since_activity",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "owner_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "owner_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "csm_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "csm_name",
+            "type": "text",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "contacts",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_contact_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "first_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "last_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "email",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "phone",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "mobile_phone",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "title",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "department",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "customer_role",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "management_level",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "last_activity_date",
+            "type": "date",
+            "nullable": true
+          },
+          {
+            "name": "last_org_login_date",
+            "type": "date",
+            "nullable": true
+          },
+          {
+            "name": "is_active_user",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "left_company",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "email_valid",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "has_opted_out",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "lifecycle_stage",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "linkedin_url",
+            "type": "text",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": [
+          {
+            "column": "sf_account_id",
+            "references_table": "accounts",
+            "references_column": "sf_account_id"
+          }
+        ]
+      },
+      {
+        "table": "call_transcripts",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "engagement_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "sf_opp_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_opp_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "call_owner",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "engagement_type",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "vector_filepath",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "transcript",
+            "type": "jsonb",
+            "nullable": true
+          },
+          {
+            "name": "participants",
+            "type": "jsonb",
+            "nullable": true
+          },
+          {
+            "name": "chorus_link",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "account",
+            "type": "jsonb",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "metrics",
+            "type": "jsonb",
+            "nullable": true
+          },
+          {
+            "name": "calendar_meeting_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "duration",
+            "type": "double precision",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "zendesk_tickets",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "zendesk_ticket_id",
+            "type": "bigint",
+            "nullable": false
+          },
+          {
+            "name": "zendesk_org_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "subject",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "priority",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "ticket_type",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "requester_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "assignee_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "tags",
+            "type": "ARRAY",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "zendesk_ticket_comments",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "comment_id",
+            "type": "bigint",
+            "nullable": false
+          },
+          {
+            "name": "zendesk_ticket_id",
+            "type": "bigint",
+            "nullable": false
+          },
+          {
+            "name": "zendesk_org_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "audit_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "author_id",
+            "type": "bigint",
+            "nullable": true
+          },
+          {
+            "name": "body",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "is_public",
+            "type": "boolean",
+            "nullable": true
+          },
+          {
+            "name": "type",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "email_threads",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "engagement_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "thread",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_account_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_opp_id",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sf_opp_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "email_subject",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "body",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "sent_time",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "initiator_email",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "initiator_name",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "participants",
+            "type": "jsonb",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "modified_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          },
+          {
+            "name": "last_synced_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "interaction_insights",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "character varying",
+            "nullable": false
+          },
+          {
+            "name": "interaction_type",
+            "type": "character varying",
+            "nullable": false
+          },
+          {
+            "name": "source_id",
+            "type": "character varying",
+            "nullable": true
+          },
+          {
+            "name": "sentiment_score",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sentiment_reasons",
+            "type": "ARRAY",
+            "nullable": true
+          },
+          {
+            "name": "engagement_quality_score",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "engagement_reasons",
+            "type": "ARRAY",
+            "nullable": true
+          },
+          {
+            "name": "churn_risk",
+            "type": "boolean",
+            "nullable": false
+          },
+          {
+            "name": "churn_reasons",
+            "type": "ARRAY",
+            "nullable": true
+          },
+          {
+            "name": "expansion_opportunity",
+            "type": "boolean",
+            "nullable": false
+          },
+          {
+            "name": "expansion_reasons",
+            "type": "ARRAY",
+            "nullable": true
+          },
+          {
+            "name": "insight_summary",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp without time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": null
+      },
+      {
+        "table": "account_health_history",
+        "columns": [
+          {
+            "name": "id",
+            "type": "integer",
+            "nullable": false
+          },
+          {
+            "name": "sf_account_id",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "health_status",
+            "type": "text",
+            "nullable": false
+          },
+          {
+            "name": "trend",
+            "type": "text",
+            "nullable": true
+          },
+          {
+            "name": "avg_sentiment",
+            "type": "numeric",
+            "nullable": true
+          },
+          {
+            "name": "interaction_count",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "churn_signals",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "expansion_signals",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "open_ticket_count",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "days_since_activity",
+            "type": "integer",
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "nullable": true
+          }
+        ],
+        "foreign_keys": [
+          {
+            "column": "sf_account_id",
+            "references_table": "accounts",
+            "references_column": "sf_account_id"
+          }
+        ]
+      }
+    ]
+  }
+]

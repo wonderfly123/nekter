@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nekter.io - CS Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --accent-primary: #f59e0b;
+            --accent-secondary: #d97706;
+            --accent-danger: #ef4444;
+            --accent-warning: #fb923c;
+            --accent-success: #10b981;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(245, 158, 11, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.02) 0%, transparent 50%);
+            z-index: -1;
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .nav-badge,
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 88px;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 2rem 0.75rem;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .sidebar.collapsed .logo {
+            gap: 0;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar.collapsed .logo-icon:hover {
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            cursor: pointer;
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        /* Navigation */
+        .nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-item {
+            padding: 0.875rem 0;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(245, 158, 11, 0.06);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .sidebar.collapsed .sidebar-footer {
+            padding: 1.5rem 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .user-profile:hover {
+            opacity: 0.8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar.collapsed .user-avatar:hover {
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            overflow-y: auto;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+        }
+
+        .notifications {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notifications:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .notifications svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-secondary);
+        }
+
+        .notifications-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-card.critical {
+            border-color: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.02);
+        }
+
+        .filter-card.at-risk {
+            border-color: rgba(251, 146, 60, 0.2);
+            background: rgba(251, 146, 60, 0.02);
+        }
+
+        .filter-card.clickable {
+            cursor: pointer;
+        }
+
+        .filter-card.clickable:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-card.active {
+            border-color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .filter-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .filter-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .filter-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .filter-card.active .filter-checkbox {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .filter-checkbox svg {
+            width: 12px;
+            height: 12px;
+            stroke: white;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .filter-card.active .filter-checkbox svg {
+            opacity: 1;
+        }
+
+        .filter-count {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .filter-card.critical .filter-count {
+            color: var(--accent-danger);
+        }
+
+        .filter-card.at-risk .filter-count {
+            color: var(--accent-warning);
+        }
+
+        .filter-arr {
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* View Controls */
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Account Cards - Compact View */
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .account-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .account-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .account-card.expanded {
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .account-compact {
+            transition: all 0.3s ease;
+        }
+
+        .account-card-line-1 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.625rem;
+        }
+
+        .health-indicator {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .account-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            flex: 1;
+            transition: color 0.2s ease;
+        }
+
+        .account-name-link {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .account-name-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: width 0.2s ease;
+        }
+
+        .account-name-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .account-name-link:hover::after {
+            width: 100%;
+        }
+
+        .account-arr {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            margin-right: 1rem;
+        }
+
+        .account-csm {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .account-card-line-2 {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 0.625rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .health-score {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-arrow {
+            font-size: 0.875rem;
+        }
+
+        .last-contact {
+            margin-left: auto;
+        }
+
+        .account-card-line-3 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+        }
+
+        .signal-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: var(--text-secondary);
+        }
+
+        .signal-bullet {
+            width: 4px;
+            height: 4px;
+            background: var(--text-muted);
+            border-radius: 50%;
+        }
+
+        .signal-churn {
+            color: var(--accent-danger);
+        }
+
+        .signal-churn .signal-bullet {
+            background: var(--accent-danger);
+        }
+
+        /* Expanded Details */
+        .account-details {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 0;
+        }
+
+        .account-card.expanded .account-details {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .detail-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .health-score-large {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-number {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .trend-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .signals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .signal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .signal-badge.danger {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--accent-danger);
+        }
+
+        .signal-badge.warning {
+            background: rgba(251, 146, 60, 0.08);
+            color: var(--accent-warning);
+        }
+
+        .signal-badge-icon {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+        }
+
+        .activity-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+
+        .activity-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+
+        .activity-stat-label {
+            color: var(--text-secondary);
+        }
+
+        .activity-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Utility Classes */
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Chart Card Styles */
+        .chart-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .filter-btn.active {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .stat-label {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-icon.yellow {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .stat-icon.red {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .stat-icon.green svg {
+            stroke: var(--accent-success);
+        }
+
+        .stat-icon.yellow svg {
+            stroke: var(--accent-primary);
+        }
+
+        .stat-icon.red svg {
+            stroke: var(--accent-danger);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination-range,
+        .pagination-total {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+        }
+
+        .pagination-pages {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .pagination-page {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-page:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .pagination-page.active {
+            border-color: var(--accent-primary);
+            background: var(--accent-primary);
+            color: white;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">nekter.io</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="nav">
+                <div class="nav-item active" onclick="switchTab('portfolio')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Portfolio</span>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('priority')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span>Priority</span>
+                    <div class="nav-badge">25</div>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('accounts')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <span>All Accounts</span>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('analytics')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" onclick="toggleSidebar()">AH</div>
+                    <div class="user-info">
+                        <div class="user-name">Anthony Huni</div>
+                        <div class="user-role">CSM Owner</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-content">
+                    <h1 class="page-title">Portfolio Overview</h1>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" placeholder="Search accounts...">
+                        </div>
+                        <div class="notifications">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="notifications-badge">3</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Priority Tab -->
+                <div id="priority" class="tab-content">
+                    <!-- Filter Cards -->
+                    <div class="stats-bar">
+                        <div class="filter-card critical">
+                            <div class="filter-card-header">
+                                <div class="filter-label">Critical</div>
+                            </div>
+                            <div class="filter-count">7</div>
+                            <div class="filter-arr">$890K ARR</div>
+                        </div>
+
+                        <div class="filter-card at-risk">
+                            <div class="filter-card-header">
+                                <div class="filter-label">At Risk</div>
+                            </div>
+                            <div class="filter-count">18</div>
+                            <div class="filter-arr">$1.8M ARR</div>
+                        </div>
+
+                        <div class="filter-card clickable" id="renewalsFilter" onclick="toggleRenewalsFilter()">
+                            <div class="filter-card-header">
+                                <div class="filter-label">Renewals (90d)</div>
+                                <div class="filter-checkbox">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="filter-count">8</div>
+                            <div class="filter-arr">$1.2M ARR</div>
+                        </div>
+                    </div>
+
+                    <!-- View Controls -->
+                    <div class="view-controls">
+                        <div class="results-count">Showing 25 priority accounts</div>
+                    </div>
+
+                    <!-- Account Cards with Expandable Details -->
+                    <div class="accounts-list">
+                        <!-- Account Card 1 -->
+                        <div class="account-card" onclick="toggleCardExpansion(this, event)">
+                            <div class="account-compact">
+                                <div class="account-card-line-1">
+                                    <span class="health-indicator">🔴</span>
+                                    <span class="account-name">
+                                        <span class="account-name-link" onclick="navigateToAccount(event, 'datacore-solutions')">DataCore Solutions</span>
+                                    </span>
+                                    <span class="account-arr">$420K ARR</span>
+                                    <span class="account-csm">Sarah Chen CSM</span>
+                                </div>
+                                <div class="account-card-line-2">
+                                    <div class="health-score">
+                                        Health: <span class="score-value">32</span>
+                                    </div>
+                                    <div class="trend-indicator">
+                                        <span class="trend-arrow">↓</span>
+                                        <span>Declining</span>
+                                    </div>
+                                    <div class="last-contact">Last contact: 12d ago</div>
+                                </div>
+                                <div class="account-card-line-3">
+                                    <div class="signal-item signal-churn">
+                                        <span class="signal-bullet"></span>
+                                        1 Churn Signal: Champion left company
+                                    </div>
+                                    <div class="signal-item">
+                                        <span class="signal-bullet"></span>
+                                        No contact in 12 days
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-details">
+                                <div class="details-grid">
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Health Status</div>
+                                        <div class="health-score-large">
+                                            <span class="score-number">32</span>
+                                            <div class="trend-text">
+                                                <span class="trend-arrow">↓</span>
+                                                Declining
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--text-muted);">
+                                            Last contact: 12 days ago
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Risk Signals</div>
+                                        <div class="signals-list">
+                                            <div class="signal-badge danger">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="9" cy="7" r="4"/>
+                                                </svg>
+                                                Champion left company
+                                            </div>
+                                            <div class="signal-badge warning">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" y1="2" x2="12" y2="6"/>
+                                                </svg>
+                                                No contact in 12 days
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Recent Activity</div>
+                                        <div class="activity-summary">
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Support tickets</span>
+                                                <span class="activity-stat-value">1 open</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Avg sentiment</span>
+                                                <span class="activity-stat-value">38/100</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Engagement</span>
+                                                <span class="activity-stat-value">Very Low</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Last call</span>
+                                                <span class="activity-stat-value">12 days ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Card 2 -->
+                        <div class="account-card" onclick="toggleCardExpansion(this, event)">
+                            <div class="account-compact">
+                                <div class="account-card-line-1">
+                                    <span class="health-indicator">🔴</span>
+                                    <span class="account-name">
+                                        <span class="account-name-link" onclick="navigateToAccount(event, 'global-manufacturing')">Global Manufacturing Ltd</span>
+                                    </span>
+                                    <span class="account-arr">$310K ARR</span>
+                                    <span class="account-csm">Sarah Chen CSM</span>
+                                </div>
+                                <div class="account-card-line-2">
+                                    <div class="health-score">
+                                        Health: <span class="score-value">28</span>
+                                    </div>
+                                    <div class="trend-indicator">
+                                        <span class="trend-arrow">↓</span>
+                                        <span>Declining</span>
+                                    </div>
+                                    <div class="last-contact">Last contact: 8d ago</div>
+                                </div>
+                                <div class="account-card-line-3">
+                                    <div class="signal-item signal-churn">
+                                        <span class="signal-bullet"></span>
+                                        3 Churn Signals: Low engagement, missed QBRs, budget review
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-details">
+                                <div class="details-grid">
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Health Status</div>
+                                        <div class="health-score-large">
+                                            <span class="score-number">28</span>
+                                            <div class="trend-text">
+                                                <span class="trend-arrow">↓</span>
+                                                Declining
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--text-muted);">
+                                            Last contact: 8 days ago
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Risk Signals</div>
+                                        <div class="signals-list">
+                                            <div class="signal-badge danger">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                                </svg>
+                                                Low engagement score
+                                            </div>
+                                            <div class="signal-badge danger">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                                </svg>
+                                                Missed QBRs
+                                            </div>
+                                            <div class="signal-badge warning">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="1"/>
+                                                    <circle cx="12" cy="5" r="1"/>
+                                                    <circle cx="12" cy="19" r="1"/>
+                                                </svg>
+                                                Budget under review
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Recent Activity</div>
+                                        <div class="activity-summary">
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Support tickets</span>
+                                                <span class="activity-stat-value">0 open</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Avg sentiment</span>
+                                                <span class="activity-stat-value">35/100</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Engagement</span>
+                                                <span class="activity-stat-value">Very Low</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Last call</span>
+                                                <span class="activity-stat-value">8 days ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Card 3 -->
+                        <div class="account-card" onclick="toggleCardExpansion(this, event)">
+                            <div class="account-compact">
+                                <div class="account-card-line-1">
+                                    <span class="health-indicator">🔴</span>
+                                    <span class="account-name">
+                                        <span class="account-name-link" onclick="navigateToAccount(event, 'acme-corp')">Acme Corp</span>
+                                    </span>
+                                    <span class="account-arr">$250K ARR</span>
+                                    <span class="account-csm">Sarah Chen CSM</span>
+                                </div>
+                                <div class="account-card-line-2">
+                                    <div class="health-score">
+                                        Health: <span class="score-value">45</span>
+                                    </div>
+                                    <div class="trend-indicator">
+                                        <span class="trend-arrow">↓</span>
+                                        <span>Declining</span>
+                                    </div>
+                                    <div class="last-contact">Last contact: 5d ago</div>
+                                </div>
+                                <div class="account-card-line-3">
+                                    <div class="signal-item signal-churn">
+                                        <span class="signal-bullet"></span>
+                                        2 Churn Signals: Evaluating competitors, budget concerns
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-details">
+                                <div class="details-grid">
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Health Status</div>
+                                        <div class="health-score-large">
+                                            <span class="score-number">45</span>
+                                            <div class="trend-text">
+                                                <span class="trend-arrow">↓</span>
+                                                Declining
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--text-muted);">
+                                            Last contact: 5 days ago
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Risk Signals</div>
+                                        <div class="signals-list">
+                                            <div class="signal-badge danger">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                                </svg>
+                                                Evaluating competitors
+                                            </div>
+                                            <div class="signal-badge danger">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                                </svg>
+                                                Budget concerns mentioned
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Recent Activity</div>
+                                        <div class="activity-summary">
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Support tickets</span>
+                                                <span class="activity-stat-value">2 open</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Avg sentiment</span>
+                                                <span class="activity-stat-value">42/100</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Engagement</span>
+                                                <span class="activity-stat-value">Low</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Last call</span>
+                                                <span class="activity-stat-value">5 days ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Card 4 -->
+                        <div class="account-card" onclick="toggleCardExpansion(this, event)">
+                            <div class="account-compact">
+                                <div class="account-card-line-1">
+                                    <span class="health-indicator">🟡</span>
+                                    <span class="account-name">
+                                        <span class="account-name-link" onclick="navigateToAccount(event, 'techflow-industries')">TechFlow Industries</span>
+                                    </span>
+                                    <span class="account-arr">$195K ARR</span>
+                                    <span class="account-csm">Sarah Chen CSM</span>
+                                </div>
+                                <div class="account-card-line-2">
+                                    <div class="health-score">
+                                        Health: <span class="score-value">52</span>
+                                    </div>
+                                    <div class="trend-indicator">
+                                        <span class="trend-arrow">↑</span>
+                                        <span>Improving</span>
+                                    </div>
+                                    <div class="last-contact">Last contact: 1d ago</div>
+                                </div>
+                                <div class="account-card-line-3">
+                                    <div class="signal-item">
+                                        <span class="signal-bullet"></span>
+                                        Sentiment: 48 (down from 62)
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-details">
+                                <div class="details-grid">
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Health Status</div>
+                                        <div class="health-score-large">
+                                            <span class="score-number">52</span>
+                                            <div class="trend-text">
+                                                <span class="trend-arrow">↑</span>
+                                                Improving
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--text-muted);">
+                                            Last contact: 1 day ago
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Risk Signals</div>
+                                        <div class="signals-list">
+                                            <div class="signal-badge warning">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                                </svg>
+                                                Sentiment declining (48)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Recent Activity</div>
+                                        <div class="activity-summary">
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Support tickets</span>
+                                                <span class="activity-stat-value">0 open</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Avg sentiment</span>
+                                                <span class="activity-stat-value">48/100</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Engagement</span>
+                                                <span class="activity-stat-value">Medium</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Last call</span>
+                                                <span class="activity-stat-value">1 day ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Card 5 -->
+                        <div class="account-card" onclick="toggleCardExpansion(this, event)">
+                            <div class="account-compact">
+                                <div class="account-card-line-1">
+                                    <span class="health-indicator">🟡</span>
+                                    <span class="account-name">
+                                        <span class="account-name-link" onclick="navigateToAccount(event, 'buildright-construction')">BuildRight Construction</span>
+                                    </span>
+                                    <span class="account-arr">$180K ARR</span>
+                                    <span class="account-csm">Sarah Chen CSM</span>
+                                </div>
+                                <div class="account-card-line-2">
+                                    <div class="health-score">
+                                        Health: <span class="score-value">58</span>
+                                    </div>
+                                    <div class="trend-indicator">
+                                        <span class="trend-arrow">→</span>
+                                        <span>Stable</span>
+                                    </div>
+                                    <div class="last-contact">Last contact: 2d ago</div>
+                                </div>
+                                <div class="account-card-line-3">
+                                    <div class="signal-item">
+                                        <span class="signal-bullet"></span>
+                                        3 open tickets
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-details">
+                                <div class="details-grid">
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Health Status</div>
+                                        <div class="health-score-large">
+                                            <span class="score-number">58</span>
+                                            <div class="trend-text">
+                                                <span class="trend-arrow">→</span>
+                                                Stable
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--text-muted);">
+                                            Last contact: 2 days ago
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Risk Signals</div>
+                                        <div class="signals-list">
+                                            <div class="signal-badge warning">
+                                                <svg class="signal-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                                </svg>
+                                                3 open support tickets
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-label">Recent Activity</div>
+                                        <div class="activity-summary">
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Support tickets</span>
+                                                <span class="activity-stat-value">3 open</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Avg sentiment</span>
+                                                <span class="activity-stat-value">62/100</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Engagement</span>
+                                                <span class="activity-stat-value">Medium</span>
+                                            </div>
+                                            <div class="activity-stat">
+                                                <span class="activity-stat-label">Last call</span>
+                                                <span class="activity-stat-value">2 days ago</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            Showing <span class="pagination-range">1-5</span> of <span class="pagination-total">25</span> accounts
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"/>
+                                </svg>
+                                Previous
+                            </button>
+                            <div class="pagination-pages">
+                                <button class="pagination-page active">1</button>
+                                <button class="pagination-page">2</button>
+                                <button class="pagination-page">3</button>
+                                <button class="pagination-page">4</button>
+                                <button class="pagination-page">5</button>
+                            </div>
+                            <button class="pagination-btn">
+                                Next
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Tab -->
+                <div id="portfolio" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Total ARR</div>
+                                    <div class="stat-value">$6.9M</div>
+                                    <div class="stat-meta">70 accounts</div>
+                                </div>
+                                <div class="stat-icon green">
+                                    <svg viewBox="0 0 24 24">
+                                        <line x1="12" y1="1" x2="12" y2="23"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Avg Health Score</div>
+                                    <div class="stat-value">76</div>
+                                    <div class="stat-meta">portfolio average</div>
+                                </div>
+                                <div class="stat-icon yellow">
+                                    <svg viewBox="0 0 24 24">
+                                        <line x1="18" y1="20" x2="18" y2="10"/>
+                                        <line x1="12" y1="20" x2="12" y2="4"/>
+                                        <line x1="6" y1="20" x2="6" y2="14"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Churn Risk</div>
+                                    <div class="stat-value">8%</div>
+                                    <div class="stat-meta">next 90 days</div>
+                                </div>
+                                <div class="stat-icon red">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Health Score Distribution</div>
+                                <div class="chart-filters">
+                                    <button class="filter-btn active">90D</button>
+                                    <button class="filter-btn">30D</button>
+                                    <button class="filter-btn">7D</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-end; gap: 1rem; height: 200px; padding: 1rem 0;">
+                                <div style="flex: 1; height: 60%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 75%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 45%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 85%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 70%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 55%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 90%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                                <div style="flex: 1; height: 65%; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Renewal Forecast</div>
+                            </div>
+                            <div style="padding: 1rem 0;">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <span style="color: var(--text-secondary); font-size: 0.875rem;">Healthy</span>
+                                        <span style="font-weight: 600; font-family: 'JetBrains Mono', monospace;">$2.1M (65%)</span>
+                                    </div>
+                                    <div style="height: 12px; background: var(--bg-tertiary); border-radius: 6px; overflow: hidden;">
+                                        <div style="width: 65%; height: 100%; background: var(--accent-success);"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <span style="color: var(--text-secondary); font-size: 0.875rem;">At Risk</span>
+                                        <span style="font-weight: 600; font-family: 'JetBrains Mono', monospace;">$780K (24%)</span>
+                                    </div>
+                                    <div style="height: 12px; background: var(--bg-tertiary); border-radius: 6px; overflow: hidden;">
+                                        <div style="width: 24%; height: 100%; background: var(--accent-warning);"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <span style="color: var(--text-secondary); font-size: 0.875rem;">Critical</span>
+                                        <span style="font-weight: 600; font-family: 'JetBrains Mono', monospace;">$320K (10%)</span>
+                                    </div>
+                                    <div style="height: 12px; background: var(--bg-tertiary); border-radius: 6px; overflow: hidden;">
+                                        <div style="width: 10%; height: 100%; background: var(--accent-danger);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Accounts Tab -->
+                <div id="accounts" class="tab-content">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">All Accounts</div>
+                            <div class="chart-filters">
+                                <button class="filter-btn active">All</button>
+                                <button class="filter-btn">Healthy</button>
+                                <button class="filter-btn">At Risk</button>
+                                <button class="filter-btn">Critical</button>
+                                <button class="filter-btn">Expansion Opportunities</button>
+                            </div>
+                        </div>
+                        <div style="padding: 1rem 0; color: var(--text-secondary);">
+                            Account list view would go here with sortable columns, filters, and search capabilities...
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analytics" class="tab-content">
+                    <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                        Analytics tab content coming soon...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update page title
+            const titles = {
+                priority: 'Priority Accounts',
+                portfolio: 'Portfolio Overview',
+                accounts: 'All Accounts',
+                analytics: 'Analytics'
+            };
+            document.querySelector('.page-title').textContent = titles[tabName] || 'CS Command Center';
+        }
+
+        function toggleRenewalsFilter() {
+            const filter = document.getElementById('renewalsFilter');
+            filter.classList.toggle('active');
+        }
+
+        function toggleCardExpansion(card, event) {
+            // Don't toggle if clicking on the account name link
+            if (event.target.closest('.account-name-link')) {
+                return;
+            }
+            
+            // Close other expanded cards
+            document.querySelectorAll('.account-card.expanded').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle this card
+            card.classList.toggle('expanded');
+        }
+
+        function navigateToAccount(event, accountId) {
+            // Stop the event from bubbling up to the card
+            event.stopPropagation();
+            
+            // Log the navigation (in production, you'd actually navigate)
+            console.log('Navigating to account:', accountId);
+            
+            // TODO: Add actual navigation when you build the account detail page
+            // For now, just show an alert
+            alert(`Account detail page coming soon for: ${accountId}`);
+            
+            // Example of what you might do in production:
+            // window.location.href = `/account/${accountId}`;
+        }
+
+        // Add subtle parallax effect to background
+        document.addEventListener('mousemove', (e) => {
+            const gradient = document.querySelector('.bg-gradient');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            gradient.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
+    </script>
+</body>
+</html>
