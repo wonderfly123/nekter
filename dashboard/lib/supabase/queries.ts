@@ -6,6 +6,9 @@ import type {
   AccountHealth,
   InteractionInsight,
   Account,
+  PortfolioOverviewStats,
+  PortfolioHealthHistoryPoint,
+  RenewalForecastData,
 } from './types';
 import { getDemoDateString } from '../config/demo';
 import { calculatePriorityScore, getTopSignals } from '../utils/health-calculations';
@@ -409,5 +412,316 @@ export async function getAccountDetail(
   } catch (error) {
     console.error('Error fetching account detail:', error);
     return null;
+  }
+}
+
+/**
+ * Get portfolio overview stats (Total ARR, Avg Health Score, Churn Risk)
+ * Optionally filter by CSM
+ */
+export async function getPortfolioOverviewStats(
+  csmName?: string | null
+): Promise<PortfolioOverviewStats> {
+  const demoDate = getDemoDateString();
+  const startOfDay = `${demoDate}T00:00:00`;
+  const endOfDay = `${demoDate}T23:59:59`;
+
+  try {
+    // Get all accounts (with optional CSM filter)
+    let accountsQuery = supabase.from('accounts').select('sf_account_id, arr, csm_name');
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!accounts || accounts.length === 0) {
+      return {
+        totalARR: 0,
+        accountCount: 0,
+        avgHealthScore: null,
+        churnRiskPercent: 0,
+      };
+    }
+
+    const accountIds = accounts.map((a) => a.sf_account_id);
+
+    // Get latest health snapshot for these accounts
+    const { data: healthData, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('sf_account_id, health_status, health_score')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay);
+
+    if (healthError) throw healthError;
+
+    // Calculate stats
+    const totalARR = accounts.reduce((sum, acc) => sum + (acc.arr || 0), 0);
+    const accountCount = accounts.length;
+
+    // Map account ARR by sf_account_id
+    const arrMap = new Map(accounts.map((a) => [a.sf_account_id, a.arr || 0]));
+
+    // Calculate average health score and churn risk
+    let healthScoreSum = 0;
+    let healthScoreCount = 0;
+    let criticalARR = 0;
+    let atRiskARR = 0;
+
+    healthData?.forEach((health) => {
+      const arr = arrMap.get(health.sf_account_id) || 0;
+
+      if (health.health_score !== null) {
+        healthScoreSum += health.health_score;
+        healthScoreCount++;
+      }
+
+      if (health.health_status === 'Critical') {
+        criticalARR += arr;
+      } else if (health.health_status === 'At Risk') {
+        atRiskARR += arr;
+      }
+    });
+
+    const avgHealthScore = healthScoreCount > 0 ? healthScoreSum / healthScoreCount : null;
+    const churnRiskPercent = totalARR > 0 ? ((criticalARR + atRiskARR) / totalARR) * 100 : 0;
+
+    return {
+      totalARR,
+      accountCount,
+      avgHealthScore,
+      churnRiskPercent,
+    };
+  } catch (error) {
+    console.error('Error fetching portfolio overview stats:', error);
+    return {
+      totalARR: 0,
+      accountCount: 0,
+      avgHealthScore: null,
+      churnRiskPercent: 0,
+    };
+  }
+}
+
+/**
+ * Get portfolio health history (average health score over time)
+ * Returns daily data points for the specified number of days
+ */
+export async function getPortfolioHealthHistory(
+  days: number,
+  csmName?: string | null
+): Promise<PortfolioHealthHistoryPoint[]> {
+  const demoDate = getDemoDateString();
+  const startDate = new Date(new Date(demoDate).getTime() - days * 24 * 60 * 60 * 1000);
+
+  try {
+    // Get all accounts (with optional CSM filter)
+    let accountsQuery = supabase.from('accounts').select('sf_account_id, csm_name');
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!accounts || accounts.length === 0) return [];
+
+    const accountIds = accounts.map((a) => a.sf_account_id);
+
+    // Get health history for these accounts
+    const { data: healthHistory, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('sf_account_id, health_score, created_at')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', startDate.toISOString())
+      .order('created_at', { ascending: true });
+
+    if (healthError) throw healthError;
+    if (!healthHistory || healthHistory.length === 0) return [];
+
+    // Group by date and calculate average health score per day
+    const dateMap = new Map<string, { sum: number; count: number }>();
+
+    healthHistory.forEach((record) => {
+      if (record.health_score === null || !record.created_at) return;
+
+      const date = record.created_at.split('T')[0]; // Get YYYY-MM-DD
+      const existing = dateMap.get(date) || { sum: 0, count: 0 };
+
+      dateMap.set(date, {
+        sum: existing.sum + record.health_score,
+        count: existing.count + 1,
+      });
+    });
+
+    // Convert to array and calculate averages
+    const result: PortfolioHealthHistoryPoint[] = Array.from(dateMap.entries())
+      .map(([date, { sum, count }]) => ({
+        date,
+        avgHealthScore: count > 0 ? sum / count : null,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching portfolio health history:', error);
+    return [];
+  }
+}
+
+/**
+ * Get list of unique CSM names
+ */
+export async function getCsmList(): Promise<string[]> {
+  try {
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('csm_name')
+      .not('csm_name', 'is', null)
+      .order('csm_name');
+
+    if (error) throw error;
+
+    // Get unique CSM names
+    const uniqueCSMs = [...new Set(data?.map((account) => account.csm_name).filter(Boolean))];
+
+    return uniqueCSMs as string[];
+  } catch (error) {
+    console.error('Error fetching CSM list:', error);
+    return [];
+  }
+}
+
+/**
+ * Get renewal forecast data (health breakdown of accounts with renewals in next 90 days)
+ */
+export async function getRenewalForecast(
+  csmName?: string | null
+): Promise<RenewalForecastData> {
+  const demoDate = getDemoDateString();
+  const ninetyDaysFromNow = new Date(demoDate);
+  ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+  const startOfDay = `${demoDate}T00:00:00`;
+  const endOfDay = `${demoDate}T23:59:59`;
+
+  try {
+    // Get renewal opportunities in next 90 days
+    const { data: renewals, error: renewalsError } = await supabase
+      .from('opportunities')
+      .select('sf_account_id, amount')
+      .eq('type', 'Renewal')
+      .eq('is_closed', false)
+      .lte('close_date', ninetyDaysFromNow.toISOString().split('T')[0]);
+
+    if (renewalsError) throw renewalsError;
+    if (!renewals || renewals.length === 0) {
+      return {
+        healthy: { arr: 0, percent: 0, count: 0 },
+        atRisk: { arr: 0, percent: 0, count: 0 },
+        critical: { arr: 0, percent: 0, count: 0 },
+        total: { arr: 0, count: 0 },
+      };
+    }
+
+    const renewalAccountIds = renewals.map((r) => r.sf_account_id);
+
+    // Get accounts (with optional CSM filter)
+    let accountsQuery = supabase
+      .from('accounts')
+      .select('sf_account_id, arr, csm_name')
+      .in('sf_account_id', renewalAccountIds);
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!accounts || accounts.length === 0) {
+      return {
+        healthy: { arr: 0, percent: 0, count: 0 },
+        atRisk: { arr: 0, percent: 0, count: 0 },
+        critical: { arr: 0, percent: 0, count: 0 },
+        total: { arr: 0, count: 0 },
+      };
+    }
+
+    const accountIds = accounts.map((a) => a.sf_account_id);
+
+    // Get latest health snapshot for these accounts
+    const { data: healthData, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('sf_account_id, health_status')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay);
+
+    if (healthError) throw healthError;
+
+    // Map account ARR and health status
+    const arrMap = new Map(accounts.map((a) => [a.sf_account_id, a.arr || 0]));
+    const healthMap = new Map(healthData?.map((h) => [h.sf_account_id, h.health_status]) || []);
+
+    // Calculate breakdown
+    let healthyARR = 0;
+    let healthyCount = 0;
+    let atRiskARR = 0;
+    let atRiskCount = 0;
+    let criticalARR = 0;
+    let criticalCount = 0;
+
+    accounts.forEach((account) => {
+      const arr = arrMap.get(account.sf_account_id) || 0;
+      const status = healthMap.get(account.sf_account_id);
+
+      if (status === 'Healthy') {
+        healthyARR += arr;
+        healthyCount++;
+      } else if (status === 'At Risk') {
+        atRiskARR += arr;
+        atRiskCount++;
+      } else if (status === 'Critical') {
+        criticalARR += arr;
+        criticalCount++;
+      }
+    });
+
+    const totalARR = healthyARR + atRiskARR + criticalARR;
+    const totalCount = healthyCount + atRiskCount + criticalCount;
+
+    return {
+      healthy: {
+        arr: healthyARR,
+        percent: totalARR > 0 ? (healthyARR / totalARR) * 100 : 0,
+        count: healthyCount,
+      },
+      atRisk: {
+        arr: atRiskARR,
+        percent: totalARR > 0 ? (atRiskARR / totalARR) * 100 : 0,
+        count: atRiskCount,
+      },
+      critical: {
+        arr: criticalARR,
+        percent: totalARR > 0 ? (criticalARR / totalARR) * 100 : 0,
+        count: criticalCount,
+      },
+      total: {
+        arr: totalARR,
+        count: totalCount,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching renewal forecast:', error);
+    return {
+      healthy: { arr: 0, percent: 0, count: 0 },
+      atRisk: { arr: 0, percent: 0, count: 0 },
+      critical: { arr: 0, percent: 0, count: 0 },
+      total: { arr: 0, count: 0 },
+    };
   }
 }

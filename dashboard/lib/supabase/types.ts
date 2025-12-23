@@ -227,3 +227,38 @@ export interface AccountDetailData {
   // Calculated fields
   championLeft: boolean; // Any contact with customer_role='Champion' and left_company=true
 }
+
+// Portfolio Tab Types
+export interface PortfolioOverviewStats {
+  totalARR: number;
+  accountCount: number;
+  avgHealthScore: number | null;
+  churnRiskPercent: number; // (Critical ARR + At Risk ARR) / Total ARR × 100
+}
+
+export interface PortfolioHealthHistoryPoint {
+  date: string; // ISO date string
+  avgHealthScore: number | null;
+}
+
+export interface RenewalForecastData {
+  healthy: {
+    arr: number;
+    percent: number;
+    count: number;
+  };
+  atRisk: {
+    arr: number;
+    percent: number;
+    count: number;
+  };
+  critical: {
+    arr: number;
+    percent: number;
+    count: number;
+  };
+  total: {
+    arr: number;
+    count: number;
+  };
+}
