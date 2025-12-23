@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Ticket,
   Clock,
-  Users,
 } from 'lucide-react';
 
 interface MetricsGridProps {
@@ -18,7 +17,7 @@ interface MetricsGridProps {
 }
 
 export function MetricsGrid({ data }: MetricsGridProps) {
-  const { currentHealth, contacts } = data;
+  const { currentHealth } = data;
 
   const metrics = [
     {
@@ -80,13 +79,6 @@ export function MetricsGrid({ data }: MetricsGridProps) {
       icon: Clock,
       color: 'text-gray-600',
       bgColor: 'bg-gray-50',
-    },
-    {
-      label: 'Contacts',
-      value: contacts.length,
-      icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
     },
   ];
 

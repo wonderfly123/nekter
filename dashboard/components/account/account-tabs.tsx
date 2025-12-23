@@ -56,14 +56,32 @@ export function AccountTabs({ data }: AccountTabsProps) {
               </div>
 
               {/* Current Status Card */}
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+              <div className={`rounded-lg p-6 mb-6 ${
+                data.currentHealth.health_status === 'Critical'
+                  ? 'bg-red-50 border border-red-200'
+                  : data.currentHealth.health_status === 'At Risk'
+                  ? 'bg-yellow-50 border border-yellow-200'
+                  : 'bg-green-50 border border-green-200'
+              }`}>
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-red-600 rounded-full flex-shrink-0"></div>
+                  <div className={`w-14 h-14 rounded-full flex-shrink-0 ${
+                    data.currentHealth.health_status === 'Critical'
+                      ? 'bg-red-600'
+                      : data.currentHealth.health_status === 'At Risk'
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
+                  }`}></div>
                   <div>
                     <div className="text-xs text-gray-600 uppercase tracking-wide mb-1">
                       CURRENT STATUS
                     </div>
-                    <div className="text-2xl font-bold text-red-600 mb-1">
+                    <div className={`text-2xl font-bold mb-1 ${
+                      data.currentHealth.health_status === 'Critical'
+                        ? 'text-red-600'
+                        : data.currentHealth.health_status === 'At Risk'
+                        ? 'text-yellow-600'
+                        : 'text-green-600'
+                    }`}>
                       {data.currentHealth.health_status}
                     </div>
                     <div className="text-sm text-gray-700 flex items-center gap-1">
@@ -88,9 +106,6 @@ export function AccountTabs({ data }: AccountTabsProps) {
 
             {/* Health Trend Chart */}
             <HealthTrendChart healthHistory={data.healthHistory} />
-
-            {/* Action Items */}
-            <ActionItems data={data} />
           </div>
         )}
 
