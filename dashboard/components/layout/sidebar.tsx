@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useSidebarStore } from '@/lib/stores/sidebar-store';
 
 interface NavItem {
   name: string;
@@ -22,7 +22,7 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleCollapsed, setCollapsed } = useSidebarStore();
 
   return (
     <aside
@@ -32,11 +32,17 @@ export function Sidebar() {
       )}
     >
       {/* Header */}
-      <div className="border-b border-gray-200 p-6 flex items-center justify-between min-h-[88px]">
-        <div className="flex items-center gap-3">
+      <div className={cn(
+        "border-b border-gray-200 p-6 min-h-[88px]",
+        isCollapsed ? "flex items-center justify-center" : "flex items-center justify-between"
+      )}>
+        <div className={cn(
+          "flex items-center gap-3",
+          isCollapsed && "flex-col gap-0"
+        )}>
           <div
             className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleCollapsed}
           >
             <Zap className="w-4 h-4 text-white fill-white" />
           </div>
@@ -48,7 +54,7 @@ export function Sidebar() {
         </div>
         {!isCollapsed && (
           <button
-            onClick={() => setIsCollapsed(true)}
+            onClick={() => setCollapsed(true)}
             className="text-gray-500 hover:text-gray-700"
           >
             <svg

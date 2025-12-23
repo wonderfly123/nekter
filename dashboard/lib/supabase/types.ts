@@ -190,15 +190,26 @@ export interface AccountDetailData {
   // From accounts
   account: Account;
 
-  // From account_health_history
+  // From account_health_history (open_ticket_count is in currentHealth)
   currentHealth: AccountHealth;
-  healthHistory: AccountHealth[];
+  healthHistory: AccountHealth[]; // 90 days for trend chart
 
   // From interaction_insights
-  recentInteractions: InteractionInsight[];
+  recentInteractions: InteractionInsight[]; // 30 days for timeline
 
-  // Calculated
-  openTicketCount: number;
-  contactCount: number;
-  championLeft: boolean;
+  // From contacts
+  contacts: Contact[];
+
+  // From zendesk_tickets (open tickets list for display)
+  openTickets: ZendeskTicket[];
+
+  // From opportunities
+  opportunities: Opportunity[];
+  renewalOpportunity: Opportunity | null;
+
+  // From zendesk_org_mapping
+  supportTier: string | null;
+
+  // Calculated fields
+  championLeft: boolean; // Any contact with customer_role='Champion' and left_company=true
 }

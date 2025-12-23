@@ -215,9 +215,153 @@ export async function getDashboardStats(): Promise<PortfolioStats> {
   }
 }
 
+/**
+ * Get detailed account information with all related data
+ */
 export async function getAccountDetail(
   sfAccountId: string
 ): Promise<AccountDetailData | null> {
-  // TODO: Implement in Part 3
-  return null;
+  const demoDate = getDemoDateString();
+  const startOfDay = `${demoDate}T00:00:00`;
+  const endOfDay = `${demoDate}T23:59:59`;
+
+  try {
+    // Run all queries in parallel for performance
+    const [
+      accountResult,
+      currentHealthResult,
+      healthHistoryResult,
+      interactionsResult,
+      contactsResult,
+      ticketsResult,
+      opportunitiesResult,
+      supportTierResult,
+    ] = await Promise.all([
+      // 1. Get account base data
+      supabase
+        .from('accounts')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .single(),
+
+      // 2. Get current health status (most recent, preferably today's)
+      supabase
+        .from('account_health_history')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .lte('created_at', endOfDay)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+
+      // 3. Get 90-day health history for trend chart
+      supabase
+        .from('account_health_history')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .gte(
+          'created_at',
+          new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000).toISOString()
+        )
+        .order('created_at', { ascending: true }),
+
+      // 4. Get recent interactions (30 days)
+      supabase
+        .from('interaction_insights')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .gte(
+          'created_at',
+          new Date(new Date(demoDate).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        )
+        .order('created_at', { ascending: false }),
+
+      // 5. Get contacts
+      supabase
+        .from('contacts')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .order('last_activity_date', { ascending: false }),
+
+      // 6. Get open tickets
+      supabase
+        .from('zendesk_tickets')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .in('status', ['new', 'open', 'pending', 'hold'])
+        .order('created_at', { ascending: false }),
+
+      // 7. Get opportunities
+      supabase
+        .from('opportunities')
+        .select('*')
+        .eq('sf_account_id', sfAccountId)
+        .eq('is_closed', false)
+        .order('close_date', { ascending: true }),
+
+      // 8. Get support tier from zendesk_org_mapping
+      supabase
+        .from('zendesk_org_mapping')
+        .select('tier')
+        .eq('sf_account_id', sfAccountId)
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+    // Check for errors
+    if (accountResult.error) {
+      console.error('Error fetching account:', accountResult.error);
+      throw accountResult.error;
+    }
+    if (currentHealthResult.error) {
+      console.error('Error fetching current health:', currentHealthResult.error);
+      throw currentHealthResult.error;
+    }
+
+    // Account must exist
+    if (!accountResult.data) {
+      console.error('Account not found:', sfAccountId);
+      return null;
+    }
+
+    // Current health must exist
+    if (!currentHealthResult.data) {
+      console.error('Current health not found for account:', sfAccountId);
+      return null;
+    }
+
+    // Find renewal opportunity (next 90 days)
+    const ninetyDaysFromNow = new Date(demoDate);
+    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+    const renewalOpportunity =
+      opportunitiesResult.data?.find(
+        (opp) =>
+          opp.type === 'Renewal' &&
+          opp.close_date &&
+          new Date(opp.close_date) <= ninetyDaysFromNow
+      ) || null;
+
+    // Check if champion left
+    const championLeft =
+      contactsResult.data?.some(
+        (contact) =>
+          contact.customer_role === 'Champion' && contact.left_company === true
+      ) || false;
+
+    return {
+      account: accountResult.data,
+      currentHealth: currentHealthResult.data,
+      healthHistory: healthHistoryResult.data || [],
+      recentInteractions: interactionsResult.data || [],
+      contacts: contactsResult.data || [],
+      openTickets: ticketsResult.data || [],
+      opportunities: opportunitiesResult.data || [],
+      renewalOpportunity,
+      supportTier: supportTierResult.data?.tier || null,
+      championLeft,
+    };
+  } catch (error) {
+    console.error('Error fetching account detail:', error);
+    return null;
+  }
 }
