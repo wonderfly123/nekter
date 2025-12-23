@@ -288,7 +288,7 @@ export async function getAccountDetail(
         .from('zendesk_tickets')
         .select('*')
         .eq('sf_account_id', sfAccountId)
-        .in('status', ['new', 'open', 'pending', 'hold'])
+        .in('status', ['new', 'open'])
         .order('created_at', { ascending: false }),
 
       // 7. Get opportunities

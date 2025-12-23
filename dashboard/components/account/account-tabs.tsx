@@ -23,7 +23,7 @@ export function AccountTabs({ data }: AccountTabsProps) {
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full flex-1 min-w-0">
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 bg-white">
         <div className="flex gap-1 px-8 pt-4">
