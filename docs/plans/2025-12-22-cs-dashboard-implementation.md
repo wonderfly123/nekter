@@ -1,9 +1,9 @@
 # Customer Success Command Center - Implementation Plan
 
-**Date:** December 22, 2025
+**Date:** December 22, 2025 (Updated: December 23, 2025)
 **Demo Date:** December 18, 2025
-**Status:** In Progress - Part 2 Complete ✅
-**Progress:** 2 of 3 parts complete (67%)
+**Status:** In Progress - Part 4 Complete ✅
+**Progress:** 4 of 5 parts complete (80%)
 
 ## Overview
 
@@ -84,13 +84,62 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 **Files Created:** 7 files (queries, hooks, components)
 **Features Working:** Filter cards, expandable account cards, pagination, renewals toggle
 
-### Part 3: Account Detail Page (90-120 min)
-- [ ] Account detail query (6 parallel queries)
-- [ ] Account header component
-- [ ] 7 metric cards grid
-- [ ] 90-day health trend chart
-- [ ] Auto-generated action items
-- [ ] Interaction timeline (30 days)
+### Part 3: Account Detail Page ✅ COMPLETE
+- [x] Account detail query (`getAccountDetail()` - 8 parallel queries)
+- [x] Account header component (`components/account/account-header.tsx`)
+- [x] 6 metric cards grid (`components/account/metrics-grid.tsx`)
+- [x] 90-day health trend chart (`components/account/health-trend-chart.tsx`)
+- [x] Auto-generated action items (`components/account/action-items.tsx`)
+- [x] Interaction timeline (`components/account/interaction-timeline.tsx`)
+- [x] Account tabs component with Overview, Contacts, Tickets, Opportunities (`components/account/account-tabs.tsx`)
+
+**Files Created:** 6 components + updated queries
+**Features Working:** Full account detail page with all metrics, health trends, action items, and tabbed sections
+
+### Part 4: Metrics Refactoring ✅ COMPLETE
+- [x] Created metrics calculation utility (`lib/utils/metrics-calculations.ts`)
+- [x] Separated database fields (health_score, trend) from calculated metrics
+- [x] Updated `AccountHealth` type to use `health_score` instead of `avg_sentiment`
+- [x] Refactored `getPriorityAccounts()` to calculate metrics on-the-fly
+- [x] Refactored `getAccountDetail()` to calculate metrics on-the-fly
+- [x] Updated all components to use new calculated metrics structure
+- [x] Created SQL script for health_score population (`scripts/populate-health-scores.sql`)
+- [x] Fixed sidebar CSM bubble collapse behavior
+
+**Key Changes:**
+- Metrics now calculated from source data: avgSentiment (from interaction_insights), interactionCount, churnSignals, expansionSignals, openTicketCount, daysSinceActivity
+- Database stores only: health_status, health_score, trend
+- Consistent 90-day time windows across all metrics
+
+### Part 5: Portfolio Tab (In Progress)
+**Purpose:** High-level executive dashboard with CSM filtering
+
+**Components to Build:**
+- [ ] Portfolio stats query (`getPortfolioStats()`)
+  - Total ARR with account count
+  - Average health score (portfolio average)
+  - Churn risk % = (Critical ARR + At Risk ARR) / Total ARR × 100
+- [ ] Health history query (`getPortfolioHealthHistory()`)
+  - 90-day timeline for average health score chart
+- [ ] Renewal forecast query (`getRenewalForecast()`)
+  - Health status breakdown of accounts with renewals in next 90 days
+- [ ] Portfolio stats cards (`components/portfolio/stats-cards.tsx`)
+- [ ] Health score distribution chart (`components/portfolio/health-score-chart.tsx`)
+  - Time series showing average health score over time
+  - Filter buttons: 90D / 30D / 7D
+- [ ] Renewal forecast chart (`components/portfolio/renewal-forecast.tsx`)
+  - Horizontal bars showing Healthy/At Risk/Critical breakdown
+  - Shows ARR and percentages for each status
+- [ ] CSM filter dropdown (`components/portfolio/csm-filter.tsx`)
+- [ ] React Query hooks (`hooks/usePortfolioStats.ts`, `usePortfolioHealthHistory.ts`, `useRenewalForecast.ts`)
+- [ ] Portfolio page (`app/portfolio/page.tsx`)
+
+**Design Decisions:**
+- **Hybrid query approach**: 3 focused queries (stats, health history, renewals) for balanced caching
+- **CSM filter only**: Keep filtering simple, show all CSMs by default
+- **90-day renewal window**: Matches Priority tab behavior
+- **Time series chart**: Shows portfolio health trend over time (not histogram)
+- **ARR-based churn risk**: More meaningful than account count for business decisions
 
 ## Database Schema (Existing)
 
@@ -104,13 +153,13 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 - `call_transcripts` - Call data
 - `email_threads` - Email data
 
-## Pages to Build
+## Pages Status
 
-1. `/priority` - Priority accounts view (Critical + At Risk)
-2. `/account/[id]` - Account detail page
-3. `/portfolio` - Portfolio overview (placeholder for now)
-4. `/all-accounts` - All accounts (placeholder)
-5. `/team` - Team performance (placeholder)
+1. ✅ `/priority` - Priority accounts view (Critical + At Risk) - **COMPLETE**
+2. ✅ `/account/[id]` - Account detail page - **COMPLETE**
+3. 🚧 `/portfolio` - Portfolio overview - **IN PROGRESS**
+4. `/all-accounts` - All accounts (future)
+5. `/analytics` - Analytics dashboard (future)
 
 ## Success Criteria
 
@@ -129,7 +178,21 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 - [x] Filter cards show real-time stats from database
 
 **Account Detail (Part 3):**
-- [ ] Account detail page loads with all metrics
-- [ ] Health trend chart displays 90 days
-- [ ] Action items generate correctly
-- [ ] Interaction timeline shows recent activity
+- [x] Account detail page loads with all metrics
+- [x] Health trend chart displays 90 days
+- [x] Action items generate correctly
+- [x] Interaction timeline shows recent activity
+- [x] Tabbed sections work (Overview, Contacts, Tickets, Opportunities)
+
+**Metrics Refactoring (Part 4):**
+- [x] Metrics calculated on-the-fly from source data
+- [x] Consistent 90-day time windows
+- [x] Priority tab and Account Detail both use new structure
+- [x] No NaN or N/A values in UI
+
+**Portfolio Tab (Part 5):**
+- [ ] Portfolio page shows aggregate stats (Total ARR, Avg Health Score, Churn Risk)
+- [ ] CSM filter works correctly
+- [ ] Health score distribution chart shows time series
+- [ ] Renewal forecast chart shows health breakdown
+- [ ] All metrics update when CSM filter changes
