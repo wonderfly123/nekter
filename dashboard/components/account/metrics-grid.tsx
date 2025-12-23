@@ -17,55 +17,55 @@ interface MetricsGridProps {
 }
 
 export function MetricsGrid({ data }: MetricsGridProps) {
-  const { currentHealth } = data;
+  const { currentHealth, metrics: calculatedMetrics } = data;
 
   const metrics = [
     {
-      label: 'Avg Sentiment (30d)',
+      label: 'Avg Sentiment (90d)',
       value:
-        currentHealth.avg_sentiment !== null
-          ? Math.round(currentHealth.avg_sentiment)
+        calculatedMetrics.avgSentiment !== null
+          ? Math.round(calculatedMetrics.avgSentiment)
           : 'N/A',
       icon: HeartPulse,
       color:
-        currentHealth.avg_sentiment !== null && currentHealth.avg_sentiment < 50
+        calculatedMetrics.avgSentiment !== null && calculatedMetrics.avgSentiment < 50
           ? 'text-red-600'
-          : currentHealth.avg_sentiment !== null &&
-            currentHealth.avg_sentiment >= 70
+          : calculatedMetrics.avgSentiment !== null &&
+            calculatedMetrics.avgSentiment >= 70
           ? 'text-green-600'
           : 'text-yellow-600',
       bgColor:
-        currentHealth.avg_sentiment !== null && currentHealth.avg_sentiment < 50
+        calculatedMetrics.avgSentiment !== null && calculatedMetrics.avgSentiment < 50
           ? 'bg-red-50'
-          : currentHealth.avg_sentiment !== null &&
-            currentHealth.avg_sentiment >= 70
+          : calculatedMetrics.avgSentiment !== null &&
+            calculatedMetrics.avgSentiment >= 70
           ? 'bg-green-50'
           : 'bg-yellow-50',
     },
     {
-      label: 'Interactions (30d)',
-      value: currentHealth.interaction_count || 0,
+      label: 'Interactions (90d)',
+      value: calculatedMetrics.interactionCount,
       icon: MessageSquare,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
     },
     {
       label: 'Churn Signals',
-      value: currentHealth.churn_signals || 0,
+      value: calculatedMetrics.churnSignals,
       icon: AlertTriangle,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
     },
     {
       label: 'Expansion Signals',
-      value: currentHealth.expansion_signals || 0,
+      value: calculatedMetrics.expansionSignals,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
       label: 'Open Tickets',
-      value: currentHealth.open_ticket_count || 0,
+      value: calculatedMetrics.openTicketCount,
       icon: Ticket,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
@@ -73,8 +73,8 @@ export function MetricsGrid({ data }: MetricsGridProps) {
     {
       label: 'Last Contact',
       value:
-        currentHealth.days_since_activity !== null
-          ? formatDaysAgo(currentHealth.days_since_activity)
+        calculatedMetrics.daysSinceActivity !== null
+          ? formatDaysAgo(calculatedMetrics.daysSinceActivity)
           : 'N/A',
       icon: Clock,
       color: 'text-gray-600',

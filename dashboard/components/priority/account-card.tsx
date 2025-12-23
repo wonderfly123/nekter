@@ -67,8 +67,8 @@ export function AccountCard({ account }: AccountCardProps) {
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Health:</span>
               <span className="font-semibold text-gray-900">
-                {account.health.avg_sentiment !== null
-                  ? Math.round(account.health.avg_sentiment)
+                {account.health.health_score !== null
+                  ? Math.round(account.health.health_score)
                   : 'N/A'}
               </span>
               <TrendIndicator trend={account.health.trend} showText={true} />
@@ -76,8 +76,8 @@ export function AccountCard({ account }: AccountCardProps) {
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Last Interaction:</span>
               <span className="font-medium text-gray-900">
-                {account.health.days_since_activity !== null
-                  ? formatDaysAgo(account.health.days_since_activity)
+                {account.metrics.daysSinceActivity !== null
+                  ? formatDaysAgo(account.metrics.daysSinceActivity)
                   : 'N/A'}
               </span>
             </div>
@@ -110,16 +110,16 @@ export function AccountCard({ account }: AccountCardProps) {
                 </div>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="text-4xl font-bold text-gray-900">
-                    {account.health.avg_sentiment !== null
-                      ? Math.round(account.health.avg_sentiment)
+                    {account.health.health_score !== null
+                      ? Math.round(account.health.health_score)
                       : 'N/A'}
                   </div>
                   <TrendIndicator trend={account.health.trend} showText={true} />
                 </div>
                 <div className="text-sm text-gray-600">
                   Last contact:{' '}
-                  {account.health.days_since_activity !== null
-                    ? `${account.health.days_since_activity} days ago`
+                  {account.metrics.daysSinceActivity !== null
+                    ? `${account.metrics.daysSinceActivity} days ago`
                     : 'N/A'}
                 </div>
               </div>
@@ -130,25 +130,24 @@ export function AccountCard({ account }: AccountCardProps) {
                   Risk Signals
                 </div>
                 <div className="space-y-2">
-                  {account.health.churn_signals !== null &&
-                    account.health.churn_signals > 0 && (
-                      <div className="flex items-center gap-2 text-sm bg-red-50 text-red-700 px-3 py-2 rounded-lg">
-                        <AlertTriangle className="w-4 h-4" />
-                        <span>{account.health.churn_signals} Churn Signals</span>
-                      </div>
-                    )}
-                  {account.health.days_since_activity !== null &&
-                    account.health.days_since_activity > 30 && (
+                  {account.metrics.churnSignals > 0 && (
+                    <div className="flex items-center gap-2 text-sm bg-red-50 text-red-700 px-3 py-2 rounded-lg">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>{account.metrics.churnSignals} Churn Signals</span>
+                    </div>
+                  )}
+                  {account.metrics.daysSinceActivity !== null &&
+                    account.metrics.daysSinceActivity > 30 && (
                       <div className="flex items-center gap-2 text-sm bg-yellow-50 text-yellow-700 px-3 py-2 rounded-lg">
                         <Clock className="w-4 h-4" />
-                        <span>No contact in {account.health.days_since_activity} days</span>
+                        <span>No contact in {account.metrics.daysSinceActivity} days</span>
                       </div>
                     )}
-                  {account.health.avg_sentiment !== null &&
-                    account.health.avg_sentiment < 50 && (
+                  {account.metrics.avgSentiment !== null &&
+                    account.metrics.avgSentiment < 50 && (
                       <div className="flex items-center gap-2 text-sm bg-orange-50 text-orange-700 px-3 py-2 rounded-lg">
                         <HeartPulse className="w-4 h-4" />
-                        <span>Low sentiment ({Math.round(account.health.avg_sentiment)})</span>
+                        <span>Low sentiment ({Math.round(account.metrics.avgSentiment)})</span>
                       </div>
                     )}
                 </div>
@@ -163,28 +162,28 @@ export function AccountCard({ account }: AccountCardProps) {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Support tickets</span>
                     <span className="font-medium text-gray-900">
-                      {account.health.open_ticket_count || 0} open
+                      {account.metrics.openTicketCount} open
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Avg sentiment</span>
                     <span className="font-medium text-gray-900">
-                      {account.health.avg_sentiment !== null
-                        ? `${Math.round(account.health.avg_sentiment)}/100`
+                      {account.metrics.avgSentiment !== null
+                        ? `${Math.round(account.metrics.avgSentiment)}/100`
                         : 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Interactions</span>
                     <span className="font-medium text-gray-900">
-                      {account.health.interaction_count || 0} (30d)
+                      {account.metrics.interactionCount} (90d)
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Last activity</span>
                     <span className="font-medium text-gray-900">
-                      {account.health.days_since_activity !== null
-                        ? formatDaysAgo(account.health.days_since_activity)
+                      {account.metrics.daysSinceActivity !== null
+                        ? formatDaysAgo(account.metrics.daysSinceActivity)
                         : 'N/A'}
                     </span>
                   </div>

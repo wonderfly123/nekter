@@ -109,12 +109,15 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className="border-t border-gray-200 p-6">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer transition-transform hover:scale-105"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
+      <div className={cn(
+        "border-t border-gray-200 p-6",
+        isCollapsed && "flex items-center justify-center"
+      )}>
+        <div className={cn(
+          "flex items-center gap-3",
+          isCollapsed && "justify-center"
+        )}>
+          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
             AH
           </div>
           {!isCollapsed && (

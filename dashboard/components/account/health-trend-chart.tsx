@@ -17,12 +17,14 @@ interface HealthTrendChartProps {
 }
 
 export function HealthTrendChart({ healthHistory }: HealthTrendChartProps) {
-  // Transform data for chart
-  const chartData = healthHistory.map((health) => ({
-    date: health.created_at ? parseISO(health.created_at) : new Date(),
-    score: health.avg_sentiment || 0,
-    status: health.health_status,
-  }));
+  // Transform data for chart - filter out entries without dates or scores
+  const chartData = healthHistory
+    .filter((health) => health.created_at && health.health_score !== null)
+    .map((health) => ({
+      date: parseISO(health.created_at!),
+      score: health.health_score!,
+      status: health.health_status,
+    }));
 
   // Custom bar color based on health status
   const getBarColor = (status: string) => {
@@ -43,8 +45,13 @@ export function HealthTrendChart({ healthHistory }: HealthTrendChartProps) {
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         90-Day Health Trend
       </h2>
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <ResponsiveContainer width="100%" height={200}>
+      {chartData.length === 0 ? (
+        <div className="bg-white p-4 rounded-lg border border-gray-200 text-center py-12">
+          <p className="text-gray-600">No health trend data available</p>
+        </div>
+      ) : (
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
@@ -104,6 +111,7 @@ export function HealthTrendChart({ healthHistory }: HealthTrendChartProps) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      )}
     </div>
   );
 }

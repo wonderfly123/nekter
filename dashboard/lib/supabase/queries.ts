@@ -9,6 +9,7 @@ import type {
 } from './types';
 import { getDemoDateString } from '../config/demo';
 import { calculatePriorityScore, getTopSignals } from '../utils/health-calculations';
+import { calculateMetrics } from '../utils/metrics-calculations';
 
 /**
  * Get priority accounts (Critical and At Risk) sorted by priority score
@@ -17,24 +18,30 @@ export async function getPriorityAccounts(
   includeRenewalsOnly: boolean
 ): Promise<PriorityAccount[]> {
   const demoDate = getDemoDateString();
-  const startOfDay = `${demoDate}T00:00:00`;
-  const endOfDay = `${demoDate}T23:59:59`;
+  const ninetyDaysAgo = new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000);
 
   try {
-    // Get today's health snapshot for Critical and At Risk accounts
+    // Get latest health snapshot for Critical and At Risk accounts
     const { data: healthData, error: healthError } = await supabase
       .from('account_health_history')
-      .select('*')
-      .gte('created_at', startOfDay)
-      .lte('created_at', endOfDay)
+      .select('health_status, health_score, trend, id, sf_account_id, created_at')
       .in('health_status', ['Critical', 'At Risk'])
       .order('created_at', { ascending: false });
 
     if (healthError) throw healthError;
     if (!healthData || healthData.length === 0) return [];
 
+    // Get most recent health record per account
+    const latestHealthMap = new Map<string, AccountHealth>();
+    healthData.forEach((h) => {
+      if (!latestHealthMap.has(h.sf_account_id)) {
+        latestHealthMap.set(h.sf_account_id, h);
+      }
+    });
+
+    const accountIds = Array.from(latestHealthMap.keys());
+
     // Get account details for these accounts
-    const accountIds = healthData.map((h) => h.sf_account_id);
     const { data: accounts, error: accountsError } = await supabase
       .from('accounts')
       .select('*')
@@ -60,26 +67,36 @@ export async function getPriorityAccounts(
       renewalAccountIds = new Set(renewals?.map((r) => r.sf_account_id) || []);
     }
 
-    // Get recent interactions for signal extraction (last 5 per account)
-    const interactionsPromises = accountIds.map(async (accountId) => {
-      const { data } = await supabase
-        .from('interaction_insights')
-        .select('*')
-        .eq('sf_account_id', accountId)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      return { accountId, interactions: data || [] };
+    // Get interactions and tickets for each account in parallel
+    const dataPromises = accountIds.map(async (accountId) => {
+      const [interactionsResult, ticketsResult] = await Promise.all([
+        supabase
+          .from('interaction_insights')
+          .select('*')
+          .eq('sf_account_id', accountId)
+          .gte('created_at', ninetyDaysAgo.toISOString())
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('zendesk_tickets')
+          .select('*')
+          .eq('sf_account_id', accountId)
+          .in('status', ['new', 'open']),
+      ]);
+
+      return {
+        accountId,
+        interactions: interactionsResult.data || [],
+        tickets: ticketsResult.data || [],
+      };
     });
 
-    const interactionsResults = await Promise.all(interactionsPromises);
-    const interactionsMap = new Map(
-      interactionsResults.map((r) => [r.accountId, r.interactions])
-    );
+    const dataResults = await Promise.all(dataPromises);
+    const dataMap = new Map(dataResults.map((r) => [r.accountId, r]));
 
     // Build priority accounts
     const priorityAccounts: PriorityAccount[] = accounts
       .map((account) => {
-        const health = healthData.find((h) => h.sf_account_id === account.sf_account_id);
+        const health = latestHealthMap.get(account.sf_account_id);
         if (!health) return null;
 
         // Filter by renewals if needed
@@ -87,8 +104,26 @@ export async function getPriorityAccounts(
           return null;
         }
 
-        const interactions = interactionsMap.get(account.sf_account_id) || [];
-        const topSignals = getTopSignals(health, interactions);
+        const accountData = dataMap.get(account.sf_account_id);
+        const interactions = accountData?.interactions || [];
+        const tickets = accountData?.tickets || [];
+
+        // Calculate metrics on-the-fly
+        const metrics = calculateMetrics(
+          interactions,
+          tickets,
+          account.last_activity_date
+        );
+
+        // Get top signals
+        const topSignals = getTopSignals(
+          metrics.avgSentiment,
+          metrics.churnSignals,
+          metrics.openTicketCount,
+          metrics.daysSinceActivity,
+          interactions
+        );
+
         const priorityScore = calculatePriorityScore(account.arr, health.health_status);
 
         return {
@@ -97,6 +132,7 @@ export async function getPriorityAccounts(
           arr: account.arr,
           csm_name: account.csm_name,
           health,
+          metrics,
           topSignals,
           priorityScore,
         };
@@ -244,20 +280,21 @@ export async function getAccountDetail(
         .eq('sf_account_id', sfAccountId)
         .single(),
 
-      // 2. Get current health status (most recent, preferably today's)
+      // 2. Get current health status (most recent)
+      // Fetch: health_status, health_score, trend, id, sf_account_id, created_at
       supabase
         .from('account_health_history')
-        .select('*')
+        .select('health_status, health_score, trend, id, sf_account_id, created_at')
         .eq('sf_account_id', sfAccountId)
-        .lte('created_at', endOfDay)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
 
       // 3. Get 90-day health history for trend chart
+      // Fetch: health_status, health_score, trend, id, sf_account_id, created_at
       supabase
         .from('account_health_history')
-        .select('*')
+        .select('health_status, health_score, trend, id, sf_account_id, created_at')
         .eq('sf_account_id', sfAccountId)
         .gte(
           'created_at',
@@ -265,15 +302,16 @@ export async function getAccountDetail(
         )
         .order('created_at', { ascending: true }),
 
-      // 4. Get recent interactions (30 days)
+      // 4. Get recent interactions (90 days)
       supabase
         .from('interaction_insights')
         .select('*')
         .eq('sf_account_id', sfAccountId)
         .gte(
           'created_at',
-          new Date(new Date(demoDate).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+          new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000).toISOString()
         )
+        .lte('created_at', endOfDay)
         .order('created_at', { ascending: false }),
 
       // 5. Get contacts
@@ -348,6 +386,13 @@ export async function getAccountDetail(
           contact.customer_role === 'Champion' && contact.left_company === true
       ) || false;
 
+    // Calculate metrics on-the-fly from source data
+    const metrics = calculateMetrics(
+      interactionsResult.data || [],
+      ticketsResult.data || [],
+      accountResult.data.last_activity_date
+    );
+
     return {
       account: accountResult.data,
       currentHealth: currentHealthResult.data,
@@ -358,6 +403,7 @@ export async function getAccountDetail(
       opportunities: opportunitiesResult.data || [],
       renewalOpportunity,
       supportTier: supportTierResult.data?.tier || null,
+      metrics,
       championLeft,
     };
   } catch (error) {

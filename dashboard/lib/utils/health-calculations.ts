@@ -99,40 +99,43 @@ export function calculatePriorityScore(
 }
 
 /**
- * Extracts top 2 signals from health data and interactions
+ * Extracts top 2 signals from calculated metrics and interactions
  * Priority: Sentiment > Churn > Tickets > Inactivity
  */
 export function getTopSignals(
-  health: AccountHealth,
+  avgSentiment: number | null,
+  churnSignals: number,
+  openTicketCount: number,
+  daysSinceActivity: number | null,
   interactions: InteractionInsight[]
 ): string[] {
   const signals: string[] = [];
 
   // Priority 1: Low Sentiment (most important)
-  if (health.avg_sentiment !== null && health.avg_sentiment < 50) {
-    signals.push(`Sentiment: ${Math.round(health.avg_sentiment)} (concerning)`);
+  if (avgSentiment !== null && avgSentiment < 50) {
+    signals.push(`Sentiment: ${Math.round(avgSentiment)} (concerning)`);
   }
 
   // Priority 2: Churn Signals
-  if (health.churn_signals !== null && health.churn_signals > 0) {
+  if (churnSignals > 0) {
     // Find latest interaction with churn risk to get reasons
     const churnInteraction = interactions.find((i) => i.churn_risk);
     if (churnInteraction && churnInteraction.churn_reasons) {
       const reasons = churnInteraction.churn_reasons.slice(0, 2).join(', ');
-      signals.push(`${health.churn_signals} Churn Signals: ${reasons}`);
+      signals.push(`${churnSignals} Churn Signals: ${reasons}`);
     } else {
-      signals.push(`${health.churn_signals} Churn Signals detected`);
+      signals.push(`${churnSignals} Churn Signals detected`);
     }
   }
 
   // Priority 3: Open Tickets
-  if (health.open_ticket_count !== null && health.open_ticket_count >= 2) {
-    signals.push(`${health.open_ticket_count} open tickets`);
+  if (openTicketCount >= 2) {
+    signals.push(`${openTicketCount} open tickets`);
   }
 
   // Priority 4: Inactivity
-  if (health.days_since_activity !== null && health.days_since_activity > 30) {
-    signals.push(`No contact in ${health.days_since_activity} days`);
+  if (daysSinceActivity !== null && daysSinceActivity > 30) {
+    signals.push(`No contact in ${daysSinceActivity} days`);
   }
 
   // Return top 2 signals only

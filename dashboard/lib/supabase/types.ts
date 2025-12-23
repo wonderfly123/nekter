@@ -24,13 +24,8 @@ export interface AccountHealth {
   id: number;
   sf_account_id: string;
   health_status: HealthStatus;
+  health_score: number | null;
   trend: TrendStatus;
-  avg_sentiment: number | null;
-  interaction_count: number | null;
-  churn_signals: number | null;
-  expansion_signals: number | null;
-  open_ticket_count: number | null;
-  days_since_activity: number | null;
   created_at: string | null;
 }
 
@@ -168,6 +163,15 @@ export interface PriorityAccount {
   // From account_health_history
   health: AccountHealth;
 
+  // Calculated metrics (computed on-the-fly)
+  metrics: {
+    avgSentiment: number | null;
+    interactionCount: number;
+    churnSignals: number;
+    openTicketCount: number;
+    daysSinceActivity: number | null;
+  };
+
   // Calculated from interaction_insights
   topSignals: string[];
 
@@ -190,12 +194,12 @@ export interface AccountDetailData {
   // From accounts
   account: Account;
 
-  // From account_health_history (open_ticket_count is in currentHealth)
+  // From account_health_history (only health_status, health_score, trend, id, sf_account_id, created_at)
   currentHealth: AccountHealth;
   healthHistory: AccountHealth[]; // 90 days for trend chart
 
   // From interaction_insights
-  recentInteractions: InteractionInsight[]; // 30 days for timeline
+  recentInteractions: InteractionInsight[]; // 90 days for timeline
 
   // From contacts
   contacts: Contact[];
@@ -209,6 +213,16 @@ export interface AccountDetailData {
 
   // From zendesk_org_mapping
   supportTier: string | null;
+
+  // Calculated metrics (computed on-the-fly from source data)
+  metrics: {
+    avgSentiment: number | null; // Average of sentiment_score from interaction_insights (90d)
+    interactionCount: number;
+    churnSignals: number;
+    expansionSignals: number;
+    openTicketCount: number;
+    daysSinceActivity: number | null;
+  };
 
   // Calculated fields
   championLeft: boolean; // Any contact with customer_role='Champion' and left_company=true

@@ -29,7 +29,7 @@ export function InteractionTimeline({ interactions }: InteractionTimelineProps) 
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Recent Interactions (30 days)
+        Recent Interactions (90 days)
       </h2>
       {interactions.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">

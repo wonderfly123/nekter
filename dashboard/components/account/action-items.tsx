@@ -14,14 +14,14 @@ interface ActionItem {
 
 function generateActionItems(data: AccountDetailData): ActionItem[] {
   const actions: ActionItem[] = [];
-  const { currentHealth, championLeft, recentInteractions } = data;
+  const { currentHealth, championLeft, recentInteractions, metrics } = data;
 
   // Priority 1: Low Sentiment (most important)
-  if (currentHealth.avg_sentiment !== null && currentHealth.avg_sentiment < 50) {
+  if (metrics.avgSentiment !== null && metrics.avgSentiment < 50) {
     actions.push({
       priority: 'high',
       text: `Schedule urgent check-in call - sentiment at ${Math.round(
-        currentHealth.avg_sentiment
+        metrics.avgSentiment
       )}`,
     });
 
@@ -38,11 +38,11 @@ function generateActionItems(data: AccountDetailData): ActionItem[] {
   }
 
   // Priority 2: Churn Signals
-  if (currentHealth.churn_signals !== null && currentHealth.churn_signals > 0) {
+  if (metrics.churnSignals > 0) {
     actions.push({
       priority: 'high',
-      text: `Review ${currentHealth.churn_signals} churn signal${
-        currentHealth.churn_signals > 1 ? 's' : ''
+      text: `Review ${metrics.churnSignals} churn signal${
+        metrics.churnSignals > 1 ? 's' : ''
       } and create mitigation plan`,
     });
 
@@ -67,58 +67,55 @@ function generateActionItems(data: AccountDetailData): ActionItem[] {
   }
 
   // Priority 3: Open Tickets
-  if (currentHealth.open_ticket_count !== null && currentHealth.open_ticket_count > 0) {
-    if (currentHealth.open_ticket_count >= 3) {
+  if (metrics.openTicketCount > 0) {
+    if (metrics.openTicketCount >= 3) {
       actions.push({
         priority: 'medium',
-        text: `Follow up on ${currentHealth.open_ticket_count} open support tickets`,
+        text: `Follow up on ${metrics.openTicketCount} open support tickets`,
       });
     } else {
       actions.push({
         priority: 'low',
-        text: `Monitor ${currentHealth.open_ticket_count} open ticket${
-          currentHealth.open_ticket_count > 1 ? 's' : ''
+        text: `Monitor ${metrics.openTicketCount} open ticket${
+          metrics.openTicketCount > 1 ? 's' : ''
         }`,
       });
     }
   }
 
   // Priority 4: Inactivity
-  if (currentHealth.days_since_activity !== null && currentHealth.days_since_activity > 30) {
-    if (currentHealth.days_since_activity > 60) {
+  if (metrics.daysSinceActivity !== null && metrics.daysSinceActivity > 30) {
+    if (metrics.daysSinceActivity > 60) {
       actions.push({
         priority: 'high',
-        text: `No contact in ${currentHealth.days_since_activity} days - schedule immediate outreach`,
+        text: `No contact in ${metrics.daysSinceActivity} days - schedule immediate outreach`,
       });
     } else {
       actions.push({
         priority: 'medium',
-        text: `Plan proactive check-in - ${currentHealth.days_since_activity} days since last contact`,
+        text: `Plan proactive check-in - ${metrics.daysSinceActivity} days since last contact`,
       });
     }
   }
 
   // Low Interaction Count
-  if (currentHealth.interaction_count !== null && currentHealth.interaction_count < 2) {
+  if (metrics.interactionCount < 2) {
     actions.push({
       priority: 'medium',
       text: 'Increase engagement frequency - only ' +
-        currentHealth.interaction_count +
+        metrics.interactionCount +
         ' interaction' +
-        (currentHealth.interaction_count === 1 ? '' : 's') +
-        ' in 30 days',
+        (metrics.interactionCount === 1 ? '' : 's') +
+        ' in 90 days',
     });
   }
 
   // Expansion Opportunities
-  if (
-    currentHealth.expansion_signals !== null &&
-    currentHealth.expansion_signals > 0
-  ) {
+  if (metrics.expansionSignals > 0) {
     actions.push({
       priority: 'low',
-      text: `Explore ${currentHealth.expansion_signals} expansion opportunity${
-        currentHealth.expansion_signals > 1 ? 'ies' : ''
+      text: `Explore ${metrics.expansionSignals} expansion opportunity${
+        metrics.expansionSignals > 1 ? 'ies' : ''
       }`,
     });
   }

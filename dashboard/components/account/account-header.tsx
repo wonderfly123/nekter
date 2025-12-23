@@ -11,7 +11,7 @@ interface AccountHeaderProps {
 }
 
 export function AccountHeader({ data }: AccountHeaderProps) {
-  const { account, currentHealth, renewalOpportunity, supportTier } = data;
+  const { account, currentHealth, renewalOpportunity, supportTier, metrics } = data;
 
   // Calculate MRR from ARR
   const mrr = account.arr ? account.arr / 12 : null;
@@ -38,10 +38,10 @@ export function AccountHeader({ data }: AccountHeaderProps) {
             </div>
           </div>
         </div>
-        {currentHealth.avg_sentiment !== null && (
+        {currentHealth.health_score !== null && (
           <div className="text-center py-3 bg-gray-50 rounded-lg">
             <div className="text-3xl font-bold text-gray-900">
-              {Math.round(currentHealth.avg_sentiment)}
+              {Math.round(currentHealth.health_score)}
             </div>
             <div className="text-xs text-gray-600 uppercase tracking-wide">
               Health Score
