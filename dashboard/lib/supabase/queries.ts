@@ -97,7 +97,7 @@ export async function getPriorityAccounts(
     const dataMap = new Map(dataResults.map((r) => [r.accountId, r]));
 
     // Build priority accounts
-    const priorityAccounts: PriorityAccount[] = accounts
+    const priorityAccounts = accounts
       .map((account) => {
         const health = latestHealthMap.get(account.sf_account_id);
         if (!health) return null;
