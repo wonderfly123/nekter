@@ -89,7 +89,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Loading...' : mode === 'login' ? 'Sign in' : 'Sign up'}
             </button>
@@ -133,7 +133,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -161,7 +161,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            className="text-sm text-blue-600 hover:text-blue-500"
+            className="text-sm text-orange-600 hover:text-orange-500"
           >
             {mode === 'login'
               ? "Don't have an account? Sign up"
@@ -173,7 +173,7 @@ export default function LoginPage() {
           <div className="text-center">
             <a
               href="/reset-password"
-              className="text-sm text-blue-600 hover:text-blue-500"
+              className="text-sm text-orange-600 hover:text-orange-500"
             >
               Forgot your password?
             </a>
