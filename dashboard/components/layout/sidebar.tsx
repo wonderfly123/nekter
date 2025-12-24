@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
+import { useAuth } from '@/lib/auth/use-auth';
 
 interface NavItem {
   name: string;
@@ -24,11 +25,16 @@ const navItems: NavItem[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapsed, setCollapsed } = useSidebarStore();
+  const { user } = useAuth();
+
+  const getInitials = (email: string) => {
+    return email.charAt(0).toUpperCase();
+  };
 
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-screen bg-gray-50 border-r border-gray-200 transition-all duration-300 z-50 flex flex-col',
+        'fixed left-0 top-0 h-screen bg-gray-50 border-r border-gray-200 transition-all duration-300 ease-in-out z-50 flex flex-col',
         isCollapsed ? 'w-[60px]' : 'w-[260px]'
       )}
     >
@@ -117,8 +123,12 @@ export function Sidebar() {
         {!isCollapsed ? (
           <UserMenu />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-medium text-sm flex-shrink-0">
-            U
+          <div
+            className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-sm flex-shrink-0 cursor-pointer hover:bg-orange-700 transition-colors"
+            onClick={() => setCollapsed(false)}
+            title={user?.email || 'User'}
+          >
+            {user?.email ? getInitials(user.email) : 'U'}
           </div>
         )}
       </div>

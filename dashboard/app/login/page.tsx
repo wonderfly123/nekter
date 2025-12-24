@@ -1,16 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/auth/use-auth';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [company, setCompany] = useState('');
+  const [signupReason, setSignupReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const router = useRouter();
+  const { user, isLoading } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/portfolio');
+    }
+  }, [user, isLoading, router]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,23 +33,40 @@ export default function LoginPage() {
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        // Sign up the user with metadata
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+              company: company.trim(),
+              signup_reason: signupReason.trim(),
+            }
+          }
         });
-        if (error) throw error;
-        router.push('/priority'); // Will redirect to pending if not approved
+
+        if (signUpError) throw signUpError;
+        if (!authData.user) throw new Error('Signup failed - no user returned');
+
+        console.log('Sign up successful with metadata:', authData);
+
+        // Show success message
+        setSignupSuccess(true);
+        setLoading(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
-        router.push('/priority');
+        if (signInError) throw signInError;
+        console.log('Sign in successful:', data);
+        // Auth state listener and useEffect will handle redirect
       }
     } catch (err: any) {
+      console.error('Auth error:', err);
       setError(err.message || 'An error occurred');
-    } finally {
       setLoading(false);
     }
   };
@@ -48,7 +79,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/priority`,
+          redirectTo: `${window.location.origin}/complete-profile`,
         },
       });
       if (error) throw error;
@@ -58,8 +89,59 @@ export default function LoginPage() {
     }
   };
 
+  // Show success message after signup
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md text-center">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-orange-100">
+            <svg
+              className="h-8 w-8 text-orange-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Check your email</h2>
+            <p className="mt-4 text-sm text-gray-600">
+              We've sent a confirmation link to <span className="font-medium text-gray-900">{email}</span>
+            </p>
+            <p className="mt-2 text-sm text-gray-600">
+              Click the link in the email to confirm your account, then come back here to sign in.
+            </p>
+          </div>
+          <div className="pt-4">
+            <button
+              onClick={() => {
+                setSignupSuccess(false);
+                setMode('login');
+                setEmail('');
+                setPassword('');
+                setFirstName('');
+                setLastName('');
+                setCompany('');
+                setSignupReason('');
+              }}
+              className="text-sm text-orange-600 hover:text-orange-500 font-medium"
+            >
+              Back to login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
         <div>
           <h2 className="text-3xl font-bold text-center text-gray-900">
@@ -78,6 +160,56 @@ export default function LoginPage() {
 
         <form onSubmit={handleEmailAuth} className="mt-8 space-y-6">
           <div className="space-y-4">
+            {mode === 'signup' && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                      First Name
+                    </label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                      Last Name
+                    </label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      required
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                    Company
+                  </label>
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
+                    required
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+              </>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -107,6 +239,24 @@ export default function LoginPage() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
+
+            {mode === 'signup' && (
+              <div>
+                <label htmlFor="signupReason" className="block text-sm font-medium text-gray-700">
+                  Why are you signing up?
+                </label>
+                <textarea
+                  id="signupReason"
+                  name="signupReason"
+                  required
+                  rows={3}
+                  value={signupReason}
+                  onChange={(e) => setSignupReason(e.target.value)}
+                  placeholder="Tell us why you'd like access to the dashboard..."
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                />
+              </div>
+            )}
           </div>
 
           <div>

@@ -1,11 +1,15 @@
 import type { User } from '@supabase/supabase-js';
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'pending' | 'user' | 'admin';
 
 export interface ApprovedUser {
   id: number;
   email: string;
   role: UserRole;
+  first_name: string | null;
+  last_name: string | null;
+  company: string | null;
+  signup_reason: string | null;
   approved_by: string | null;
   approved_at: string | null;
   notes: string | null;

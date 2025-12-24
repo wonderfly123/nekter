@@ -29,8 +29,9 @@ export function UserMenu() {
   };
 
   const handleLogout = async () => {
+    setIsOpen(false);
     await signOut();
-    router.push('/login');
+    // Redirect handled by auth state listener in AuthProvider
   };
 
   return (
@@ -39,10 +40,10 @@ export function UserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-medium">
+        <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium">
           {getInitials(user.email || '')}
         </div>
-        <span className="text-sm font-medium text-gray-700">{user.email}</span>
+        <span className="text-sm font-medium text-gray-700 truncate max-w-[140px]">{user.email}</span>
         <svg
           className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"

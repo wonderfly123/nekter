@@ -14,12 +14,28 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!isLoading && !user) {
       router.push('/login');
     }
-  }, [user, isLoading, router]);
+
+    // Check profile completion for approved users
+    if (!isLoading && user && isApproved) {
+      const hasFirstName = user.user_metadata?.first_name;
+      const hasLastName = user.user_metadata?.last_name;
+      const hasCompany = user.user_metadata?.company;
+      const hasSignupReason = user.user_metadata?.signup_reason;
+
+      // If profile is incomplete, redirect to complete-profile
+      if (!hasFirstName || !hasLastName || !hasCompany || !hasSignupReason) {
+        router.push('/complete-profile');
+      }
+    }
+  }, [user, isLoading, isApproved, router]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+          <div className="text-gray-600 font-medium">Convincing the bouncer you're on the list...</div>
+        </div>
       </div>
     );
   }
