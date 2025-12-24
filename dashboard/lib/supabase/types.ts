@@ -152,6 +152,9 @@ export interface EmailThread {
 export type HealthStatus = 'Healthy' | 'At Risk' | 'Critical';
 export type TrendStatus = 'Improving' | 'Declining' | 'Stable' | null;
 
+// Import CalculatedMetrics from metrics-calculations
+import type { CalculatedMetrics } from '../utils/metrics-calculations';
+
 // Composite Types (for UI)
 export interface PriorityAccount {
   // From accounts table
@@ -164,13 +167,7 @@ export interface PriorityAccount {
   health: AccountHealth;
 
   // Calculated metrics (computed on-the-fly)
-  metrics: {
-    avgSentiment: number | null;
-    interactionCount: number;
-    churnSignals: number;
-    openTicketCount: number;
-    daysSinceActivity: number | null;
-  };
+  metrics: CalculatedMetrics;
 
   // Calculated from interaction_insights
   topSignals: string[];
@@ -215,14 +212,7 @@ export interface AccountDetailData {
   supportTier: string | null;
 
   // Calculated metrics (computed on-the-fly from source data)
-  metrics: {
-    avgSentiment: number | null; // Average of sentiment_score from interaction_insights (90d)
-    interactionCount: number;
-    churnSignals: number;
-    expansionSignals: number;
-    openTicketCount: number;
-    daysSinceActivity: number | null;
-  };
+  metrics: CalculatedMetrics;
 
   // Calculated fields
   championLeft: boolean; // Any contact with customer_role='Champion' and left_company=true
