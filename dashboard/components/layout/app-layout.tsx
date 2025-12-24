@@ -1,12 +1,24 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { Sidebar } from './sidebar';
 import { AppHeader } from './app-header';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
+  // Public routes that don't need sidebar/header
+  const publicRoutes = ['/login', '/reset-password'];
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+  // If public route, render children without layout chrome
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
+
+  // Authenticated routes get full layout
   return (
     <div className="flex h-screen overflow-hidden w-screen">
       <Sidebar />
