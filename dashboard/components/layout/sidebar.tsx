@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
+import { UserMenu } from '@/components/user-menu';
 
 interface NavItem {
   name: string;
@@ -113,22 +114,13 @@ export function Sidebar() {
         "border-t border-gray-200 p-6",
         isCollapsed && "flex items-center justify-center"
       )}>
-        <div className={cn(
-          "flex items-center gap-3",
-          isCollapsed && "justify-center"
-        )}>
-          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-            AH
+        {!isCollapsed ? (
+          <UserMenu />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-medium text-sm flex-shrink-0">
+            U
           </div>
-          {!isCollapsed && (
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-gray-900 truncate">
-                Anthony Huni
-              </div>
-              <div className="text-xs text-gray-500 truncate">CSM Owner</div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </aside>
   );
