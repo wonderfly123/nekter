@@ -1,19 +1,43 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 // Opt out of static generation since this page uses searchParams
 export const dynamic = 'force-dynamic';
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const hasToken = searchParams.get('token') || searchParams.get('type') === 'recovery';
+  const [isRecovery, setIsRecovery] = useState<boolean | null>(null);
 
-  // If no token, show request reset form
-  // If has token, show new password form
-  return hasToken ? <ResetPasswordForm /> : <RequestResetForm />;
+  // Check if this is a password recovery link (from email)
+  // Supabase sends tokens in URL hash (#), not query params
+  useEffect(() => {
+    // Check URL hash for recovery type
+    if (typeof window !== 'undefined') {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get('type');
+
+      if (type === 'recovery') {
+        setIsRecovery(true);
+      } else {
+        setIsRecovery(false);
+      }
+    }
+  }, []);
+
+  // Show loading while checking
+  if (isRecovery === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  // If recovery link, show password reset form
+  // Otherwise, show request reset form
+  return isRecovery ? <ResetPasswordForm /> : <RequestResetForm />;
 }
 
 function RequestResetForm() {
