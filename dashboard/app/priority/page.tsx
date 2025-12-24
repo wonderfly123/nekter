@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthGuard } from '@/components/auth/auth-guard';
 import { PageContainer } from '@/components/layout/page-container';
 import { FilterCards } from '@/components/priority/filter-cards';
 import { AccountList } from '@/components/priority/account-list';
@@ -9,6 +10,14 @@ import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { useFilterStore } from '@/lib/stores/filter-store';
 
 export default function PriorityPage() {
+  return (
+    <AuthGuard>
+      <PriorityContent />
+    </AuthGuard>
+  );
+}
+
+function PriorityContent() {
   const { showRenewalsOnly } = useFilterStore();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: accounts, isLoading: accountsLoading } = usePriorityAccounts(showRenewalsOnly);

@@ -1,6 +1,7 @@
 'use client';
 
 import { use } from 'react';
+import { AuthGuard } from '@/components/auth/auth-guard';
 import { useAccountDetail } from '@/hooks/use-account-detail';
 import { AccountHeader } from '@/components/account/account-header';
 import { AccountTabs } from '@/components/account/account-tabs';
@@ -13,6 +14,15 @@ export default function AccountDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+
+  return (
+    <AuthGuard>
+      <AccountDetailContent id={id} />
+    </AuthGuard>
+  );
+}
+
+function AccountDetailContent({ id }: { id: string }) {
   const { data, isLoading, error } = useAccountDetail(id);
 
   if (isLoading) {

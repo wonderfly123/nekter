@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AuthGuard } from '@/components/auth/auth-guard';
 import { PageContainer } from '@/components/layout/page-container';
 import { StatsCards } from '@/components/portfolio/stats-cards';
 import { HealthScoreChart } from '@/components/portfolio/health-score-chart';
@@ -13,6 +14,14 @@ import { useRenewalForecast } from '@/hooks/use-renewal-forecast';
 import { useCsmList } from '@/hooks/use-csm-list';
 
 export default function PortfolioPage() {
+  return (
+    <AuthGuard>
+      <PortfolioContent />
+    </AuthGuard>
+  );
+}
+
+function PortfolioContent() {
   const [selectedCsm, setSelectedCsm] = useState<string | null>(null);
 
   // Fetch all data with CSM filter
