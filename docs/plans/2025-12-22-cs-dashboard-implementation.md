@@ -2,8 +2,8 @@
 
 **Date:** December 22, 2025 (Updated: December 23, 2025)
 **Demo Date:** December 18, 2025
-**Status:** In Progress - Part 4 Complete ✅
-**Progress:** 4 of 5 parts complete (80%)
+**Status:** Complete - All 5 Parts Done ✅
+**Progress:** 5 of 5 parts complete (100%)
 
 ## Overview
 
@@ -111,28 +111,33 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 - Database stores only: health_status, health_score, trend
 - Consistent 90-day time windows across all metrics
 
-### Part 5: Portfolio Tab (In Progress)
+### Part 5: Portfolio Tab ✅ COMPLETE
 **Purpose:** High-level executive dashboard with CSM filtering
 
-**Components to Build:**
-- [ ] Portfolio stats query (`getPortfolioStats()`)
+**Components Built:**
+- [x] Portfolio stats query (`getPortfolioOverviewStats()`)
   - Total ARR with account count
   - Average health score (portfolio average)
   - Churn risk % = (Critical ARR + At Risk ARR) / Total ARR × 100
-- [ ] Health history query (`getPortfolioHealthHistory()`)
+- [x] Health history query (`getPortfolioHealthHistory()`)
   - 90-day timeline for average health score chart
-- [ ] Renewal forecast query (`getRenewalForecast()`)
+- [x] Renewal forecast query (`getRenewalForecast()`)
   - Health status breakdown of accounts with renewals in next 90 days
-- [ ] Portfolio stats cards (`components/portfolio/stats-cards.tsx`)
-- [ ] Health score distribution chart (`components/portfolio/health-score-chart.tsx`)
+- [x] CSM list query (`getCsmList()`)
+  - Get unique CSM names for filter dropdown
+- [x] Portfolio stats cards (`components/portfolio/stats-cards.tsx`)
+- [x] Health score distribution chart (`components/portfolio/health-score-chart.tsx`)
   - Time series showing average health score over time
   - Filter buttons: 90D / 30D / 7D
-- [ ] Renewal forecast chart (`components/portfolio/renewal-forecast.tsx`)
+- [x] Renewal forecast chart (`components/portfolio/renewal-forecast.tsx`)
   - Horizontal bars showing Healthy/At Risk/Critical breakdown
   - Shows ARR and percentages for each status
-- [ ] CSM filter dropdown (`components/portfolio/csm-filter.tsx`)
-- [ ] React Query hooks (`hooks/usePortfolioStats.ts`, `usePortfolioHealthHistory.ts`, `useRenewalForecast.ts`)
-- [ ] Portfolio page (`app/portfolio/page.tsx`)
+- [x] CSM filter dropdown (`components/portfolio/csm-filter.tsx`)
+- [x] React Query hooks (`hooks/usePortfolioStats.ts`, `usePortfolioHealthHistory.ts`, `useRenewalForecast.ts`, `useCsmList.ts`)
+- [x] Portfolio page (`app/portfolio/page.tsx`)
+
+**Files Created:** 11 files (4 hooks, 4 components, 4 query functions)
+**Features Working:** Full portfolio dashboard with CSM filtering, stats cards, health trend chart, renewal forecast
 
 **Design Decisions:**
 - **Hybrid query approach**: 3 focused queries (stats, health history, renewals) for balanced caching
@@ -157,7 +162,7 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 
 1. ✅ `/priority` - Priority accounts view (Critical + At Risk) - **COMPLETE**
 2. ✅ `/account/[id]` - Account detail page - **COMPLETE**
-3. 🚧 `/portfolio` - Portfolio overview - **IN PROGRESS**
+3. ✅ `/portfolio` - Portfolio overview - **COMPLETE**
 4. `/all-accounts` - All accounts (future)
 5. `/analytics` - Analytics dashboard (future)
 
@@ -191,8 +196,9 @@ Building a Next.js 14 Customer Success dashboard that connects to existing Supab
 - [x] No NaN or N/A values in UI
 
 **Portfolio Tab (Part 5):**
-- [ ] Portfolio page shows aggregate stats (Total ARR, Avg Health Score, Churn Risk)
-- [ ] CSM filter works correctly
-- [ ] Health score distribution chart shows time series
-- [ ] Renewal forecast chart shows health breakdown
-- [ ] All metrics update when CSM filter changes
+- [x] Portfolio page shows aggregate stats (Total ARR, Avg Health Score, Churn Risk)
+- [x] CSM filter works correctly
+- [x] Health score distribution chart shows time series with 90D/30D/7D filters
+- [x] Renewal forecast chart shows health breakdown
+- [x] All metrics update when CSM filter changes
+- [x] Deployed successfully to Vercel
