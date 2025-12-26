@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log('Session found for:', session.user.email);
       console.log('Checking approval status...');
-      const { isApproved, role } = await getUserApprovalStatus(session.user.id);
+      const { isApproved, role } = getUserApprovalStatus(session.user);
       console.log('Approval status:', { isApproved, role });
 
       setState({
@@ -75,54 +75,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
 
-        try {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            if (session?.user) {
-              const { isApproved, role } = await getUserApprovalStatus(session.user.id);
-              console.log('User approval status:', { isApproved, role });
-              setState({
-                user: session.user,
-                role,
-                isLoading: false,
-                isApproved,
-              });
-            }
-          } else if (event === 'SIGNED_OUT') {
-            console.log('User signed out, redirecting to login');
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            const { isApproved, role } = getUserApprovalStatus(session.user);
+            console.log('User approval status:', { isApproved, role });
             setState({
-              user: null,
-              role: null,
+              user: session.user,
+              role,
               isLoading: false,
-              isApproved: false,
+              isApproved,
             });
-            router.push('/login');
-          } else if (event === 'INITIAL_SESSION') {
-            // Handle initial session load
-            if (session?.user) {
-              const { isApproved, role } = await getUserApprovalStatus(session.user.id);
-              setState({
-                user: session.user,
-                role,
-                isLoading: false,
-                isApproved,
-              });
-            } else {
-              setState({
-                user: null,
-                role: null,
-                isLoading: false,
-                isApproved: false,
-              });
-            }
           }
-        } catch (error) {
-          console.error('Error in auth state change handler:', error);
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out, redirecting to login');
           setState({
             user: null,
             role: null,
             isLoading: false,
             isApproved: false,
           });
+          router.push('/login');
+        } else if (event === 'INITIAL_SESSION') {
+          // Handle initial session load
+          if (session?.user) {
+            const { isApproved, role } = getUserApprovalStatus(session.user);
+            setState({
+              user: session.user,
+              role,
+              isLoading: false,
+              isApproved,
+            });
+          } else {
+            setState({
+              user: null,
+              role: null,
+              isLoading: false,
+              isApproved: false,
+            });
+          }
         }
       }
     );

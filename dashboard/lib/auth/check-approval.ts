@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 import type { UserRole } from './types';
 
 // Cache approval status to prevent redundant checks
@@ -10,69 +10,56 @@ const approvalCache = new Map<string, {
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// Clear cache for a specific email (useful after admin changes)
-export function clearApprovalCache(email?: string) {
-  if (email) {
-    console.log('Clearing approval cache for:', email);
-    approvalCache.delete(email);
+// Clear cache for a specific user ID (useful after admin changes)
+export function clearApprovalCache(userId?: string) {
+  if (userId) {
+    console.log('Clearing approval cache for:', userId);
+    approvalCache.delete(userId);
   } else {
     console.log('Clearing all approval cache');
     approvalCache.clear();
   }
 }
 
-export async function getUserApprovalStatus(userId: string): Promise<{
+// Get approval status directly from user object (no API calls)
+export function getUserApprovalStatus(user: User | null): {
   isApproved: boolean;
   role: UserRole | null;
-}> {
-  console.log('getUserApprovalStatus called for userId:', userId);
+} {
+  if (!user) {
+    return { isApproved: false, role: null };
+  }
+
+  console.log('getUserApprovalStatus called for userId:', user.id);
 
   // Check cache first
-  const cached = approvalCache.get(userId);
+  const cached = approvalCache.get(user.id);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     console.log('Returning cached approval status:', cached);
     return { isApproved: cached.isApproved, role: cached.role };
   }
 
-  try {
-    const startTime = Date.now();
+  // Get role directly from app_metadata (no API call needed)
+  const role = (user.app_metadata?.role as UserRole) || 'pending';
 
-    console.log('Fetching user from Supabase Auth...');
-    const { data: { user }, error } = await supabase.auth.getUser();
+  console.log('User metadata:', {
+    userId: user.id,
+    email: user.email,
+    role,
+    email_confirmed: user.email_confirmed_at ? 'Yes' : 'No'
+  });
 
-    const duration = Date.now() - startTime;
-    console.log(`Auth check completed in ${duration}ms`);
+  // Only approve if role is 'user' or 'admin', not 'pending'
+  const isApproved = role === 'user' || role === 'admin';
 
-    if (error || !user) {
-      console.error('Error fetching user:', error);
-      return { isApproved: false, role: null };
-    }
+  const result = {
+    isApproved,
+    role
+  };
 
-    // Get role from app_metadata (set by admin via API)
-    const role = (user.app_metadata?.role as UserRole) || 'pending';
+  console.log('Approval status:', result);
 
-    console.log('User metadata:', {
-      userId: user.id,
-      email: user.email,
-      role,
-      email_confirmed: user.email_confirmed_at ? 'Yes' : 'No'
-    });
-
-    // Only approve if role is 'user' or 'admin', not 'pending'
-    const isApproved = role === 'user' || role === 'admin';
-
-    const result = {
-      isApproved,
-      role
-    };
-
-    console.log('Approval status:', result);
-
-    // Cache the result
-    approvalCache.set(userId, { ...result, timestamp: Date.now() });
-    return result;
-  } catch (error) {
-    console.error('Error in getUserApprovalStatus:', error);
-    return { isApproved: false, role: null };
-  }
+  // Cache the result
+  approvalCache.set(user.id, { ...result, timestamp: Date.now() });
+  return result;
 }
