@@ -27,8 +27,19 @@ export function Sidebar() {
   const { isCollapsed, toggleCollapsed, setCollapsed } = useSidebarStore();
   const { user } = useAuth();
 
-  const getInitials = (email: string) => {
-    return email.charAt(0).toUpperCase();
+  // Get user name and initials
+  const firstName = user?.user_metadata?.first_name || '';
+  const lastName = user?.user_metadata?.last_name || '';
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  const getInitials = () => {
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    }
+    return (user?.email || 'U').charAt(0).toUpperCase();
   };
 
   return (
@@ -124,11 +135,11 @@ export function Sidebar() {
           <UserMenu />
         ) : (
           <div
-            className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-sm flex-shrink-0 cursor-pointer hover:bg-orange-700 transition-colors"
+            className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-xs flex-shrink-0 cursor-pointer hover:bg-orange-700 transition-colors"
             onClick={() => setCollapsed(false)}
-            title={user?.email || 'User'}
+            title={fullName || user?.email || 'User'}
           >
-            {user?.email ? getInitials(user.email) : 'U'}
+            {getInitials()}
           </div>
         )}
       </div>
