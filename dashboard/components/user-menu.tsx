@@ -24,8 +24,20 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const getInitials = (email: string) => {
-    return email.charAt(0).toUpperCase();
+  // Get name from user metadata
+  const firstName = user.user_metadata?.first_name || '';
+  const lastName = user.user_metadata?.last_name || '';
+  const fullName = `${firstName} ${lastName}`.trim();
+  const displayName = fullName || user.email || 'User';
+
+  const getInitials = (name: string) => {
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    }
+    return (user.email || 'U').charAt(0).toUpperCase();
   };
 
   const handleLogout = async () => {
@@ -40,10 +52,10 @@ export function UserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium">
-          {getInitials(user.email || '')}
+        <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-xs">
+          {getInitials(displayName)}
         </div>
-        <span className="text-sm font-medium text-gray-700 truncate max-w-[140px]">{user.email}</span>
+        <span className="text-sm font-medium text-gray-700 truncate max-w-[140px]">{displayName}</span>
         <svg
           className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
@@ -57,6 +69,9 @@ export function UserMenu() {
       {isOpen && (
         <div className="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
           <div className="px-4 py-2 border-b border-gray-100">
+            {fullName && (
+              <p className="text-sm font-medium text-gray-900 truncate">{fullName}</p>
+            )}
             <p className="text-xs text-gray-500 truncate">{user.email}</p>
           </div>
 
