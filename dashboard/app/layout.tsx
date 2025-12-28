@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppLayout } from "@/components/layout/app-layout";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Providers>
           <AppLayout>{children}</AppLayout>
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
