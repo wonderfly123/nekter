@@ -681,7 +681,31 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
       };
     }
 
-    // Step 3: Build accounts with health data for sorting
+    // Step 3: Fetch renewals for ALL accounts (needed for sorting by renewal_date)
+    const ninetyDaysFromNow = new Date(demoDate);
+    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+
+    const allAccountIds = accounts.map((a) => a.sf_account_id);
+
+    const { data: renewalsData, error: renewalsError } = await supabase
+      .from('opportunities')
+      .select('sf_account_id, close_date')
+      .eq('type', 'Renewal')
+      .eq('is_closed', false)
+      .in('sf_account_id', allAccountIds);
+
+    if (renewalsError) throw renewalsError;
+
+    // Build renewal map
+    const renewalMap = new Map<string, string>();
+    renewalsData?.forEach((r) => {
+      const existing = renewalMap.get(r.sf_account_id);
+      if (!existing || r.close_date < existing) {
+        renewalMap.set(r.sf_account_id, r.close_date);
+      }
+    });
+
+    // Step 4: Build accounts with health data AND renewal date for sorting
     const accountsWithHealth = accounts
       .map((account) => {
         const health = healthMap.get(account.sf_account_id);
@@ -690,6 +714,7 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
           ...account,
           health_status: health.health_status,
           health_score: health.health_score,
+          renewal_date: renewalMap.get(account.sf_account_id) || null,
         };
       })
       .filter((acc): acc is NonNullable<typeof acc> => acc !== null);
@@ -721,41 +746,18 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
     const paginatedAccountsData = accountsWithHealth.slice(offset, offset + limit);
     const paginatedAccountIds = paginatedAccountsData.map((a) => a.sf_account_id);
 
-    // Step 4: Fetch additional data ONLY for paginated accounts (much faster!)
-    const ninetyDaysFromNow = new Date(demoDate);
-    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+    // Step 5: Fetch interactions ONLY for paginated accounts (still optimized!)
+    const { data: interactionsData, error: interactionsError } = await supabase
+      .from('interaction_insights')
+      .select('sf_account_id, churn_risk, expansion_opportunity')
+      .in('sf_account_id', paginatedAccountIds)
+      .gte('created_at', ninetyDaysAgo.toISOString());
 
-    const [renewalsResult, interactionsResult] = await Promise.all([
-      // Get renewals only for this page
-      supabase
-        .from('opportunities')
-        .select('sf_account_id, close_date')
-        .eq('type', 'Renewal')
-        .eq('is_closed', false)
-        .in('sf_account_id', paginatedAccountIds),
+    if (interactionsError) throw interactionsError;
 
-      // Get interactions only for this page
-      supabase
-        .from('interaction_insights')
-        .select('sf_account_id, churn_risk, expansion_opportunity')
-        .in('sf_account_id', paginatedAccountIds)
-        .gte('created_at', ninetyDaysAgo.toISOString()),
-    ]);
-
-    if (renewalsResult.error) throw renewalsResult.error;
-    if (interactionsResult.error) throw interactionsResult.error;
-
-    // Build maps
-    const renewalMap = new Map<string, string>();
-    renewalsResult.data?.forEach((r) => {
-      const existing = renewalMap.get(r.sf_account_id);
-      if (!existing || r.close_date < existing) {
-        renewalMap.set(r.sf_account_id, r.close_date);
-      }
-    });
-
+    // Build signal count map
     const signalMap = new Map<string, { churn: number; expansion: number }>();
-    interactionsResult.data?.forEach((i) => {
+    interactionsData?.forEach((i) => {
       const existing = signalMap.get(i.sf_account_id) || { churn: 0, expansion: 0 };
       signalMap.set(i.sf_account_id, {
         churn: existing.churn + (i.churn_risk ? 1 : 0),
@@ -763,10 +765,9 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
       });
     });
 
-    // Build final result
+    // Build final result (renewal_date already in paginatedAccountsData)
     const paginatedAccounts = paginatedAccountsData.map((account) => {
       const signals = signalMap.get(account.sf_account_id) || { churn: 0, expansion: 0 };
-      const renewalDate = renewalMap.get(account.sf_account_id);
 
       return {
         sf_account_id: account.sf_account_id,
@@ -774,7 +775,7 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
         health_status: account.health_status,
         health_score: account.health_score,
         arr: account.arr,
-        renewal_date: renewalDate || null,
+        renewal_date: account.renewal_date,
         last_activity_date: account.last_activity_date,
         churn_signals_count: signals.churn,
         expansion_signals_count: signals.expansion,
