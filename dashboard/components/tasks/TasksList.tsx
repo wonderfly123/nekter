@@ -181,9 +181,41 @@ export function TasksList({ sfAccountId }: TasksListProps) {
   };
 
   const handleTaskComplete = async (taskId: string) => {
+    // Optimistic update - update UI immediately
+    setTasks(prevTasks =>
+      prevTasks.map(task => {
+        if (task.id === taskId) {
+          const isCompleted = task.status === 'completed';
+          return {
+            ...task,
+            status: isCompleted ? 'active' : 'completed',
+            completed_at: isCompleted ? null : new Date().toISOString()
+          } as Task;
+        }
+        return task;
+      })
+    );
+
+    // Update stats optimistically
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      const isCompleted = task.status === 'completed';
+      setStats(prev => ({
+        ...prev,
+        completed: isCompleted ? prev.completed - 1 : prev.completed + 1,
+        activeCount: isCompleted ? prev.activeCount + 1 : prev.activeCount - 1,
+        completedCount: isCompleted ? prev.completedCount - 1 : prev.completedCount + 1
+      }));
+    }
+
+    // Then sync with server
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        // Revert on auth failure
+        fetchTasks();
+        return;
+      }
 
       const response = await fetch(`/api/tasks/${taskId}/complete`, {
         method: 'POST',
@@ -193,12 +225,14 @@ export function TasksList({ sfAccountId }: TasksListProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to complete task');
+        throw new Error('Failed to toggle task completion');
       }
 
-      fetchTasks();
+      // Success - optimistic update already applied, no need to refresh
     } catch (error) {
-      console.error('Error completing task:', error);
+      console.error('Error toggling task completion:', error);
+      // Revert on error
+      fetchTasks();
     }
   };
 
