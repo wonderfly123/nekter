@@ -106,7 +106,7 @@ export function generateTaskAssignedEmail(data: TaskAssignedEmailData): string {
           <!-- Footer -->
           <tr>
             <td style="padding: 24px 32px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
-              <p style="margin: 0; font-size: 13px; color: #6b7280; text-align: center;">This is an automated notification from your Task Management System</p>
+              <p style="margin: 0; font-size: 13px; color: #6b7280; text-align: center;">This is an automated notification from Nekter Task Management System</p>
             </td>
           </tr>
         </table>

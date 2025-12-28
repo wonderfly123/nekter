@@ -3,7 +3,7 @@ import { generateTaskAssignedEmail, TaskAssignedEmailData } from './templates/ta
 import { generateTaskReminderEmail, TaskReminderEmailData } from './templates/task-reminder';
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'tasks@example.com';
-const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'Task Management System';
+const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'Nekter Task Management';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 interface Task {
