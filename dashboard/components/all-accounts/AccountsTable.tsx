@@ -99,12 +99,12 @@ export function AccountsTable({
             <tr>
               <SortableHeader column="name" label="Account Name" />
               <SortableHeader column="arr" label="ARR" align="right" />
-              <SortableHeader column="renewal_date" label="Renewal Date" />
               <SortableHeader column="health_status" label="Status" />
               <SortableHeader column="health_score" label="Health Score" />
               <SortableHeader column="churn_signals_count" label="Churn (90D)" align="center" />
               <SortableHeader column="expansion_signals_count" label="Expansion (90D)" align="center" />
               <SortableHeader column="last_activity_date" label="Last Activity" />
+              <SortableHeader column="renewal_date" label="Renewal Date" />
               <th className="text-gray-600 text-xs uppercase font-semibold px-6 py-3 text-right">
                 Actions
               </th>

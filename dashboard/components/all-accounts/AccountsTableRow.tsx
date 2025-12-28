@@ -76,11 +76,6 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
         </span>
       </td>
 
-      {/* Renewal Date */}
-      <td className="py-4 px-6 text-sm text-gray-700">
-        {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
-      </td>
-
       {/* Status */}
       <td className="py-4 px-6">
         <HealthBadge
@@ -133,6 +128,11 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Last Activity */}
       <td className="py-4 px-6 text-sm text-gray-500">
         {daysSinceActivity || '—'}
+      </td>
+
+      {/* Renewal Date */}
+      <td className="py-4 px-6 text-sm text-gray-700">
+        {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
       </td>
 
       {/* Actions */}
