@@ -47,6 +47,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || undefined;
     const statusParam = searchParams.get('status');
     const healthStatus = statusParam ? statusParam.split(',') : undefined;
+    const csmParam = searchParams.get('csm');
+    const csmFilter = csmParam ? csmParam.split(',') : undefined;
     const sortBy = searchParams.get('sort') || 'health_score';
     const sortOrder = (searchParams.get('order') || 'asc') as 'asc' | 'desc';
 
@@ -64,6 +66,7 @@ export async function GET(request: NextRequest) {
       limit,
       search,
       healthStatus,
+      csmFilter,
       sortBy,
       sortOrder,
     });

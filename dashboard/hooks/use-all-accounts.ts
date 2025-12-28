@@ -7,6 +7,7 @@ interface UseAllAccountsParams {
   limit: number;
   search?: string;
   healthStatus?: string[];
+  csmFilter?: string[];
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -33,7 +34,7 @@ interface AllAccountsResponse {
 }
 
 export function useAllAccounts(params: UseAllAccountsParams) {
-  const { page, limit, search, healthStatus, sortBy, sortOrder } = params;
+  const { page, limit, search, healthStatus, csmFilter, sortBy, sortOrder } = params;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check authentication status
@@ -44,7 +45,7 @@ export function useAllAccounts(params: UseAllAccountsParams) {
   }, []);
 
   return useQuery<AllAccountsResponse>({
-    queryKey: ['all-accounts', page, limit, search, healthStatus, sortBy, sortOrder],
+    queryKey: ['all-accounts', page, limit, search, healthStatus, csmFilter, sortBy, sortOrder],
     enabled: isAuthenticated, // Only run query when authenticated
     queryFn: async () => {
       // Get session for auth token
@@ -61,6 +62,9 @@ export function useAllAccounts(params: UseAllAccountsParams) {
       if (search) searchParams.set('search', search);
       if (healthStatus && healthStatus.length > 0) {
         searchParams.set('status', healthStatus.join(','));
+      }
+      if (csmFilter && csmFilter.length > 0) {
+        searchParams.set('csm', csmFilter.join(','));
       }
       if (sortBy) searchParams.set('sort', sortBy);
       if (sortOrder) searchParams.set('order', sortOrder);

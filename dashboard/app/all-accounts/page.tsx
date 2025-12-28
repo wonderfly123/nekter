@@ -19,6 +19,9 @@ function AllAccountsContent() {
   const [healthStatus, setHealthStatus] = useState<string[]>(
     searchParams.get('status') ? searchParams.get('status')!.split(',') : []
   );
+  const [csmFilter, setCsmFilter] = useState<string[]>(
+    searchParams.get('csm') ? searchParams.get('csm')!.split(',') : []
+  );
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'health_score');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
     (searchParams.get('order') as 'asc' | 'desc') || 'asc'
@@ -30,6 +33,7 @@ function AllAccountsContent() {
     limit,
     search,
     healthStatus,
+    csmFilter,
     sortBy,
     sortOrder,
   });
@@ -40,11 +44,12 @@ function AllAccountsContent() {
     params.set('page', page.toString());
     if (search) params.set('search', search);
     if (healthStatus.length > 0) params.set('status', healthStatus.join(','));
+    if (csmFilter.length > 0) params.set('csm', csmFilter.join(','));
     params.set('sort', sortBy);
     params.set('order', sortOrder);
 
     router.push(`/all-accounts?${params.toString()}`, { scroll: false });
-  }, [page, search, healthStatus, sortBy, sortOrder, router]);
+  }, [page, search, healthStatus, csmFilter, sortBy, sortOrder, router]);
 
   // Handle search change (reset to page 1)
   const handleSearchChange = useCallback((value: string) => {
@@ -55,6 +60,12 @@ function AllAccountsContent() {
   // Handle health status filter change (reset to page 1)
   const handleHealthStatusChange = useCallback((value: string[]) => {
     setHealthStatus(value);
+    setPage(1);
+  }, []);
+
+  // Handle CSM filter change (reset to page 1)
+  const handleCsmFilterChange = useCallback((value: string[]) => {
+    setCsmFilter(value);
     setPage(1);
   }, []);
 
@@ -122,6 +133,8 @@ function AllAccountsContent() {
           onSearchChange={handleSearchChange}
           healthStatus={healthStatus}
           onHealthStatusChange={handleHealthStatusChange}
+          csmFilter={csmFilter}
+          onCsmFilterChange={handleCsmFilterChange}
           sortBy={sortBy}
           onSortByChange={handleSortByChange}
           sortOrder={sortOrder}

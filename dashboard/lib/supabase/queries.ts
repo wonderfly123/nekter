@@ -601,6 +601,7 @@ export interface AllAccountsFilters {
   limit: number;
   search?: string;
   healthStatus?: string[];
+  csmFilter?: string[];
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -630,7 +631,7 @@ export interface AllAccountsResult {
  * Optimized with database-level filtering and pagination
  */
 export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAccountsResult> {
-  const { page, limit, search, healthStatus, sortBy = 'health_score', sortOrder = 'asc' } = filters;
+  const { page, limit, search, healthStatus, csmFilter, sortBy = 'health_score', sortOrder = 'asc' } = filters;
   const demoDate = getDemoDateString();
   const startOfDay = `${demoDate}T00:00:00`;
   const endOfDay = `${demoDate}T23:59:59`;
@@ -662,7 +663,7 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
     const healthMap = new Map(healthData.map((h) => [h.sf_account_id, h]));
     const accountIds = Array.from(healthMap.keys());
 
-    // Step 2: Get accounts with optional search filter
+    // Step 2: Get accounts with optional search and CSM filters
     let accountsQuery = supabase
       .from('accounts')
       .select('*')
@@ -670,6 +671,10 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
 
     if (search) {
       accountsQuery = accountsQuery.ilike('name', `%${search}%`);
+    }
+
+    if (csmFilter && csmFilter.length > 0) {
+      accountsQuery = accountsQuery.in('csm_name', csmFilter);
     }
 
     const { data: accounts, error: accountsError } = await accountsQuery;
