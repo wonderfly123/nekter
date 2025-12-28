@@ -17,7 +17,7 @@ interface Task {
 
 interface User {
   id: string;
-  email: string;
+  email?: string;
   user_metadata?: {
     first_name?: string;
     last_name?: string;
@@ -59,6 +59,12 @@ export async function sendTaskAssignmentEmail(params: {
   // Skip if SendGrid is not configured
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Email] Skipping task assignment email - SendGrid not configured');
+    return;
+  }
+
+  // Skip if assignee has no email
+  if (!assignee.email) {
+    console.log('[Email] Skipping task assignment email - assignee has no email');
     return;
   }
 
@@ -106,6 +112,12 @@ export async function sendTaskReminderEmail(params: {
   // Skip if SendGrid is not configured
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Email] Skipping task reminder email - SendGrid not configured');
+    return;
+  }
+
+  // Skip if assignee has no email
+  if (!assignee.email) {
+    console.log('[Email] Skipping task reminder email - assignee has no email');
     return;
   }
 
