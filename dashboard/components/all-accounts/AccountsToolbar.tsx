@@ -130,6 +130,7 @@ export function AccountsToolbar({
             <option value="health_score">Health Score</option>
             <option value="arr">ARR</option>
             <option value="renewal_date">Renewal Date</option>
+            <option value="csm_name">CSM</option>
             <option value="last_activity_date">Last Activity</option>
             <option value="churn_signals_count">Churn Signals</option>
             <option value="expansion_signals_count">Expansion Signals</option>

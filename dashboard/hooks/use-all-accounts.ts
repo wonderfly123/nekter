@@ -20,6 +20,7 @@ interface AllAccountsResponse {
     arr: number | null;
     renewal_date: string | null;
     last_activity_date: string | null;
+    csm_name: string | null;
     churn_signals_count: number;
     expansion_signals_count: number;
   }[];

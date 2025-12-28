@@ -11,6 +11,7 @@ interface AccountRow {
   arr: number | null;
   renewal_date: string | null;
   last_activity_date: string | null;
+  csm_name: string | null;
   churn_signals_count: number;
   expansion_signals_count: number;
 }
@@ -34,7 +35,7 @@ export function AccountsTable({
   const renderLoadingRows = () => {
     return Array.from({ length: 5 }).map((_, index) => (
       <tr key={`loading-${index}`} className="border-b border-gray-100">
-        {Array.from({ length: 8 }).map((_, colIndex) => (
+        {Array.from({ length: 9 }).map((_, colIndex) => (
           <td key={colIndex} className="py-4 px-6">
             <div className="h-4 bg-gray-200 rounded animate-pulse" />
           </td>
@@ -105,6 +106,7 @@ export function AccountsTable({
               <SortableHeader column="expansion_signals_count" label="Expansion (90D)" align="center" />
               <SortableHeader column="last_activity_date" label="Last Activity" />
               <SortableHeader column="renewal_date" label="Renewal Date" />
+              <SortableHeader column="csm_name" label="CSM" />
             </tr>
           </thead>
           <tbody>

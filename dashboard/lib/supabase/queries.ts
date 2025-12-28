@@ -777,6 +777,7 @@ export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAc
         arr: account.arr,
         renewal_date: account.renewal_date,
         last_activity_date: account.last_activity_date,
+        csm_name: account.csm_name,
         churn_signals_count: signals.churn,
         expansion_signals_count: signals.expansion,
       };

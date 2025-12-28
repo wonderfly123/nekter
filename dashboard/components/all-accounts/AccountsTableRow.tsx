@@ -14,6 +14,7 @@ interface AccountRow {
   arr: number | null;
   renewal_date: string | null;
   last_activity_date: string | null;
+  csm_name: string | null;
   churn_signals_count: number;
   expansion_signals_count: number;
 }
@@ -137,6 +138,11 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Renewal Date */}
       <td className="py-4 px-6 text-sm text-gray-700">
         {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
+      </td>
+
+      {/* CSM Name */}
+      <td className="py-4 px-6 text-sm text-gray-700">
+        {account.csm_name || '—'}
       </td>
     </tr>
   );
