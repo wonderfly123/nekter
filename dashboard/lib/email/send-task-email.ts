@@ -35,7 +35,7 @@ function getUserDisplayName(user: User): string {
   if (firstName || lastName) {
     return `${firstName || ''} ${lastName || ''}`.trim();
   }
-  return user.email;
+  return user.email || 'Unknown User';
 }
 
 function formatDueDate(dateString: string): string {
