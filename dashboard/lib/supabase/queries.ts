@@ -596,6 +596,199 @@ export async function getCsmList(): Promise<string[]> {
   }
 }
 
+export interface AllAccountsFilters {
+  page: number;
+  limit: number;
+  search?: string;
+  healthStatus?: string[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface AllAccountsResult {
+  accounts: {
+    sf_account_id: string;
+    name: string;
+    health_status: string;
+    health_score: number | null;
+    arr: number | null;
+    renewal_date: string | null;
+    last_activity_date: string | null;
+    churn_signals_count: number;
+    expansion_signals_count: number;
+  }[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+/**
+ * Get all accounts with health scores, ARR, signals, and pagination
+ */
+export async function getAllAccounts(filters: AllAccountsFilters): Promise<AllAccountsResult> {
+  const { page, limit, search, healthStatus, sortBy = 'health_score', sortOrder = 'asc' } = filters;
+  const demoDate = getDemoDateString();
+  const startOfDay = `${demoDate}T00:00:00`;
+  const endOfDay = `${demoDate}T23:59:59`;
+  const ninetyDaysAgo = new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000);
+
+  try {
+    // Build base query for accounts
+    let accountsQuery = supabase.from('accounts').select('*');
+
+    // Apply search filter
+    if (search) {
+      accountsQuery = accountsQuery.ilike('name', `%${search}%`);
+    }
+
+    // Get all matching accounts
+    const { data: allAccounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!allAccounts || allAccounts.length === 0) {
+      return {
+        accounts: [],
+        pagination: { total: 0, page, limit, totalPages: 0 },
+      };
+    }
+
+    const accountIds = allAccounts.map((a) => a.sf_account_id);
+
+    // Get latest health snapshot for all accounts
+    const { data: healthData, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('health_status, health_score, sf_account_id')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay);
+
+    if (healthError) throw healthError;
+
+    // Create health map
+    const healthMap = new Map(
+      healthData?.map((h) => [h.sf_account_id, h]) || []
+    );
+
+    // Filter by health status if specified
+    let filteredAccounts = allAccounts.filter((account) => {
+      const health = healthMap.get(account.sf_account_id);
+      if (!health) return false;
+
+      if (healthStatus && healthStatus.length > 0) {
+        return healthStatus.includes(health.health_status);
+      }
+      return true;
+    });
+
+    // Get renewal opportunities for all accounts
+    const ninetyDaysFromNow = new Date(demoDate);
+    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+
+    const { data: renewals, error: renewalsError } = await supabase
+      .from('opportunities')
+      .select('sf_account_id, close_date')
+      .eq('type', 'Renewal')
+      .eq('is_closed', false)
+      .in('sf_account_id', accountIds);
+
+    if (renewalsError) throw renewalsError;
+
+    // Create renewal map (account_id -> closest renewal date)
+    const renewalMap = new Map<string, string>();
+    renewals?.forEach((r) => {
+      const existing = renewalMap.get(r.sf_account_id);
+      if (!existing || r.close_date < existing) {
+        renewalMap.set(r.sf_account_id, r.close_date);
+      }
+    });
+
+    // Get interactions for signal counting (last 90 days)
+    const { data: interactions, error: interactionsError } = await supabase
+      .from('interaction_insights')
+      .select('sf_account_id, churn_risk, expansion_opportunity')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', ninetyDaysAgo.toISOString());
+
+    if (interactionsError) throw interactionsError;
+
+    // Create signal count map
+    const signalMap = new Map<string, { churn: number; expansion: number }>();
+    interactions?.forEach((i) => {
+      const existing = signalMap.get(i.sf_account_id) || { churn: 0, expansion: 0 };
+      signalMap.set(i.sf_account_id, {
+        churn: existing.churn + (i.churn_risk ? 1 : 0),
+        expansion: existing.expansion + (i.expansion_opportunity ? 1 : 0),
+      });
+    });
+
+    // Build result accounts with all data
+    const accountsWithData = filteredAccounts
+      .map((account) => {
+        const health = healthMap.get(account.sf_account_id);
+        if (!health) return null;
+
+        const signals = signalMap.get(account.sf_account_id) || { churn: 0, expansion: 0 };
+        const renewalDate = renewalMap.get(account.sf_account_id);
+
+        return {
+          sf_account_id: account.sf_account_id,
+          name: account.name,
+          health_status: health.health_status,
+          health_score: health.health_score,
+          arr: account.arr,
+          renewal_date: renewalDate || null,
+          last_activity_date: account.last_activity_date,
+          churn_signals_count: signals.churn,
+          expansion_signals_count: signals.expansion,
+        };
+      })
+      .filter((acc): acc is NonNullable<typeof acc> => acc !== null);
+
+    // Sort accounts
+    accountsWithData.sort((a, b) => {
+      let aValue: any = a[sortBy as keyof typeof a];
+      let bValue: any = b[sortBy as keyof typeof b];
+
+      // Handle null values
+      if (aValue === null && bValue === null) return 0;
+      if (aValue === null) return sortOrder === 'asc' ? 1 : -1;
+      if (bValue === null) return sortOrder === 'asc' ? -1 : 1;
+
+      // Sort by value
+      if (typeof aValue === 'string') {
+        return sortOrder === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      } else {
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+    });
+
+    // Apply pagination
+    const offset = (page - 1) * limit;
+    const paginatedAccounts = accountsWithData.slice(offset, offset + limit);
+
+    return {
+      accounts: paginatedAccounts,
+      pagination: {
+        total: accountsWithData.length,
+        page,
+        limit,
+        totalPages: Math.ceil(accountsWithData.length / limit),
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching all accounts:', error);
+    return {
+      accounts: [],
+      pagination: { total: 0, page, limit, totalPages: 0 },
+    };
+  }
+}
+
 /**
  * Get renewal forecast data (health breakdown of accounts with renewals in next 90 days)
  */
