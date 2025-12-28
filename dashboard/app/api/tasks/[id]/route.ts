@@ -167,9 +167,9 @@ export async function PATCH(
           // Send assignment email to new assignee
           await sendTaskAssignmentEmail({
             task,
-            assignee: newAssigneeData.user,
+            assignee: newAssigneeData.user as any,
             account: accountData,
-            createdBy: user,
+            createdBy: user as any,
           });
         }
       } catch (emailError) {

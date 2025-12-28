@@ -86,7 +86,7 @@ export async function GET(request: Request) {
         // Send reminder email
         await sendTaskReminderEmail({
           task,
-          assignee: assigneeData.user,
+          assignee: assigneeData.user as any,
           account: accountData,
           reminderType: reminder.reminder_type,
         });

@@ -179,15 +179,15 @@ export async function POST(request: Request) {
         // Send assignment email
         await sendTaskAssignmentEmail({
           task,
-          assignee: assigneeData.user,
+          assignee: assigneeData.user as any,
           account: accountData,
-          createdBy: user,
+          createdBy: user as any,
         });
 
         // Send immediate reminder if task is overdue or due today
         await sendImmediateReminderEmail({
           task,
-          assignee: assigneeData.user,
+          assignee: assigneeData.user as any,
           account: accountData,
         });
       }
