@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { TaskItem } from './TaskItem';
 import { TaskModal } from './TaskModal';
+import { DeleteTaskModal } from './DeleteTaskModal';
 import { Plus, Search } from 'lucide-react';
 
 interface Task {
@@ -40,6 +41,7 @@ export function TasksList({ sfAccountId }: TasksListProps) {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
@@ -200,11 +202,24 @@ export function TasksList({ sfAccountId }: TasksListProps) {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
       const isCompleted = task.status === 'completed';
+      const isOverdue = new Date(task.due_date) < new Date();
+      const today = new Date().toDateString();
+      const taskDate = new Date(task.due_date).toDateString();
+      const isDueToday = today === taskDate;
+
       setStats(prev => ({
         ...prev,
         completed: isCompleted ? prev.completed - 1 : prev.completed + 1,
         activeCount: isCompleted ? prev.activeCount + 1 : prev.activeCount - 1,
-        completedCount: isCompleted ? prev.completedCount - 1 : prev.completedCount + 1
+        completedCount: isCompleted ? prev.completedCount - 1 : prev.completedCount + 1,
+        // Update overdue count: if marking as completed and was overdue, decrease; if marking as active and is overdue, increase
+        overdue: isCompleted
+          ? (isOverdue ? prev.overdue + 1 : prev.overdue)
+          : (isOverdue ? prev.overdue - 1 : prev.overdue),
+        // Update dueToday count: if marking as completed and was due today, decrease; if marking as active and is due today, increase
+        dueToday: isCompleted
+          ? (isDueToday ? prev.dueToday + 1 : prev.dueToday)
+          : (isDueToday ? prev.dueToday - 1 : prev.dueToday)
       }));
     }
 
@@ -236,12 +251,43 @@ export function TasksList({ sfAccountId }: TasksListProps) {
     }
   };
 
-  const handleTaskDelete = async (taskId: string) => {
-    if (!confirm('Are you sure you want to delete this task?')) return;
+  const handleTaskDelete = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      setDeletingTask(task);
+    }
+  };
+
+  const confirmDeleteTask = async () => {
+    if (!deletingTask) return;
+
+    // Optimistic update - remove task from UI immediately
+    const taskId = deletingTask.id;
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+
+    // Update stats optimistically
+    const isCompleted = deletingTask.status === 'completed';
+    const isOverdue = deletingTask.status === 'active' && new Date(deletingTask.due_date) < new Date();
+    const today = new Date().toDateString();
+    const taskDate = new Date(deletingTask.due_date).toDateString();
+    const isDueToday = deletingTask.status === 'active' && today === taskDate;
+
+    setStats(prev => ({
+      ...prev,
+      total: prev.total - 1,
+      activeCount: isCompleted ? prev.activeCount : prev.activeCount - 1,
+      completedCount: isCompleted ? prev.completedCount - 1 : prev.completedCount,
+      overdue: isOverdue ? prev.overdue - 1 : prev.overdue,
+      dueToday: isDueToday ? prev.dueToday - 1 : prev.dueToday
+    }));
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        // Revert on auth failure
+        fetchTasks();
+        return;
+      }
 
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'DELETE',
@@ -254,9 +300,11 @@ export function TasksList({ sfAccountId }: TasksListProps) {
         throw new Error('Failed to delete task');
       }
 
-      fetchTasks();
+      // Success - optimistic update already applied, no need to refresh
     } catch (error) {
       console.error('Error deleting task:', error);
+      // Revert on error
+      fetchTasks();
     }
   };
 
@@ -447,6 +495,15 @@ export function TasksList({ sfAccountId }: TasksListProps) {
           sfAccountId={sfAccountId}
           task={editingTask}
           onClose={handleModalClose}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingTask && (
+        <DeleteTaskModal
+          taskTitle={deletingTask.title}
+          onConfirm={confirmDeleteTask}
+          onClose={() => setDeletingTask(null)}
         />
       )}
     </div>

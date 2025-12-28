@@ -29,11 +29,8 @@ async function verifyAuth(authHeader: string | null) {
   return { user };
 }
 
-// POST - Toggle task completion status
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// POST - Mark all notifications as read
+export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get('authorization');
     const authCheck = await verifyAuth(authHeader);
@@ -42,41 +39,26 @@ export async function POST(
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }
 
-    const { id } = await params;
+    const { user } = authCheck;
 
-    // Get current task status
-    const { data: currentTask } = await supabase
-      .from('tasks')
-      .select('status')
-      .eq('id', id)
-      .single();
-
-    if (!currentTask) {
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
-    }
-
-    // Toggle completion status
-    const isCompleted = currentTask.status === 'completed';
-    const updates = isCompleted
-      ? { status: 'active', completed_at: null }
-      : { status: 'completed', completed_at: new Date().toISOString() };
-
-    // Update task
-    const { data: task, error } = await supabase
-      .from('tasks')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    // Update all unread notifications for this user
+    const { error } = await supabase
+      .from('notifications')
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+      .eq('is_read', false);
 
     if (error) {
-      console.error('Error toggling task completion:', error);
+      console.error('Error marking all notifications as read:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ task });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Error in POST /api/tasks/[id]/complete:', error);
+    console.error('Error in POST /api/notifications/mark-all-read:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -190,6 +190,23 @@ export async function POST(request: Request) {
           assignee: assigneeData.user as any,
           account: accountData,
         });
+
+        // Create notification for task assignment
+        try {
+          await supabase
+            .from('notifications')
+            .insert({
+              user_id: assigneeId,
+              type: 'task_assigned',
+              title: 'New Task Assigned',
+              message: `You have been assigned a new task: ${task.title}`,
+              related_entity_type: 'task',
+              related_entity_id: task.id
+            });
+        } catch (notifError) {
+          console.error('Error creating notification:', notifError);
+          // Don't fail the request if notification creation fails
+        }
       }
     } catch (emailError) {
       console.error('Error sending task assignment email:', emailError);

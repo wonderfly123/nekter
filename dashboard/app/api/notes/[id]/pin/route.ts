@@ -29,7 +29,7 @@ async function verifyAuth(authHeader: string | null) {
   return { user };
 }
 
-// POST - Toggle task completion status
+// POST - Toggle note pin status
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -44,39 +44,36 @@ export async function POST(
 
     const { id } = await params;
 
-    // Get current task status
-    const { data: currentTask } = await supabase
-      .from('tasks')
-      .select('status')
+    // Get current note pin status
+    const { data: currentNote } = await supabase
+      .from('notes')
+      .select('is_pinned')
       .eq('id', id)
       .single();
 
-    if (!currentTask) {
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+    if (!currentNote) {
+      return NextResponse.json({ error: 'Note not found' }, { status: 404 });
     }
 
-    // Toggle completion status
-    const isCompleted = currentTask.status === 'completed';
-    const updates = isCompleted
-      ? { status: 'active', completed_at: null }
-      : { status: 'completed', completed_at: new Date().toISOString() };
+    // Toggle pin status
+    const newPinStatus = !currentNote.is_pinned;
 
-    // Update task
-    const { data: task, error } = await supabase
-      .from('tasks')
-      .update(updates)
+    // Update note
+    const { data: note, error } = await supabase
+      .from('notes')
+      .update({ is_pinned: newPinStatus })
       .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error('Error toggling task completion:', error);
+      console.error('Error toggling note pin status:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ task });
+    return NextResponse.json({ note });
   } catch (error: any) {
-    console.error('Error in POST /api/tasks/[id]/complete:', error);
+    console.error('Error in POST /api/notes/[id]/pin:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

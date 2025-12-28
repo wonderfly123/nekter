@@ -29,8 +29,8 @@ async function verifyAuth(authHeader: string | null) {
   return { user };
 }
 
-// POST - Toggle task completion status
-export async function POST(
+// PATCH - Mark notification as read
+export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -42,41 +42,33 @@ export async function POST(
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }
 
+    const { user } = authCheck;
     const { id } = await params;
 
-    // Get current task status
-    const { data: currentTask } = await supabase
-      .from('tasks')
-      .select('status')
+    // Update notification
+    const { data: notification, error } = await supabase
+      .from('notifications')
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString()
+      })
       .eq('id', id)
-      .single();
-
-    if (!currentTask) {
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
-    }
-
-    // Toggle completion status
-    const isCompleted = currentTask.status === 'completed';
-    const updates = isCompleted
-      ? { status: 'active', completed_at: null }
-      : { status: 'completed', completed_at: new Date().toISOString() };
-
-    // Update task
-    const { data: task, error } = await supabase
-      .from('tasks')
-      .update(updates)
-      .eq('id', id)
+      .eq('user_id', user.id) // Ensure user can only update their own notifications
       .select()
       .single();
 
     if (error) {
-      console.error('Error toggling task completion:', error);
+      console.error('Error updating notification:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ task });
+    if (!notification) {
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ notification });
   } catch (error: any) {
-    console.error('Error in POST /api/tasks/[id]/complete:', error);
+    console.error('Error in PATCH /api/notifications/[id]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

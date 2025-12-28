@@ -93,12 +93,11 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete }: TaskItem
       <div className="flex items-start gap-4">
         {/* Checkbox */}
         <button
-          onClick={() => !isCompleted && onComplete(task.id)}
-          className={`mt-1 flex-shrink-0 ${isCompleted ? 'cursor-default' : 'cursor-pointer'}`}
-          disabled={isCompleted}
+          onClick={() => onComplete(task.id)}
+          className="mt-1 flex-shrink-0 cursor-pointer"
         >
           {isCompleted ? (
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <CheckCircle2 className="w-5 h-5 text-green-600 hover:text-green-700 transition-colors" />
           ) : (
             <Circle className="w-5 h-5 text-gray-400 hover:text-orange-600 transition-colors" />
           )}

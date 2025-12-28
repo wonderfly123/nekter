@@ -6,13 +6,14 @@ import { HealthTrendChart } from './health-trend-chart';
 import { ActionItems } from './action-items';
 import { InteractionTimeline } from './interaction-timeline';
 import { TasksList } from '@/components/tasks/TasksList';
+import { NotesList } from '@/components/notes/NotesList';
 import type { AccountDetailData } from '@/lib/supabase/types';
 
 interface AccountTabsProps {
   data: AccountDetailData;
 }
 
-type TabType = 'overview' | 'interactions' | 'tasks';
+type TabType = 'overview' | 'interactions' | 'tasks' | 'notes';
 
 export function AccountTabs({ data }: AccountTabsProps) {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -21,6 +22,7 @@ export function AccountTabs({ data }: AccountTabsProps) {
     { id: 'overview' as TabType, label: 'Overview' },
     { id: 'interactions' as TabType, label: 'Interactions' },
     { id: 'tasks' as TabType, label: 'Tasks' },
+    { id: 'notes' as TabType, label: 'Notes' },
   ];
 
   return (
@@ -119,6 +121,12 @@ export function AccountTabs({ data }: AccountTabsProps) {
         {activeTab === 'tasks' && (
           <div className="p-8">
             <TasksList sfAccountId={data.account.sf_account_id} />
+          </div>
+        )}
+
+        {activeTab === 'notes' && (
+          <div className="p-8">
+            <NotesList sfAccountId={data.account.sf_account_id} />
           </div>
         )}
       </div>

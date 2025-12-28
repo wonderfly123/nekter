@@ -171,6 +171,23 @@ export async function PATCH(
             account: accountData,
             createdBy: user as any,
           });
+
+          // Create notification for task reassignment
+          try {
+            await supabase
+              .from('notifications')
+              .insert({
+                user_id: assigneeId,
+                type: 'task_reassigned',
+                title: 'Task Reassigned to You',
+                message: `You have been reassigned a task: ${task.title}`,
+                related_entity_type: 'task',
+                related_entity_id: task.id
+              });
+          } catch (notifError) {
+            console.error('Error creating notification:', notifError);
+            // Don't fail the request if notification creation fails
+          }
         }
       } catch (emailError) {
         console.error('Error sending task reassignment email:', emailError);

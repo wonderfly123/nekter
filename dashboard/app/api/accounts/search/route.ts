@@ -29,11 +29,8 @@ async function verifyAuth(authHeader: string | null) {
   return { user };
 }
 
-// POST - Toggle task completion status
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// GET - Search accounts by name
+export async function GET(request: Request) {
   try {
     const authHeader = request.headers.get('authorization');
     const authCheck = await verifyAuth(authHeader);
@@ -42,41 +39,30 @@ export async function POST(
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
     }
 
-    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get('q') || '';
 
-    // Get current task status
-    const { data: currentTask } = await supabase
-      .from('tasks')
-      .select('status')
-      .eq('id', id)
-      .single();
-
-    if (!currentTask) {
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+    // Return empty results if query is too short
+    if (query.length < 2) {
+      return NextResponse.json({ accounts: [] });
     }
 
-    // Toggle completion status
-    const isCompleted = currentTask.status === 'completed';
-    const updates = isCompleted
-      ? { status: 'active', completed_at: null }
-      : { status: 'completed', completed_at: new Date().toISOString() };
-
-    // Update task
-    const { data: task, error } = await supabase
-      .from('tasks')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    // Search accounts by name (case-insensitive) or account ID
+    const { data: accounts, error } = await supabase
+      .from('accounts')
+      .select('sf_account_id, name')
+      .or(`name.ilike.%${query}%,sf_account_id.ilike.%${query}%`)
+      .order('name', { ascending: true })
+      .limit(10);
 
     if (error) {
-      console.error('Error toggling task completion:', error);
+      console.error('Error searching accounts:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ task });
+    return NextResponse.json({ accounts: accounts || [] });
   } catch (error: any) {
-    console.error('Error in POST /api/tasks/[id]/complete:', error);
+    console.error('Error in GET /api/accounts/search:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
