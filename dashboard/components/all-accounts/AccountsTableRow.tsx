@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { HealthBadge } from '@/components/shared/health-badge';
 import { formatCurrency } from '@/lib/utils/formatters';
 import { format } from 'date-fns';
 import { formatDaysAgo } from '@/lib/utils/date-utils';
-import { ArrowRight } from 'lucide-react';
 
 interface AccountRow {
   sf_account_id: string;
@@ -24,6 +23,7 @@ interface AccountsTableRowProps {
 }
 
 export function AccountsTableRow({ account }: AccountsTableRowProps) {
+  const router = useRouter();
   // Calculate days since last activity
   let daysSinceActivity: string | null = null;
   if (account.last_activity_date) {
@@ -52,21 +52,25 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
     return 'bg-red-500';
   };
 
+  const handleRowClick = () => {
+    router.push(`/account/${account.sf_account_id}`);
+  };
+
   return (
-    <tr className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors">
+    <tr
+      className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+      onClick={handleRowClick}
+    >
       {/* Account Name */}
       <td className="py-4 px-6">
-        <Link
-          href={`/account/${account.sf_account_id}`}
-          className="flex items-center gap-3 group"
-        >
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
             {getInitials(account.name)}
           </div>
-          <span className="font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
+          <span className="font-medium text-gray-900">
             {account.name}
           </span>
-        </Link>
+        </div>
       </td>
 
       {/* ARR */}
@@ -133,17 +137,6 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Renewal Date */}
       <td className="py-4 px-6 text-sm text-gray-700">
         {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
-      </td>
-
-      {/* Actions */}
-      <td className="py-4 px-6 text-right">
-        <Link
-          href={`/account/${account.sf_account_id}`}
-          className="inline-flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
-        >
-          View
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </td>
     </tr>
   );
