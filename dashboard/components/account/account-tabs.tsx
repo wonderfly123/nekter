@@ -5,6 +5,7 @@ import { MetricsGrid } from './metrics-grid';
 import { HealthTrendChart } from './health-trend-chart';
 import { ActionItems } from './action-items';
 import { InteractionTimeline } from './interaction-timeline';
+import { TasksList } from '@/components/tasks/TasksList';
 import type { AccountDetailData } from '@/lib/supabase/types';
 
 interface AccountTabsProps {
@@ -117,12 +118,7 @@ export function AccountTabs({ data }: AccountTabsProps) {
 
         {activeTab === 'tasks' && (
           <div className="p-8">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Tasks
-              </h3>
-              <p className="text-gray-600">Task management coming soon</p>
-            </div>
+            <TasksList sfAccountId={data.account.sf_account_id} />
           </div>
         )}
       </div>

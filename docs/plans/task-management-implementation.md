@@ -1,7 +1,8 @@
 # Task Management System - Implementation Plan
 
 **Created:** 2025-12-27
-**Status:** Ready for Implementation
+**Last Updated:** 2025-12-27
+**Status:** In Progress - Core Features Implemented, Email Notifications Pending
 
 ## Overview
 
@@ -21,20 +22,20 @@ Account-level task management system for CSMs to track action items, follow-ups,
 - ✅ Archive old completed tasks (30+ days)
 
 ### Filtering & Organization
-- ✅ Filter by status (Active/Completed)
 - ✅ Filter by priority
 - ✅ Filter by assignee
 - ✅ Search by title/description
 - ✅ Sort by: due date, priority, created date, title
-- ✅ View toggle: Active vs Completed
+- ✅ View toggle: Active vs Completed (replaces status filter)
 
 ### Notifications & Reminders
-- ✅ Email notification on task assignment
-- ✅ Automatic reminders:
+- ⏳ **Email notification on task assignment** (TODO)
+- ⏳ **Email notification on task reassignment** (TODO)
+- ⏳ **Automatic reminders** (TODO):
   - 3 days before due date
   - 1 day before due date
-  - 1 hour before due date
   - When task becomes overdue
+  - Immediate notification for tasks created overdue/due today
 
 ### Statistics Dashboard
 - ✅ Total tasks count
@@ -50,8 +51,7 @@ Account-level task management system for CSMs to track action items, follow-ups,
 ### Tables Required
 
 1. **`tasks`** - Main task storage
-2. **`task_comments`** - Optional: Comments/notes on tasks
-3. Uses existing: **`accounts`**, **`auth.users`**
+2. Uses existing: **`accounts`**, **`auth.users`**
 
 ### SQL Schema
 
@@ -131,102 +131,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- =====================================================
--- TASK COMMENTS TABLE (Optional - for future)
--- =====================================================
-CREATE TABLE IF NOT EXISTS public.task_comments (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  task_id UUID NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  comment TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
-CREATE INDEX idx_task_comments_task_id ON public.task_comments(task_id);
-CREATE INDEX idx_task_comments_created_at ON public.task_comments(created_at);
-
--- =====================================================
--- ROW LEVEL SECURITY (RLS)
--- =====================================================
-
--- Enable RLS
-ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
-
--- Tasks policies
-CREATE POLICY "Users can view tasks for their accounts"
-  ON public.tasks FOR SELECT
-  USING (
-    -- Users can see tasks for accounts they manage
-    sf_account_id IN (
-      SELECT sf_account_id FROM public.accounts
-      WHERE csm_owner_id = auth.uid()
-    )
-    -- Or tasks assigned to them
-    OR assignee_id = auth.uid()
-    -- Or tasks they created
-    OR created_by = auth.uid()
-  );
-
-CREATE POLICY "Users can create tasks for their accounts"
-  ON public.tasks FOR INSERT
-  WITH CHECK (
-    sf_account_id IN (
-      SELECT sf_account_id FROM public.accounts
-      WHERE csm_owner_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can update their assigned tasks or tasks they created"
-  ON public.tasks FOR UPDATE
-  USING (
-    assignee_id = auth.uid()
-    OR created_by = auth.uid()
-    OR sf_account_id IN (
-      SELECT sf_account_id FROM public.accounts
-      WHERE csm_owner_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can delete tasks they created or for their accounts"
-  ON public.tasks FOR DELETE
-  USING (
-    created_by = auth.uid()
-    OR sf_account_id IN (
-      SELECT sf_account_id FROM public.accounts
-      WHERE csm_owner_id = auth.uid()
-    )
-  );
-
--- Task comments policies
-CREATE POLICY "Users can view comments on tasks they can see"
-  ON public.task_comments FOR SELECT
-  USING (
-    task_id IN (
-      SELECT id FROM public.tasks
-      WHERE sf_account_id IN (
-        SELECT sf_account_id FROM public.accounts
-        WHERE csm_owner_id = auth.uid()
-      )
-      OR assignee_id = auth.uid()
-      OR created_by = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can create comments on tasks they can see"
-  ON public.task_comments FOR INSERT
-  WITH CHECK (
-    task_id IN (
-      SELECT id FROM public.tasks
-      WHERE sf_account_id IN (
-        SELECT sf_account_id FROM public.accounts
-        WHERE csm_owner_id = auth.uid()
-      )
-      OR assignee_id = auth.uid()
-      OR created_by = auth.uid()
-    )
-  );
+-- Disable RLS for development
+ALTER TABLE public.tasks DISABLE ROW LEVEL SECURITY;
 
 -- =====================================================
 -- HELPER FUNCTIONS
@@ -327,92 +233,220 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 3. ✅ Test RLS policies with sample data
 4. ✅ Verify indexes created
 
-### Phase 2: API Routes (1 hour)
+### Phase 2: API Routes
 Create Next.js API routes:
 
 **`/api/tasks`**
-- `GET` - List tasks (with filters: sfAccountId, status, priority, assignee, search)
-- `POST` - Create new task (send email notification)
+- ✅ `GET` - List tasks (with filters: sfAccountId, priority, assignee, search)
+- ✅ `POST` - Create new task (⏳ TODO: add email notification)
 
 **`/api/tasks/[id]`**
-- `GET` - Get task details
-- `PATCH` - Update task (status, priority, assignee, etc.)
-- `DELETE` - Delete task
+- ✅ `GET` - Get task details
+- ✅ `PATCH` - Update task (⏳ TODO: add email on reassignment)
+- ✅ `DELETE` - Delete task
 
 **`/api/tasks/[id]/complete`**
-- `POST` - Mark task complete (set completed_at)
-
-**`/api/tasks/[id]/comments`**
-- `GET` - Get task comments
-- `POST` - Add comment
+- ✅ `POST` - Mark task complete (set completed_at)
 
 **`/api/tasks/stats/[sfAccountId]`**
-- `GET` - Get task statistics (total, overdue, due today, completed)
+- ⏳ `GET` - Get task statistics (currently calculated in GET /api/tasks)
 
-### Phase 3: Frontend Components (2-3 hours)
+### Phase 3: Frontend Components
 
-**Create components:**
-1. `TasksList` - Main task list with filters
-2. `TaskItem` - Individual task row
-3. `TaskModal` - Create/edit task form
-4. `TaskFilters` - Filter toolbar
-5. `TaskStats` - Statistics cards
-6. `TaskCheckbox` - Completion checkbox
+**Created components:**
+1. ✅ `TasksList` - Main task list with filters, stats, and view toggle
+2. ✅ `TaskItem` - Individual task row with completion, edit, delete
+3. ✅ `TaskModal` - Create/edit task form
+4. ✅ Statistics cards (integrated in TasksList)
+5. ✅ Completion checkbox (integrated in TaskItem)
 
-**Integrate into:**
-- Account detail page (add "Tasks" tab)
-- Optional: Standalone tasks page
+**Integration:**
+- ✅ Account detail page "Tasks" tab
+- ⏳ Standalone tasks page (optional future enhancement)
 
-### Phase 4: Email Notifications (1 hour)
+### Phase 4: Email Notifications (TODO - Not Yet Implemented)
 
-**Email Templates:**
-1. Task Assignment Email
-2. 3-Day Reminder Email
-3. 1-Day Reminder Email
-4. Overdue Email
+**Required Email Service Setup:**
+1. Email provider: **SendGrid**
+2. Add API key to `.env.local`:
+   ```
+   SENDGRID_API_KEY=your_sendgrid_api_key_here
+   ```
+3. Set sender email in environment:
+   ```
+   EMAIL_FROM=tasks@yourdomain.com
+   EMAIL_FROM_NAME=Task Management System
+   ```
+
+**Email Templates to Create:**
+1. **Task Assignment Email** - Sent immediately when task is created
+2. **Task Reassignment Email** - Sent when assignee is changed
+3. **3-Day Reminder Email** - Sent by cron job
+4. **1-Day Reminder Email** - Sent by cron job
+5. **Overdue Email** - Sent by cron job
+6. **Immediate Overdue Email** - Sent when task is created with past due date
+
+**Email Content Structure:**
+Each email should include:
+- Task title and description
+- Account name (context for the task)
+- Priority level (High/Medium/Low) with color coding
+- Due date (formatted, with urgency indicator)
+- Assignee name
+- Created by (user who created the task)
+- Link to task (deep link to account page with task expanded)
+- Call-to-action button
+
+**Implementation Files Needed:**
+
+```
+dashboard/
+├── lib/
+│   └── email/
+│       ├── client.ts                   # SendGrid client setup
+│       ├── send-task-email.ts          # Main email sending function
+│       └── templates/
+│           ├── task-assigned.tsx       # Assignment email template
+│           ├── task-reassigned.tsx     # Reassignment email template
+│           ├── task-reminder-3d.tsx    # 3-day reminder template
+│           ├── task-reminder-1d.tsx    # 1-day reminder template
+│           └── task-overdue.tsx        # Overdue reminder template
+└── app/
+    └── api/
+        └── cron/
+            └── send-reminders/
+                └── route.ts            # Cron job endpoint
+```
 
 **Cron Job Setup:**
-- Use Vercel Cron or Supabase Edge Functions
-- Run daily at 9 AM
-- Call `get_tasks_needing_reminders()`
-- Send emails via Resend or SendGrid
+- Use Vercel Cron Jobs (add to `vercel.json`)
+- Run daily at 9 AM UTC
+- Call `get_tasks_needing_reminders()` database function
+- Send emails via SendGrid
 - Mark reminders sent with `mark_reminder_sent()`
 
-### Phase 5: Testing & Polish (30 min)
-1. Test create/edit/delete
-2. Test filters and search
-3. Test completion flow
-4. Test statistics accuracy
-5. Verify email sending
-6. Test RLS policies
-7. Mobile responsive check
+**Vercel Cron Configuration:**
+```json
+{
+  "crons": [{
+    "path": "/api/cron/send-reminders",
+    "schedule": "0 9 * * *"
+  }]
+}
+```
+
+**API Route Updates Needed:**
+
+1. **`POST /api/tasks`** - Add email notification on creation:
+   ```typescript
+   // After task creation
+   await sendTaskAssignmentEmail({
+     task,
+     assignee,
+     account,
+     createdBy: user
+   });
+
+   // If task is overdue or due today, send immediate reminder
+   if (isOverdueOrDueToday(task.due_date)) {
+     await sendImmediateReminderEmail({
+       task,
+       assignee,
+       account
+     });
+   }
+   ```
+
+2. **`PATCH /api/tasks/[id]`** - Add email on reassignment:
+   ```typescript
+   // If assignee changed
+   if (body.assigneeId && body.assigneeId !== oldTask.assignee_id) {
+     await sendTaskReassignmentEmail({
+       task: updatedTask,
+       newAssignee,
+       oldAssignee,
+       account,
+       updatedBy: user
+     });
+   }
+   ```
+
+**Email Edge Cases to Handle:**
+1. **Task created with past due date**: Send immediate overdue notification
+2. **Task created due today**: Send immediate "due today" notification
+3. **Task created due tomorrow**: Will get 1-day reminder on next cron run (missed 3-day reminder)
+4. **Task reassigned**: Both old and new assignee should be notified
+5. **Task completed**: No more reminders (checked by status in cron query)
+6. **Task deleted**: No notification needed
+7. **Demo/test mode**: Add flag to prevent sending emails in development
+
+### Phase 5: Testing & Polish
+
+**Completed:**
+1. ✅ Test create/edit/delete
+2. ✅ Test filters and search
+3. ✅ Test completion flow
+4. ✅ Test statistics accuracy
+5. ✅ Mobile responsive check
+
+**Pending:**
+1. ⏳ Verify email sending (once implemented)
+2. ⏳ Test RLS policies (currently disabled for development)
+3. ⏳ Test all email templates
+4. ⏳ Test cron job execution
+5. ⏳ Test edge cases (overdue tasks, reassignments)
 
 ---
 
-## Key Features to Implement
+## Implementation Status
 
-### Priority 1 (MVP)
+### ✅ Completed (MVP)
+- [x] Database schema and migrations
 - [x] Create tasks
+- [x] Edit tasks
+- [x] Delete tasks
 - [x] List tasks by account
-- [x] Mark complete
-- [x] Filter by status/priority/assignee
-- [x] Due date tracking
-- [x] Statistics display
+- [x] Mark complete/uncomplete
+- [x] Filter by priority/assignee
+- [x] Search by title/description
+- [x] Sort by due date, priority, created date, title
+- [x] Due date tracking with overdue/due today indicators
+- [x] Statistics display (total, overdue, due today, completed)
+- [x] Active/Completed view toggle
+- [x] Priority badges (High/Medium/Low)
+- [x] User display names (first name + last name)
+- [x] Task tags
+- [x] Responsive UI
 
-### Priority 2 (Nice to Have)
-- [ ] Task comments
+### ⏳ In Progress / TODO
+- [ ] **Email notifications on task assignment**
+- [ ] **Email notifications on task reassignment**
+- [ ] **Automated reminder emails (cron job)**
+- [ ] **Email templates (5 types)**
+- [ ] **SendGrid email service integration**
+- [ ] Enable RLS policies for production
+- [ ] Task statistics dedicated API endpoint
+
+### 🎯 Next Priority (Post-MVP)
+- [ ] Task comments/notes
 - [ ] Task history/audit log
-- [ ] Bulk actions
+- [ ] Bulk actions (bulk complete, bulk delete, bulk reassign)
 - [ ] Export to CSV
 - [ ] Recurring tasks
 - [ ] Subtasks
+- [ ] Task attachments
 
-### Priority 3 (Future)
+### 🚀 Future Enhancements
 - [ ] Task templates
 - [ ] Time tracking
 - [ ] Task dependencies
 - [ ] Gantt chart view
 - [ ] Team workload view
+- [ ] Custom fields
+- [ ] Task categories/types
+- [ ] Advanced filtering (date ranges, multiple tags)
+- [ ] Task duplication
+- [ ] Slack integration
 
 ---
 
@@ -422,8 +456,8 @@ Create Next.js API routes:
 - **Backend**: Next.js API Routes
 - **Database**: Supabase PostgreSQL
 - **Auth**: Supabase Auth
-- **Emails**: Resend (or Supabase email triggers)
-- **Cron**: Vercel Cron Jobs or Supabase Edge Functions
+- **Emails**: SendGrid
+- **Cron**: Vercel Cron Jobs
 
 ---
 
@@ -498,64 +532,157 @@ export async function GET(request: Request) {
 
 ---
 
-## File Structure
+## Current File Structure
 
 ```
 dashboard/
 ├── app/
-│   ├── api/
-│   │   ├── tasks/
-│   │   │   ├── route.ts                    # List, Create
-│   │   │   └── [id]/
-│   │   │       ├── route.ts                # Get, Update, Delete
-│   │   │       ├── complete/
-│   │   │       │   └── route.ts            # Mark complete
-│   │   │       └── comments/
-│   │   │           └── route.ts            # Comments
-│   │   └── cron/
-│   │       └── send-reminders/
-│   │           └── route.ts                # Email reminders
-│   └── accounts/
-│       └── [id]/
-│           └── page.tsx                    # Add Tasks tab
+│   └── api/
+│       └── tasks/
+│           ├── route.ts                    # ✅ List, Create (TODO: add email)
+│           └── [id]/
+│               ├── route.ts                # ✅ Get, Update, Delete (TODO: add email on reassign)
+│               └── complete/
+│                   └── route.ts            # ✅ Mark complete
 ├── components/
-│   ├── tasks/
-│   │   ├── TasksList.tsx
-│   │   ├── TaskItem.tsx
-│   │   ├── TaskModal.tsx
-│   │   ├── TaskFilters.tsx
-│   │   ├── TaskStats.tsx
-│   │   └── TaskCheckbox.tsx
-│   └── emails/
-│       ├── TaskAssignmentEmail.tsx
-│       └── TaskReminderEmail.tsx
-└── lib/
-    ├── supabase/
-    │   └── tasks.ts                        # Task queries
-    └── email/
-        └── send-task-email.ts              # Email sending logic
+│   └── tasks/
+│       ├── TasksList.tsx                   # ✅ Main list with filters, stats, toggle
+│       ├── TaskItem.tsx                    # ✅ Individual task row
+│       └── TaskModal.tsx                   # ✅ Create/edit form
+└── supabase/
+    └── migrations/
+        └── 001_create_tasks.sql            # ✅ Database schema
+
+# TODO: Files to Create for Email System
+dashboard/
+├── app/
+│   └── api/
+│       └── cron/
+│           └── send-reminders/
+│               └── route.ts                # ⏳ Cron job for automated reminders
+├── lib/
+│   └── email/
+│       ├── client.ts                       # ⏳ SendGrid client setup
+│       ├── send-task-email.ts              # ⏳ Email sending functions
+│       └── templates/
+│           ├── task-assigned.tsx           # ⏳ Assignment email
+│           ├── task-reassigned.tsx         # ⏳ Reassignment email
+│           ├── task-reminder-3d.tsx        # ⏳ 3-day reminder
+│           ├── task-reminder-1d.tsx        # ⏳ 1-day reminder
+│           └── task-overdue.tsx            # ⏳ Overdue reminder
+└── vercel.json                             # ⏳ Cron job configuration
 ```
 
 ---
 
-## Notes
+## Implementation Notes
 
-- Tasks are scoped to accounts (each task belongs to one account)
-- RLS ensures users only see tasks for accounts they manage
-- Reminders are sent via cron job (not real-time)
-- Archive function runs manually or via scheduled job
+### Current Behavior
+- Tasks are scoped to accounts (each task belongs to one account via `sf_account_id`)
+- RLS is **currently disabled** for development (`ALTER TABLE public.tasks DISABLE ROW LEVEL SECURITY`)
+- User display names show `first_name + last_name` from `user_metadata`, fallback to email
+- Status filter removed from UI (uses Active/Completed toggle instead)
 - Tags stored as PostgreSQL array for easy filtering
-- Use demo mode flag to disable actual email sending
+- Auto-archive function exists in DB but not scheduled yet
+
+### Email System TODO
+- Reminders will be sent via cron job (not real-time) running daily at 9 AM UTC
+- Need to add demo/test mode flag to disable actual email sending in development
+- Edge case handling needed for tasks created overdue or due within 24 hours
+- Consider immediate notifications for urgent tasks vs. waiting for next cron run
+
+### Database Schema Notes
+- `reminder_3d_sent`, `reminder_1d_sent`, `overdue_reminder_sent` track which reminders have been sent
+- `reminder_1h_sent` field exists but 1-hour reminder not implemented (removed from scope)
+- `last_reminder_sent_at` timestamp tracks most recent reminder
+- Database functions `get_tasks_needing_reminders()` and `mark_reminder_sent()` ready to use
+
+### Future Considerations
+- May need to enable RLS before production deployment
+- Consider adding email preferences (allow users to opt out of certain reminders)
+- Consider adding task watchers (CC other team members on task updates)
+- May want to add email digest option (daily summary instead of individual emails)
 
 ---
 
 ## Success Criteria
 
-✅ CSMs can create and assign tasks
-✅ Tasks visible on account detail page
-✅ Overdue tasks highlighted
-✅ Email notifications sent
-✅ Statistics accurate
-✅ Filters and search work
-✅ Mobile responsive
-✅ RLS protects data
+### ✅ Completed
+- ✅ CSMs can create and assign tasks
+- ✅ CSMs can edit and delete tasks
+- ✅ Tasks visible on account detail page in dedicated "Tasks" tab
+- ✅ Overdue tasks highlighted in red with alert indicator
+- ✅ Due today tasks highlighted in orange
+- ✅ Statistics accurate (total, overdue, due today, completed counts)
+- ✅ Filters work (priority, assignee, search)
+- ✅ Sort options work (due date, priority, created date, title)
+- ✅ Mobile responsive design
+- ✅ User names display correctly (first name + last name)
+- ✅ Task completion with checkbox interaction
+- ✅ Active/Completed view toggle
+
+### ⏳ Pending
+- ⏳ Email notifications sent on task assignment
+- ⏳ Email notifications sent on task reassignment
+- ⏳ Automated reminder emails via cron job
+- ⏳ RLS policies enabled for production security
+
+## Quick Start for Email Implementation
+
+1. **Install SendGrid package:**
+   ```bash
+   cd dashboard
+   npm install @sendgrid/mail
+   ```
+
+2. **Add environment variables to `.env.local`:**
+   ```env
+   SENDGRID_API_KEY=your_sendgrid_api_key
+   EMAIL_FROM=tasks@yourdomain.com
+   EMAIL_FROM_NAME="Task Management System"
+   CRON_SECRET=your_random_secret_for_cron_auth
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+
+3. **Create SendGrid client** (`dashboard/lib/email/client.ts`):
+   ```typescript
+   import sgMail from '@sendgrid/mail';
+
+   sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+   export { sgMail };
+   ```
+
+4. **Create email templates** (5 templates in `dashboard/lib/email/templates/`)
+   - Use SendGrid's dynamic template format
+   - Or build HTML templates with React Email
+
+5. **Create email sending functions** (`dashboard/lib/email/send-task-email.ts`):
+   - `sendTaskAssignmentEmail()`
+   - `sendTaskReassignmentEmail()`
+   - `sendTaskReminderEmail()`
+   - `sendImmediateReminderEmail()`
+
+6. **Update API routes:**
+   - `POST /api/tasks` - Add `await sendTaskAssignmentEmail()`
+   - `PATCH /api/tasks/[id]` - Add reassignment email logic
+
+7. **Create cron endpoint** (`dashboard/app/api/cron/send-reminders/route.ts`)
+
+8. **Add Vercel cron config** (`vercel.json`):
+   ```json
+   {
+     "crons": [{
+       "path": "/api/cron/send-reminders",
+       "schedule": "0 9 * * *"
+     }]
+   }
+   ```
+
+9. **Test thoroughly:**
+   - Test in development with real email to yourself
+   - Test all 5 email types
+   - Test edge cases (overdue, due today, reassignment)
+   - Verify SendGrid dashboard shows sent emails
+   - Deploy to staging/preview environment
+   - Enable in production

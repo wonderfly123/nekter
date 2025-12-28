@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataCore Solutions - Account Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #f59e0b;
+            --color-primary-hover: #d97706;
+            --color-background: #f8fafc;
+            --color-white: #ffffff;
+            --color-border: #e2e8f0;
+            --color-text-primary: #0f172a;
+            --color-text-secondary: #475569;
+            --color-text-light: #94a3b8;
+            --color-success: #10b981;
+            --color-warning: #fb923c;
+            --color-danger: #ef4444;
+            --color-info: #f59e0b;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 60px;
+            --left-panel-width: 320px;
+            --right-panel-width: 380px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--color-background);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 88px;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 2rem 0.75rem;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .sidebar.collapsed .logo {
+            gap: 0;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            display: none;
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--color-text-primary);
+        }
+
+        .nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem 1.5rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .sidebar.collapsed .nav-item {
+            padding: 0.875rem 0;
+            justify-content: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--color-text-primary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .sidebar.collapsed .sidebar-footer {
+            padding: 1.5rem 0.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar.collapsed .user-profile {
+            gap: 0;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-text-primary);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--color-text-light);
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            z-index: 1000;
+            height: 56px;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .top-nav {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            flex: 1;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            margin-top: 56px;
+            margin-left: var(--sidebar-width);
+            height: calc(100vh - 56px);
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .top-nav ~ .main-layout {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: var(--left-panel-width);
+            background: var(--color-white);
+            border-right: 1px solid var(--color-border);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .account-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .account-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--color-background);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .account-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 12px;
+        }
+
+        .about-section {
+            padding: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .property-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .property-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .property-label {
+            font-size: 12px;
+            color: var(--color-text-light);
+            font-weight: 500;
+        }
+
+        .property-value {
+            font-size: 14px;
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        /* Center Panel */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--color-background);
+        }
+
+        .tab-navigation {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        .tab-item {
+            padding: 16px 0;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+        }
+
+        .tab-item:hover {
+            color: var(--color-text-primary);
+        }
+
+        .tab-item.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .activities-section {
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .activities-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .activities-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .section-action {
+            font-size: 13px;
+            color: var(--color-info);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: var(--right-panel-width);
+            background: var(--color-white);
+            border-left: 1px solid var(--color-border);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .collapsible-section {
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .collapsible-header {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: var(--color-white);
+            transition: background 0.2s;
+        }
+
+        .collapsible-header:hover {
+            background: var(--color-background);
+        }
+
+        .collapsible-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .collapsible-count {
+            color: var(--color-text-light);
+            font-size: 13px;
+        }
+
+        .collapsible-content {
+            padding: 0 24px 20px 24px;
+        }
+
+        .collapsible-content.collapsed {
+            display: none;
+        }
+
+        .contact-card {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: var(--color-info);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .contact-email {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .contact-phone {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .view-all-link {
+            display: inline-block;
+            color: var(--color-info);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-badge.high {
+            background: #fff5f5;
+            color: var(--color-danger);
+        }
+
+        /* TASK MANAGEMENT STYLES */
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-toolbar {
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background: var(--color-white);
+            font-size: 13px;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .filter-select:hover {
+            border-color: var(--color-text-secondary);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 6px 12px 6px 36px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-light);
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            background: var(--color-white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--color-background);
+            border-color: var(--color-text-secondary);
+        }
+
+        .action-btn.primary {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--color-primary-hover);
+            border-color: var(--color-primary-hover);
+        }
+
+        .task-stats {
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value.overdue {
+            color: var(--color-danger);
+        }
+
+        .stat-value.today {
+            color: var(--color-warning);
+        }
+
+        .stat-value.completed {
+            color: var(--color-success);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .tasks-section {
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tasks-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tasks-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            gap: 16px;
+            align-items: start;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            background: var(--color-background);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-border);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--color-primary);
+        }
+
+        .task-checkbox.checked {
+            background: var(--color-success);
+            border-color: var(--color-success);
+        }
+
+        .task-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title-row {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .task-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            line-height: 1.4;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--color-text-light);
+        }
+
+        .task-priority {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .task-priority.high {
+            background: #fff5f5;
+            color: var(--color-danger);
+        }
+
+        .task-priority.medium {
+            background: #fffbf0;
+            color: var(--color-warning);
+        }
+
+        .task-priority.low {
+            background: #f0f9ff;
+            color: #3b82f6;
+        }
+
+        .task-description {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--color-text-light);
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-meta-item svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .task-due {
+            font-weight: 500;
+        }
+
+        .task-due.overdue {
+            color: var(--color-danger);
+        }
+
+        .task-due.today {
+            color: var(--color-warning);
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-assignee-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .task-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .task-tag {
+            padding: 2px 8px;
+            background: var(--color-background);
+            border-radius: 3px;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--color-white);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--color-text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-cancel {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            background: var(--color-white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .btn-cancel:hover {
+            background: var(--color-background);
+        }
+
+        .btn-primary {
+            padding: 8px 16px;
+            border: none;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .reminder-config {
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .reminder-config-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text-primary);
+        }
+
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .reminder-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+
+        .notification-badge {
+            background: var(--color-danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .view-tab-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+        }
+
+        .view-tab-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .view-tab-btn.active {
+            background: var(--color-white);
+            color: var(--color-text-primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.archived {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd6e2;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b0bec5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo" onclick="toggleSidebar()">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="logo-text">nekter.io</div>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="nav">
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </div>
+                <span>Portfolio</span>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <span>Priority</span>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <span>All Accounts</span>
+            </div>
+
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <span>Analytics</span>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">SC</div>
+                <div class="user-info">
+                    <div class="user-name">Sarah Chen</div>
+                    <div class="user-role">CSM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="page-title" style="color: var(--color-text-light); font-weight: 400; font-size: 15px;">
+            Priority Accounts <span style="margin: 0 8px;">/</span> <span style="color: var(--color-text-primary); font-weight: 600;">DataCore Solutions</span>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="account-header">
+                <div class="account-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                </div>
+                <div class="account-name">DataCore Solutions</div>
+                <div style="margin-top: 12px; margin-bottom: 16px;">
+                    <span class="risk-badge high" style="font-size: 16px; padding: 6px 14px;">32 - Critical</span>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <div class="section-title">About this account</div>
+                <div class="property-list">
+                    <div class="property-item">
+                        <div class="property-label">CSM Owner</div>
+                        <div class="property-value">Sarah Chen</div>
+                    </div>
+                    <div class="property-item">
+                        <div class="property-label">ARR</div>
+                        <div class="property-value">$420K</div>
+                    </div>
+                    <div class="property-item">
+                        <div class="property-label">Renewal Date</div>
+                        <div class="property-value">March 15, 2025</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel -->
+        <div class="center-panel">
+            <div class="tab-navigation">
+                <div class="tab-item" data-tab="overview">Overview</div>
+                <div class="tab-item" data-tab="interactions">Interactions</div>
+                <div class="tab-item active" data-tab="tasks">
+                    Tasks
+                    <span class="notification-badge" id="overdueCount">2</span>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div class="tab-content" id="tasks-tab">
+                <div class="tasks-container">
+                    <!-- Task Toolbar -->
+                    <div class="task-toolbar">
+                        <div class="filter-group">
+                            <span class="filter-label">Status:</span>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="all">All Tasks</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span class="filter-label">Priority:</span>
+                            <select class="filter-select" id="priorityFilter">
+                                <option value="all">All Priorities</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span class="filter-label">Assignee:</span>
+                            <select class="filter-select" id="assigneeFilter">
+                                <option value="all">All Team</option>
+                                <option value="sarah">Sarah Chen</option>
+                                <option value="tom">Tom Rodriguez</option>
+                            </select>
+                        </div>
+
+                        <div class="search-box">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search tasks...">
+                        </div>
+
+                        <button class="action-btn primary" onclick="openTaskModal()">+ New Task</button>
+                    </div>
+
+                    <!-- Task Stats -->
+                    <div class="task-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalTasks">7</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value overdue" id="overdueTasks">2</div>
+                            <div class="stat-label">Overdue</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value today" id="todayTasks">1</div>
+                            <div class="stat-label">Due Today</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value completed" id="completedTasks">3</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <div class="tasks-section">
+                        <div class="tasks-header">
+                            <div style="display: flex; gap: 16px; align-items: center;">
+                                <div class="activities-title">Tasks</div>
+                                <div style="display: flex; gap: 4px; background: var(--color-background); padding: 4px; border-radius: 6px;">
+                                    <button class="view-tab-btn active" data-view="active" onclick="switchTaskView('active')">
+                                        Active <span id="activeCount" style="margin-left: 4px; font-weight: 600;">4</span>
+                                    </button>
+                                    <button class="view-tab-btn" data-view="completed" onclick="switchTaskView('completed')">
+                                        Completed <span id="completedCount" style="margin-left: 4px; font-weight: 600;">3</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span style="font-size: 13px; color: var(--color-text-light);">Sort by:</span>
+                                <select class="filter-select" id="sortBy" style="min-width: 140px;">
+                                    <option value="dueDate">Due Date</option>
+                                    <option value="priority">Priority</option>
+                                    <option value="created">Created Date</option>
+                                    <option value="title">Title</option>
+                                </select>
+                                <button class="action-btn" onclick="archiveCompleted()" style="margin-left: 8px;" id="archiveBtn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                        <polyline points="21 8 21 21 3 21 3 8"/>
+                                        <rect x="1" y="3" width="22" height="5"/>
+                                        <line x1="10" y1="12" x2="14" y2="12"/>
+                                    </svg>
+                                    Archive Old Tasks
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tasks-list" id="tasksList">
+                            <!-- Tasks will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other tabs would go here -->
+            <div class="tab-content" id="overview-tab" style="display: none;">
+                <div class="activities-section">
+                    <p>Overview content...</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="interactions-tab" style="display: none;">
+                <div class="activities-section">
+                    <p>Interactions content...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="collapsible-section">
+                <div class="collapsible-header">
+                    <div>
+                        <span class="collapsible-title">Open Tickets</span>
+                        <span class="collapsible-count"> (1)</span>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="contact-card">
+                        <div class="contact-info" style="width: 100%;">
+                            <div class="contact-name">#45821 - Data pipeline integration failing</div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                                <span class="contact-phone">Opened 8 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="collapsible-header">
+                    <div>
+                        <span class="collapsible-title">Contacts</span>
+                        <span class="collapsible-count"> (4)</span>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="contact-card">
+                        <div class="contact-avatar">MC</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Michael Chen</div>
+                            <div class="contact-email">m.chen@datacore.com</div>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">JP</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Jessica Park</div>
+                            <div class="contact-email">j.park@datacore.com</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Creation Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Create New Task</div>
+                <button class="modal-close" onclick="closeTaskModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label class="form-label">Task Title *</label>
+                        <input type="text" class="form-input" id="taskTitle" placeholder="Enter task title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" id="taskDescription" placeholder="Add task description"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Priority *</label>
+                            <select class="form-select" id="taskPriority" required>
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Due Date *</label>
+                            <input type="date" class="form-input" id="taskDueDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Assignee *</label>
+                            <select class="form-select" id="taskAssignee" required>
+                                <option value="sarah" data-email="sarah.chen@company.com">Sarah Chen</option>
+                                <option value="tom" data-email="tom.rodriguez@company.com">Tom Rodriguez</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tags</label>
+                            <input type="text" class="form-input" id="taskTags" placeholder="e.g., Renewal, Support">
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeTaskModal()">Cancel</button>
+                <button class="btn-primary" onclick="createTask()">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Team member data with emails
+        const teamMembers = {
+            'sarah': {
+                name: 'Sarah Chen',
+                initials: 'SC',
+                email: 'sarah.chen@company.com',
+                color: '#f59e0b'
+            },
+            'tom': {
+                name: 'Tom Rodriguez',
+                initials: 'TR',
+                email: 'tom.rodriguez@company.com',
+                color: '#3b82f6'
+            }
+        };
+
+        // Initialize tasks with sample data
+        const initialTasks = [
+            {
+                id: 1,
+                title: 'Schedule emergency renewal call with Michael Chen',
+                description: 'Address budget concerns and discuss value proposition for upcoming renewal. Prepare case studies and ROI analysis.',
+                priority: 'high',
+                assignee: 'sarah',
+                dueDate: '2025-12-26',
+                status: 'active',
+                tags: ['Renewal', 'Churn Risk'],
+                createdAt: '2025-12-20'
+            },
+            {
+                id: 2,
+                title: 'Follow up on open support ticket #45821',
+                description: 'Check with engineering team on data pipeline integration issue. Customer has expressed concerns about resolution time.',
+                priority: 'high',
+                assignee: 'sarah',
+                dueDate: '2025-12-25',
+                status: 'active',
+                tags: ['Support'],
+                createdAt: '2025-12-19'
+            },
+            {
+                id: 3,
+                title: 'Prepare Q1 2025 success plan presentation',
+                description: 'Create comprehensive success plan including adoption metrics, training schedule, and expansion opportunities for analytics team.',
+                priority: 'medium',
+                assignee: 'sarah',
+                dueDate: '2025-12-27',
+                status: 'active',
+                tags: ['Planning'],
+                createdAt: '2025-12-21'
+            },
+            {
+                id: 4,
+                title: 'Send onboarding materials to new analytics team contacts',
+                description: 'Package getting started guide, training videos, and schedule initial kickoff call with analytics team.',
+                priority: 'medium',
+                assignee: 'tom',
+                dueDate: '2025-12-30',
+                status: 'active',
+                tags: ['Onboarding'],
+                createdAt: '2025-12-22'
+            },
+            {
+                id: 5,
+                title: 'Complete Q4 business review with stakeholders',
+                description: 'Reviewed metrics, usage patterns, and strategic initiatives for Q4. Documented action items.',
+                priority: 'high',
+                assignee: 'sarah',
+                dueDate: '2025-12-20',
+                status: 'completed',
+                tags: ['QBR'],
+                createdAt: '2025-12-15'
+            },
+            {
+                id: 6,
+                title: 'Update account profile with new contacts',
+                description: 'Added Jessica Park and David Wang as new engineering contacts after recent org changes.',
+                priority: 'low',
+                assignee: 'sarah',
+                dueDate: '2025-12-18',
+                status: 'completed',
+                tags: ['Admin'],
+                createdAt: '2025-12-10'
+            },
+            {
+                id: 7,
+                title: 'Document current integration architecture',
+                description: 'Created technical documentation of current data pipeline setup for reference during renewal discussions.',
+                priority: 'medium',
+                assignee: 'tom',
+                dueDate: '2025-12-15',
+                status: 'completed',
+                tags: ['Documentation'],
+                createdAt: '2025-12-08'
+            }
+        ];
+
+        let tasks = [...initialTasks];
+        let taskIdCounter = 8;
+        let currentView = 'active'; // 'active' or 'completed'
+
+        // Email simulation function
+        function sendTaskEmail(task, type = 'created') {
+            const member = teamMembers[task.assignee];
+            const subject = type === 'created' 
+                ? `New Task Assigned: ${task.title}`
+                : `Task Reminder: ${task.title}`;
+            
+            const dueDate = new Date(task.dueDate);
+            const formattedDate = dueDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            console.log(`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 EMAIL SENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+To: ${member.email}
+Subject: ${subject}
+
+Hi ${member.name},
+
+${type === 'created' ? 'You have been assigned a new task:' : 'Reminder for your task:'}
+
+Task: ${task.title}
+Priority: ${task.priority.toUpperCase()}
+Due Date: ${formattedDate}
+Account: DataCore Solutions
+
+Description:
+${task.description}
+
+${type === 'created' ? `
+Automatic reminders will be sent:
+• 3 days before due date
+• 1 day before due date  
+• 1 hour before due date
+• When task becomes overdue
+` : ''}
+
+View task details in your dashboard.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            `);
+
+            // Show toast notification
+            showToast(`Email sent to ${member.email}`, 'success');
+        }
+
+        // Schedule reminder emails
+        function scheduleReminders(task) {
+            const dueDate = new Date(task.dueDate);
+            const now = new Date();
+            
+            // Calculate reminder times
+            const threeDaysBefore = new Date(dueDate.getTime() - (3 * 24 * 60 * 60 * 1000));
+            const oneDayBefore = new Date(dueDate.getTime() - (24 * 60 * 60 * 1000));
+            const oneHourBefore = new Date(dueDate.getTime() - (60 * 60 * 1000));
+            
+            console.log(`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏰ REMINDERS SCHEDULED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Task: ${task.title}
+Assignee: ${teamMembers[task.assignee].email}
+
+Reminder Schedule:
+• 3 days before: ${threeDaysBefore.toLocaleString()}
+• 1 day before: ${oneDayBefore.toLocaleString()}
+• 1 hour before: ${oneHourBefore.toLocaleString()}
+• Overdue check: Daily at 9:00 AM after due date
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            `);
+        }
+
+        // Check for overdue tasks (would run on a schedule in production)
+        function checkOverdueTasks() {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            tasks.forEach(task => {
+                if (task.status === 'active') {
+                    const dueDate = new Date(task.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    
+                    if (dueDate < now) {
+                        console.log(`⚠️ Task "${task.title}" is overdue - sending reminder email`);
+                        sendTaskEmail(task, 'overdue');
+                    }
+                }
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                background: ${type === 'success' ? '#10b981' : '#f59e0b'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Render tasks
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            const filteredTasks = getFilteredTasks();
+            
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '<div style="padding: 60px 20px; text-align: center; color: var(--color-text-light);">No tasks found</div>';
+                return;
+            }
+            
+            tasksList.innerHTML = filteredTasks.map(task => createTaskHTML(task)).join('');
+        }
+
+        // Create task HTML
+        function createTaskHTML(task) {
+            const member = teamMembers[task.assignee];
+            const dateObj = new Date(task.dueDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            dateObj.setHours(0, 0, 0, 0);
+            
+            let dueDateClass = '';
+            let dueDateText = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            if (dateObj < today) {
+                dueDateClass = 'overdue';
+                dueDateText += ' (Overdue)';
+            } else if (dateObj.getTime() === today.getTime()) {
+                dueDateClass = 'today';
+                dueDateText = 'Today';
+            }
+            
+            const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+            const tagElements = task.tags.map(tag => `<span class="task-tag">${tag}</span>`).join('');
+            
+            return `
+                <div class="task-item ${task.status === 'completed' ? 'completed' : ''}" data-task-id="${task.id}">
+                    <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                    <div class="task-content">
+                        <div class="task-title-row">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-priority ${task.priority}">${priorityLabel}</div>
+                        </div>
+                        <div class="task-description">${task.description}</div>
+                        <div class="task-meta">
+                            <div class="task-meta-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                                <span class="task-due ${dueDateClass}">${dueDateText}</span>
+                            </div>
+                            <div class="task-assignee">
+                                <div class="task-assignee-avatar" style="background: ${member.color};">${member.initials}</div>
+                                <span>${member.name}</span>
+                            </div>
+                            <div class="task-tags">${tagElements}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle task completion
+        function toggleTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = task.status === 'completed' ? 'active' : 'completed';
+                renderTasks();
+                updateStats();
+                
+                if (task.status === 'completed') {
+                    showToast('Task marked as complete', 'success');
+                }
+            }
+        }
+
+        // Get filtered tasks
+        function getFilteredTasks() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const assigneeFilter = document.getElementById('assigneeFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = tasks.filter(task => {
+                // Filter by current view
+                if (currentView === 'active' && task.status !== 'active') return false;
+                if (currentView === 'completed' && task.status !== 'completed') return false;
+                
+                // Don't show archived tasks
+                if (task.archived) return false;
+                
+                if (statusFilter !== 'all' && task.status !== statusFilter) return false;
+                if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false;
+                if (assigneeFilter !== 'all' && task.assignee !== assigneeFilter) return false;
+                if (searchTerm && !task.title.toLowerCase().includes(searchTerm) && 
+                    !task.description.toLowerCase().includes(searchTerm)) return false;
+                return true;
+            });
+            
+            // Sort tasks
+            const sortBy = document.getElementById('sortBy').value;
+            filtered.sort((a, b) => {
+                if (sortBy === 'dueDate') {
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                } else if (sortBy === 'priority') {
+                    const priorityOrder = { high: 1, medium: 2, low: 3 };
+                    return priorityOrder[a.priority] - priorityOrder[b.priority];
+                } else if (sortBy === 'title') {
+                    return a.title.localeCompare(b.title);
+                } else if (sortBy === 'created') {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+            });
+            
+            return filtered;
+        }
+
+        // Switch between active and completed views
+        function switchTaskView(view) {
+            currentView = view;
+            
+            // Update button states
+            document.querySelectorAll('.view-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            
+            // Update archive button visibility
+            const archiveBtn = document.getElementById('archiveBtn');
+            archiveBtn.style.display = view === 'completed' ? 'flex' : 'none';
+            
+            renderTasks();
+        }
+
+        // Archive completed tasks older than 30 days
+        function archiveCompleted() {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            let archivedCount = 0;
+            tasks.forEach(task => {
+                if (task.status === 'completed') {
+                    const dueDate = new Date(task.dueDate);
+                    if (dueDate < thirtyDaysAgo) {
+                        task.archived = true;
+                        archivedCount++;
+                    }
+                }
+            });
+            
+            if (archivedCount > 0) {
+                showToast(`Archived ${archivedCount} old completed task(s)`, 'success');
+                renderTasks();
+                updateStats();
+            } else {
+                showToast('No old tasks to archive (30+ days)', 'info');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const activeTasks = tasks.filter(t => t.status === 'active' && !t.archived);
+            const completedTasks = tasks.filter(t => t.status === 'completed' && !t.archived);
+            
+            let overdueCount = 0;
+            let todayCount = 0;
+            
+            activeTasks.forEach(task => {
+                const dueDate = new Date(task.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                
+                if (dueDate < today) {
+                    overdueCount++;
+                } else if (dueDate.getTime() === today.getTime()) {
+                    todayCount++;
+                }
+            });
+            
+            document.getElementById('totalTasks').textContent = activeTasks.length + completedTasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks.length;
+            document.getElementById('overdueTasks').textContent = overdueCount;
+            document.getElementById('todayTasks').textContent = todayCount;
+            document.getElementById('overdueCount').textContent = overdueCount;
+            
+            // Update view tab counts
+            document.getElementById('activeCount').textContent = activeTasks.length;
+            document.getElementById('completedCount').textContent = completedTasks.length;
+            
+            if (overdueCount === 0) {
+                document.getElementById('overdueCount').style.display = 'none';
+            } else {
+                document.getElementById('overdueCount').style.display = 'inline-block';
+            }
+        }
+
+        // Modal functions
+        function openTaskModal() {
+            document.getElementById('taskModal').classList.add('active');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('taskDueDate').valueAsDate = tomorrow;
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+            document.getElementById('taskForm').reset();
+        }
+
+        // Create new task
+        function createTask() {
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const priority = document.getElementById('taskPriority').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const tags = document.getElementById('taskTags').value;
+
+            if (!title || !dueDate) {
+                alert('Please fill in required fields');
+                return;
+            }
+
+            const newTask = {
+                id: taskIdCounter++,
+                title,
+                description,
+                priority,
+                assignee,
+                dueDate,
+                status: 'active',
+                tags: tags ? tags.split(',').map(t => t.trim()) : [],
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+
+            tasks.unshift(newTask);
+            
+            // Send assignment email
+            sendTaskEmail(newTask, 'created');
+            
+            // Schedule reminder emails
+            scheduleReminders(newTask);
+            
+            renderTasks();
+            updateStats();
+            closeTaskModal();
+            
+            showToast('Task created and assignee notified', 'success');
+        }
+
+        // Event listeners
+        document.getElementById('statusFilter').addEventListener('change', renderTasks);
+        document.getElementById('priorityFilter').addEventListener('change', renderTasks);
+        document.getElementById('assigneeFilter').addEventListener('change', renderTasks);
+        document.getElementById('searchInput').addEventListener('input', renderTasks);
+        document.getElementById('sortBy').addEventListener('change', renderTasks);
+
+        document.getElementById('taskModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTaskModal();
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                document.getElementById(tabName + '-tab').style.display = 'block';
+            });
+        });
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        // Collapsible sections
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('collapsed');
+            });
+        });
+
+        // Add CSS for toast animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        renderTasks();
+        updateStats();
+        
+        // Hide archive button initially (starts on active view)
+        document.getElementById('archiveBtn').style.display = 'none';
+        
+        // Simulate checking for overdue tasks (in production, this would be a server-side cron job)
+        console.log('Task Management System Initialized');
+        console.log('Automatic reminder system active');
+        checkOverdueTasks();
+    </script>
+</body>
+</html>
