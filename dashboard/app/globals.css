@@ -136,4 +136,18 @@
   .bg-gradient-orange {
     background: linear-gradient(135deg, #f59e0b, #d97706);
   }
+
+  /* Task highlight animation */
+  @keyframes highlightFade {
+    0% {
+      background-color: rgba(251, 191, 36, 0.3);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .task-highlight {
+    animation: highlightFade 2s ease-out;
+  }
 }

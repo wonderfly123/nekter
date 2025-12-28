@@ -32,9 +32,10 @@ interface TaskItemProps {
   onComplete: (taskId: string) => void;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  highlighted?: boolean;
 }
 
-export function TaskItem({ task, users, onComplete, onEdit, onDelete }: TaskItemProps) {
+export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighted = false }: TaskItemProps) {
   const isCompleted = task.status === 'completed';
   const dueDate = new Date(task.due_date);
   const today = new Date();
@@ -89,7 +90,7 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete }: TaskItem
   };
 
   return (
-    <div className={`p-4 hover:bg-gray-50 transition-colors ${isCompleted ? 'opacity-60' : ''}`}>
+    <div className={`p-4 hover:bg-gray-50 transition-colors ${isCompleted ? 'opacity-60' : ''} ${highlighted ? 'task-highlight' : ''}`}>
       <div className="flex items-start gap-4">
         {/* Checkbox */}
         <button

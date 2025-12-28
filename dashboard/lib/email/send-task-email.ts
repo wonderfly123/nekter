@@ -68,7 +68,7 @@ export async function sendTaskAssignmentEmail(params: {
     return;
   }
 
-  const taskUrl = `${APP_URL}/accounts/${task.sf_account_id}?tab=tasks`;
+  const taskUrl = `${APP_URL}/account/${task.sf_account_id}?tab=tasks&taskId=${task.id}`;
 
   const emailData: TaskAssignedEmailData = {
     taskTitle: task.title,
@@ -121,7 +121,7 @@ export async function sendTaskReminderEmail(params: {
     return;
   }
 
-  const taskUrl = `${APP_URL}/accounts/${task.sf_account_id}?tab=tasks`;
+  const taskUrl = `${APP_URL}/account/${task.sf_account_id}?tab=tasks&taskId=${task.id}`;
 
   const emailData: TaskReminderEmailData = {
     taskTitle: task.title,

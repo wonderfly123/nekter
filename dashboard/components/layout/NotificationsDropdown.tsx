@@ -130,9 +130,28 @@ export function NotificationsDropdown() {
 
     // Navigate to related entity if available
     if (notification.related_entity_type === 'task' && notification.related_entity_id) {
-      // For now, we don't have a direct task view, so we'll just close the dropdown
-      // In the future, you could navigate to a task detail page or the account with the task
-      setIsOpen(false);
+      try {
+        // Fetch task to get account ID
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const response = await fetch(`/api/tasks/${notification.related_entity_id}`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const accountId = data.task.sf_account_id;
+          const taskId = notification.related_entity_id;
+
+          // Navigate to account page with task tab and taskId
+          router.push(`/account/${accountId}?tab=tasks&taskId=${taskId}`);
+        }
+      } catch (error) {
+        console.error('Error fetching task for navigation:', error);
+      }
     }
 
     setIsOpen(false);

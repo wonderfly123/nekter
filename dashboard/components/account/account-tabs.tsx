@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { MetricsGrid } from './metrics-grid';
 import { HealthTrendChart } from './health-trend-chart';
 import { ActionItems } from './action-items';
@@ -16,7 +17,16 @@ interface AccountTabsProps {
 type TabType = 'overview' | 'interactions' | 'tasks' | 'notes';
 
 export function AccountTabs({ data }: AccountTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get('tab') as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(tabFromUrl || 'overview');
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    if (tabFromUrl && ['overview', 'interactions', 'tasks', 'notes'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   const tabs = [
     { id: 'overview' as TabType, label: 'Overview' },

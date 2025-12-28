@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { TaskItem } from './TaskItem';
 import { TaskModal } from './TaskModal';
@@ -36,12 +37,16 @@ interface User {
 }
 
 export function TasksList({ sfAccountId }: TasksListProps) {
+  const searchParams = useSearchParams();
+  const taskRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+  const [highlightedTaskId, setHighlightedTaskId] = useState<string | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
@@ -70,6 +75,33 @@ export function TasksList({ sfAccountId }: TasksListProps) {
   useEffect(() => {
     fetchTasks();
   }, [sfAccountId, statusFilter, priorityFilter, assigneeFilter, searchQuery, sortBy]);
+
+  // Handle task highlighting from URL
+  useEffect(() => {
+    const taskId = searchParams.get('taskId');
+    if (taskId && tasks.length > 0 && !loading) {
+      // Check if the task exists in the current list
+      const taskExists = tasks.some(task => task.id === taskId);
+      if (taskExists) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          const taskElement = taskRefs.current[taskId];
+          if (taskElement) {
+            // Scroll to task with smooth animation
+            taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Set highlight
+            setHighlightedTaskId(taskId);
+
+            // Remove highlight after 2 seconds
+            setTimeout(() => {
+              setHighlightedTaskId(null);
+            }, 2000);
+          }
+        }, 100);
+      }
+    }
+  }, [tasks, loading, searchParams]);
 
   const fetchUsers = async () => {
     try {
@@ -475,14 +507,19 @@ export function TasksList({ sfAccountId }: TasksListProps) {
           ) : (
             <div className="divide-y divide-gray-200">
               {filteredTasks.map((task) => (
-                <TaskItem
+                <div
                   key={task.id}
-                  task={task}
-                  users={users}
-                  onComplete={handleTaskComplete}
-                  onEdit={handleEditTask}
-                  onDelete={handleTaskDelete}
-                />
+                  ref={(el) => { taskRefs.current[task.id] = el; }}
+                >
+                  <TaskItem
+                    task={task}
+                    users={users}
+                    onComplete={handleTaskComplete}
+                    onEdit={handleEditTask}
+                    onDelete={handleTaskDelete}
+                    highlighted={highlightedTaskId === task.id}
+                  />
+                </div>
               ))}
             </div>
           )}
