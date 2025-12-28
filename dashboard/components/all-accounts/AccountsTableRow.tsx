@@ -69,6 +69,13 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
         </Link>
       </td>
 
+      {/* ARR */}
+      <td className="py-4 px-6 text-right">
+        <span className="text-sm font-semibold text-gray-900 font-mono">
+          {account.arr ? formatCurrency(account.arr) : '—'}
+        </span>
+      </td>
+
       {/* Renewal Date */}
       <td className="py-4 px-6 text-sm text-gray-700">
         {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
@@ -99,13 +106,6 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
             </div>
           )}
         </div>
-      </td>
-
-      {/* ARR */}
-      <td className="py-4 px-6 text-right">
-        <span className="text-sm font-semibold text-gray-900 font-mono">
-          {account.arr ? formatCurrency(account.arr) : '—'}
-        </span>
       </td>
 
       {/* Churn Signals */}
