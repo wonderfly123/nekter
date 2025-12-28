@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 
 interface UseAllAccountsParams {
@@ -32,9 +33,18 @@ interface AllAccountsResponse {
 
 export function useAllAccounts(params: UseAllAccountsParams) {
   const { page, limit, search, healthStatus, sortBy, sortOrder } = params;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+  }, []);
 
   return useQuery<AllAccountsResponse>({
     queryKey: ['all-accounts', page, limit, search, healthStatus, sortBy, sortOrder],
+    enabled: isAuthenticated, // Only run query when authenticated
     queryFn: async () => {
       // Get session for auth token
       const { data: { session } } = await supabase.auth.getSession();
