@@ -6,7 +6,6 @@ import { PageContainer } from '@/components/layout/page-container';
 import { AnimatedGradientBackground } from '@/components/portfolio/animated-gradient-bg';
 import { MetricCards } from '@/components/portfolio/metric-cards';
 import { DynamicMetricChart } from '@/components/portfolio/dynamic-metric-chart';
-import { KeyMetricsCard } from '@/components/portfolio/key-metrics-card';
 import { RenewalForecast } from '@/components/portfolio/renewal-forecast';
 import { CsmFilter } from '@/components/portfolio/csm-filter';
 import { TimeRangeFilter } from '@/components/portfolio/time-range-filter';
@@ -101,17 +100,11 @@ function PortfolioContent() {
           <DynamicMetricChart data={metricHistory} selectedMetric={selectedMetric} />
         ) : null}
 
-        {/* Bottom Section - Key Metrics and Renewal Forecast */}
+        {/* Renewal Forecast */}
         {isLoading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
-          </div>
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <KeyMetricsCard />
-            {renewalForecast && <RenewalForecast data={renewalForecast} />}
-          </div>
+          renewalForecast && <RenewalForecast data={renewalForecast} />
         )}
       </PageContainer>
     </>
