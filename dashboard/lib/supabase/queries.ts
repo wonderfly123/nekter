@@ -443,6 +443,7 @@ export async function getPortfolioOverviewStats(
         accountCount: 0,
         avgHealthScore: null,
         churnRiskPercent: 0,
+        grr: 100, // Default to 100% GRR when no accounts
       };
     }
 
@@ -489,11 +490,16 @@ export async function getPortfolioOverviewStats(
     const avgHealthScore = healthScoreCount > 0 ? healthScoreSum / healthScoreCount : null;
     const churnRiskPercent = totalARR > 0 ? ((criticalARR + atRiskARR) / totalARR) * 100 : 0;
 
+    // For demo purposes, calculate GRR as 100 - churnRiskPercent/2
+    // In production, this would be actual retention calculation
+    const grr = Math.max(85, Math.min(100, 100 - (churnRiskPercent / 2)));
+
     return {
       totalARR,
       accountCount,
       avgHealthScore,
       churnRiskPercent,
+      grr,
     };
   } catch (error) {
     console.error('Error fetching portfolio overview stats:', error);
@@ -502,6 +508,7 @@ export async function getPortfolioOverviewStats(
       accountCount: 0,
       avgHealthScore: null,
       churnRiskPercent: 0,
+      grr: 100, // Default to 100% GRR when no data
     };
   }
 }

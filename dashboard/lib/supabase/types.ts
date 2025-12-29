@@ -224,6 +224,7 @@ export interface PortfolioOverviewStats {
   accountCount: number;
   avgHealthScore: number | null;
   churnRiskPercent: number; // (Critical ARR + At Risk ARR) / Total ARR × 100
+  grr: number; // Gross Revenue Retention percentage
 }
 
 export interface PortfolioHealthHistoryPoint {
