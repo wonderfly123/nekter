@@ -25,12 +25,12 @@ export function TimeRangeFilter({ value, onChange }: TimeRangeFilterProps) {
         backgroundPosition: 'right 1rem center',
       }}
     >
-      <option value="7d">Last 7 days</option>
-      <option value="24h">Last 24 hours</option>
-      <option value="14d">Last 14 days</option>
-      <option value="30d">Last 30 days</option>
-      <option value="90d">Last 90 days</option>
-      <option value="month">This month</option>
+      <option value="7d">7D</option>
+      <option value="30d">30D</option>
+      <option value="60d">60D</option>
+      <option value="90d">90D</option>
+      <option value="120d">120D</option>
+      <option value="180d">180D</option>
     </select>
   );
 }

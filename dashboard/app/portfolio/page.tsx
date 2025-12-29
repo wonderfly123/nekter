@@ -32,12 +32,12 @@ function PortfolioContent() {
   // Convert timeRange to days
   const getDaysFromTimeRange = (range: string): number => {
     const map: Record<string, number> = {
-      '24h': 1,
       '7d': 7,
-      '14d': 14,
       '30d': 30,
+      '60d': 60,
       '90d': 90,
-      'month': 30,
+      '120d': 120,
+      '180d': 180,
     };
     return map[range] || 7;
   };

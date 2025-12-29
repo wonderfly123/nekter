@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -30,9 +30,9 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
   const metricConfig: Record<string, MetricDisplayConfig> = {
     arr: {
       dataKey: 'arr',
-      label: 'ARR ($M)',
+      label: 'MRR',
       formatter: (value) => formatCompactCurrency(value),
-      domain: [(dataMin: number) => Math.floor(dataMin * 0.95), (dataMax: number) => Math.ceil(dataMax * 1.05)],
+      domain: ['auto', 'auto'] as any,
     },
     health: {
       dataKey: 'avgHealthScore',
@@ -49,7 +49,7 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
     grr: {
       dataKey: 'grr',
       label: 'GRR (%)',
-      formatter: (value) => `${value.toFixed(1)}%`,
+      formatter: (value) => `${Math.round(value)}%`,
       domain: [85, 100],
     },
   };
@@ -60,10 +60,17 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
     () =>
       data
         .filter((point) => point[config.dataKey] !== null)
-        .map((point) => ({
-          date: parseISO(point.date),
-          value: point[config.dataKey]!,
-        })),
+        .map((point) => {
+          let value = point[config.dataKey]!;
+          // Convert ARR to MRR by dividing by 12
+          if (config.dataKey === 'arr') {
+            value = value / 12;
+          }
+          return {
+            date: parseISO(point.date),
+            value: value,
+          };
+        }),
     [data, config.dataKey]
   );
 
@@ -83,7 +90,13 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
         Track how your selected metric performs over time
       </div>
       <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={chartData}>
+        <AreaChart data={chartData}>
+          <defs>
+            <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(245, 158, 11, 0.15)" />
+              <stop offset="100%" stopColor="rgba(245, 158, 11, 0)" />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="0" stroke="#f1f5f9" vertical={false} />
           <XAxis
             dataKey="date"
@@ -94,9 +107,12 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
             axisLine={false}
             tickLine={false}
             fontFamily="'DM Sans', sans-serif"
+            interval="preserveStartEnd"
+            minTickGap={60}
           />
           <YAxis
             domain={config.domain}
+            tickFormatter={config.formatter}
             stroke="#94a3b8"
             fontSize={12}
             tickMargin={12}
@@ -122,22 +138,16 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
               return null;
             }}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="value"
             stroke="#f59e0b"
             strokeWidth={2}
+            fill="url(#colorGradient)"
             dot={{ fill: '#f59e0b', stroke: '#fff', strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6 }}
-            fill="url(#colorGradient)"
           />
-          <defs>
-            <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(245, 158, 11, 0.1)" />
-              <stop offset="100%" stopColor="rgba(245, 158, 11, 0)" />
-            </linearGradient>
-          </defs>
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

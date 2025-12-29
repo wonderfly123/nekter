@@ -20,9 +20,9 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
   const metrics: MetricConfig[] = [
     {
       id: 'arr',
-      label: 'Total ARR',
-      value: formatCompactCurrency(stats.totalARR),
-      tooltip: 'Annual Recurring Revenue (ARR) is the total value of all recurring subscription revenue normalized to a one-year period. This metric shows the predictable revenue your business can expect annually.',
+      label: 'Total MRR',
+      value: formatCompactCurrency(stats.totalARR / 12),
+      tooltip: 'Monthly Recurring Revenue (MRR) is the total value of all recurring subscription revenue normalized to a one-month period. This metric shows the predictable revenue your business can expect monthly.',
     },
     {
       id: 'health',
@@ -34,7 +34,7 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
       id: 'churn',
       label: 'Churn Risk',
       value: `${stats.churnRiskPercent.toFixed(1)}%`,
-      tooltip: 'Churn Risk represents the percentage of ARR at risk of not renewing in the next 90 days. This is calculated based on health scores, engagement patterns, and renewal signals.',
+      tooltip: 'Churn Risk represents the percentage of MRR at risk of not renewing in the next 90 days. This is calculated based on health scores, engagement patterns, and renewal signals.',
     },
     {
       id: 'grr',
