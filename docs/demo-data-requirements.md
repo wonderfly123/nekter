@@ -230,12 +230,29 @@ grr = 100 - (churnRiskPercent / 2)
 
 ### Data Frequencies
 
-- **Health Scores:** Every 3 days (122 records per account)
-- **Calls:** Every 3-5 days depending on phase (~200-300 total)
-- **Emails:** Every 2-3 days depending on phase (~400-600 total)
-- **Support Tickets:** Every 5-7 days depending on phase (~300-500 total)
-- **Ticket Comments:** 2-6 per ticket (~1,000-2,000 total)
-- **Insights:** One per call/email/comment (~2,000-3,000 total)
+- **Health Scores:** Every 3 days (122 records per account = 2,440 total)
+- **Calls:**
+  - Recover accounts: 1-2 per month = ~18 per account (108 total)
+  - Stable accounts: 1 per month = ~12 per account (144 total)
+  - Churn accounts: 2-3 per month = ~30 per account (60 total)
+  - **Total: ~310 calls**
+- **Emails:**
+  - Recover accounts: 2-3 per month = ~30 per account (180 total)
+  - Stable accounts: 1-2 per month = ~18 per account (216 total)
+  - Churn accounts: 3-4 per month = ~42 per account (84 total)
+  - **Total: ~480 emails**
+- **Support Tickets:**
+  - Recover accounts: ~9 per account over year (54 total)
+    - Decline: 1/month, Implementation: 1/month, Growth: 1 every 2 months
+  - Stable accounts: ~5 per account over year (60 total)
+    - Decline: 1 every 2 months, Implementation: 1 total, Growth: 1 every 3 months
+  - Churn accounts: ~30 per account over year (60 total)
+    - Consistently 2-3/month throughout
+  - **Total: ~175 tickets**
+- **Ticket Comments:** 3-5 per ticket (average 4 = ~700 total)
+  - Simple tickets: 2-3 comments (question → answer)
+  - Complex tickets: 6-8 comments (extended back-and-forth)
+- **Insights:** One per call/email/comment (~1,500 total)
 
 ### Phase-Based Patterns
 
