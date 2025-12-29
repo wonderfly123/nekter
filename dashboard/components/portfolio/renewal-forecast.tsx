@@ -8,15 +8,34 @@ interface RenewalForecastProps {
 }
 
 export function RenewalForecast({ data }: RenewalForecastProps) {
+  const segments = [
+    {
+      key: 'healthy',
+      label: 'Healthy',
+      data: data.healthy,
+      color: 'green',
+      gradient: 'bg-gradient-to-r from-green-500 to-green-600',
+    },
+    {
+      key: 'atRisk',
+      label: 'At Risk',
+      data: data.atRisk,
+      color: 'amber',
+      gradient: 'bg-gradient-to-r from-amber-500 to-amber-600',
+    },
+    {
+      key: 'critical',
+      label: 'Critical',
+      data: data.critical,
+      color: 'red',
+      gradient: 'bg-gradient-to-r from-red-500 to-red-600',
+    },
+  ];
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Renewal Forecast
-        </h3>
-        <p className="text-sm text-gray-500 mt-1">
-          Next 90 days - {data.total.count} renewal{data.total.count !== 1 ? 's' : ''}
-        </p>
+    <div className="bg-white border border-gray-200 rounded-2xl p-8">
+      <div className="mb-6">
+        <h3 className="text-[18px] font-bold text-gray-900">Renewal Forecast</h3>
       </div>
 
       {data.total.count === 0 ? (
@@ -25,72 +44,22 @@ export function RenewalForecast({ data }: RenewalForecastProps) {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Healthy */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Healthy</span>
-              <span className="font-mono font-semibold text-gray-900">
-                {formatCompactCurrency(data.healthy.arr)} ({data.healthy.percent.toFixed(0)}%)
-              </span>
+          {segments.map((segment) => (
+            <div key={segment.key} className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <span className="text-[15px] text-gray-600 font-semibold">{segment.label}</span>
+                <span className="font-mono font-bold text-[15px] text-gray-900">
+                  {formatCompactCurrency(segment.data.arr)} ({segment.data.percent.toFixed(0)}%)
+                </span>
+              </div>
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ${segment.gradient}`}
+                  style={{ width: `${segment.data.percent}%` }}
+                />
+              </div>
             </div>
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-green-500 transition-all duration-300"
-                style={{ width: `${data.healthy.percent}%` }}
-              />
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {data.healthy.count} account{data.healthy.count !== 1 ? 's' : ''}
-            </div>
-          </div>
-
-          {/* At Risk */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">At Risk</span>
-              <span className="font-mono font-semibold text-gray-900">
-                {formatCompactCurrency(data.atRisk.arr)} ({data.atRisk.percent.toFixed(0)}%)
-              </span>
-            </div>
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-yellow-500 transition-all duration-300"
-                style={{ width: `${data.atRisk.percent}%` }}
-              />
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {data.atRisk.count} account{data.atRisk.count !== 1 ? 's' : ''}
-            </div>
-          </div>
-
-          {/* Critical */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Critical</span>
-              <span className="font-mono font-semibold text-gray-900">
-                {formatCompactCurrency(data.critical.arr)} ({data.critical.percent.toFixed(0)}%)
-              </span>
-            </div>
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-red-500 transition-all duration-300"
-                style={{ width: `${data.critical.percent}%` }}
-              />
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {data.critical.count} account{data.critical.count !== 1 ? 's' : ''}
-            </div>
-          </div>
-
-          {/* Total */}
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-gray-900">Total</span>
-              <span className="font-mono font-bold text-gray-900">
-                {formatCompactCurrency(data.total.arr)}
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>
