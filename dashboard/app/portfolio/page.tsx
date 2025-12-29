@@ -65,7 +65,7 @@ function PortfolioContent() {
                 Track key metrics and trends across your customer portfolio
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               {csmList && csmList.length > 0 && (
                 <CsmFilter
                   selectedCsm={selectedCsm}
