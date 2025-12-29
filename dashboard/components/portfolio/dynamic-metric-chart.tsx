@@ -1,0 +1,144 @@
+'use client';
+
+import { useMemo } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { format, parseISO } from 'date-fns';
+import type { MetricHistoryPoint } from '@/lib/supabase/types';
+import { formatCompactCurrency } from '@/lib/utils/formatters';
+
+interface DynamicMetricChartProps {
+  data: MetricHistoryPoint[];
+  selectedMetric: string;
+}
+
+interface MetricDisplayConfig {
+  dataKey: keyof MetricHistoryPoint;
+  label: string;
+  formatter: (value: number) => string;
+  domain?: [number, number] | [(dataMin: number) => number, (dataMax: number) => number];
+}
+
+export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartProps) {
+  const metricConfig: Record<string, MetricDisplayConfig> = {
+    arr: {
+      dataKey: 'arr',
+      label: 'ARR ($M)',
+      formatter: (value) => formatCompactCurrency(value),
+      domain: [(dataMin: number) => Math.floor(dataMin * 0.95), (dataMax: number) => Math.ceil(dataMax * 1.05)],
+    },
+    health: {
+      dataKey: 'avgHealthScore',
+      label: 'Health Score',
+      formatter: (value) => Math.round(value).toString(),
+      domain: [0, 100],
+    },
+    churn: {
+      dataKey: 'churnRiskPercent',
+      label: 'Churn Risk (%)',
+      formatter: (value) => `${value.toFixed(1)}%`,
+      domain: [0, (dataMax: number) => Math.ceil(dataMax * 1.2)],
+    },
+    grr: {
+      dataKey: 'grr',
+      label: 'GRR (%)',
+      formatter: (value) => `${value.toFixed(1)}%`,
+      domain: [85, 100],
+    },
+  };
+
+  const config = metricConfig[selectedMetric] || metricConfig.health;
+
+  const chartData = useMemo(
+    () =>
+      data
+        .filter((point) => point[config.dataKey] !== null)
+        .map((point) => ({
+          date: parseISO(point.date),
+          value: point[config.dataKey]!,
+        })),
+    [data, config.dataKey]
+  );
+
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
+        <div className="text-center py-16">
+          <p className="text-gray-600">No data available for selected metric</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
+      <div className="text-[13px] text-gray-500 mb-6">
+        Track how your selected metric performs over time
+      </div>
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="0" stroke="#f1f5f9" vertical={false} />
+          <XAxis
+            dataKey="date"
+            tickFormatter={(date) => format(date, 'MMM d')}
+            stroke="#94a3b8"
+            fontSize={12}
+            tickMargin={12}
+            axisLine={false}
+            tickLine={false}
+            fontFamily="'DM Sans', sans-serif"
+          />
+          <YAxis
+            domain={config.domain}
+            stroke="#94a3b8"
+            fontSize={12}
+            tickMargin={12}
+            axisLine={false}
+            tickLine={false}
+            fontFamily="'JetBrains Mono', monospace"
+          />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                  <div className="bg-gray-900/95 text-white p-3 rounded-lg shadow-xl border border-amber-500">
+                    <div className="text-xs text-gray-300 mb-1">
+                      {format(data.date, 'MMM d, yyyy')}
+                    </div>
+                    <div className="text-sm font-semibold">
+                      {config.label}: {config.formatter(data.value)}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#f59e0b"
+            strokeWidth={2}
+            dot={{ fill: '#f59e0b', stroke: '#fff', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6 }}
+            fill="url(#colorGradient)"
+          />
+          <defs>
+            <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(245, 158, 11, 0.1)" />
+              <stop offset="100%" stopColor="rgba(245, 158, 11, 0)" />
+            </linearGradient>
+          </defs>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
