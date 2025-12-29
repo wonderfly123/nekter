@@ -8,9 +8,10 @@ import type {
   Account,
   PortfolioOverviewStats,
   PortfolioHealthHistoryPoint,
+  MetricHistoryPoint,
   RenewalForecastData,
 } from './types';
-import { getDemoDateString } from '../config/demo';
+import { getDemoDateString, getCurrentDate } from '../config/demo';
 import { calculatePriorityScore, getTopSignals } from '../utils/health-calculations';
 import { calculateMetrics } from '../utils/metrics-calculations';
 
@@ -578,6 +579,44 @@ export async function getPortfolioHealthHistory(
     console.error('Error fetching portfolio health history:', error);
     return [];
   }
+}
+
+/**
+ * Get portfolio metric history (ARR, health score, churn risk, GRR over time)
+ * Returns daily data points for the specified number of days
+ */
+export async function getPortfolioMetricHistory(
+  days: number,
+  csmName?: string | null
+): Promise<MetricHistoryPoint[]> {
+  const demoDate = getCurrentDate();
+  const startDate = new Date(demoDate);
+  startDate.setDate(startDate.getDate() - days);
+
+  // Call ONCE before the loop
+  const stats = await getPortfolioOverviewStats(csmName);
+
+  const result: MetricHistoryPoint[] = [];
+
+  // Generate data points for each day
+  for (let i = 0; i < days; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(currentDate.getDate() + i);
+    const dateStr = currentDate.toISOString().split('T')[0];
+
+    // Add slight random variation for demo purposes
+    const variation = 1 + (Math.random() - 0.5) * 0.05; // ±5% variation
+
+    result.push({
+      date: dateStr,
+      arr: stats.totalARR * variation,
+      avgHealthScore: stats.avgHealthScore,
+      churnRiskPercent: stats.churnRiskPercent * variation,
+      grr: stats.grr * variation,
+    });
+  }
+
+  return result;
 }
 
 /**

@@ -232,6 +232,14 @@ export interface PortfolioHealthHistoryPoint {
   avgHealthScore: number | null;
 }
 
+export interface MetricHistoryPoint {
+  date: string; // ISO date string
+  arr: number | null;
+  avgHealthScore: number | null;
+  churnRiskPercent: number | null;
+  grr: number | null;
+}
+
 export interface RenewalForecastData {
   healthy: {
     arr: number;
