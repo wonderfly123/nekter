@@ -23,7 +23,7 @@ interface MetricDisplayConfig {
   dataKey: keyof MetricHistoryPoint;
   label: string;
   formatter: (value: number) => string;
-  domain?: [number, number] | [(dataMin: number) => number, (dataMax: number) => number];
+  domain?: [number | ((dataMin: number) => number), number | ((dataMax: number) => number)];
 }
 
 export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartProps) {
