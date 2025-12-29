@@ -74,6 +74,18 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
     [data, config.dataKey]
   );
 
+  // Calculate dot interval based on data length
+  const getDotInterval = () => {
+    const length = chartData.length;
+    if (length <= 7) return 1;      // Show all dots for 7D
+    if (length <= 30) return 5;     // Show every 5th dot for 30D
+    if (length <= 60) return 10;    // Show every 10th dot for 60D
+    if (length <= 90) return 15;    // Show every 15th dot for 90D
+    return 20;                       // Show every 20th dot for 120D+
+  };
+
+  const dotInterval = getDotInterval();
+
   if (chartData.length === 0) {
     return (
       <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
@@ -144,7 +156,23 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
             stroke="#f59e0b"
             strokeWidth={2}
             fill="url(#colorGradient)"
-            dot={{ fill: '#f59e0b', stroke: '#fff', strokeWidth: 2, r: 4 }}
+            dot={(props: any) => {
+              const { index } = props;
+              // Only show dots at intervals
+              if (index % dotInterval === 0) {
+                return (
+                  <circle
+                    cx={props.cx}
+                    cy={props.cy}
+                    r={4}
+                    fill="#f59e0b"
+                    stroke="#fff"
+                    strokeWidth={2}
+                  />
+                );
+              }
+              return null;
+            }}
             activeDot={{ r: 6 }}
           />
         </AreaChart>
