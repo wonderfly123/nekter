@@ -35,7 +35,7 @@ export function RenewalForecast({ data }: RenewalForecastProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-8">
       <div className="mb-6">
-        <h3 className="text-[18px] font-bold text-gray-900">Renewal Forecast</h3>
+        <h3 className="text-[18px] font-bold text-gray-900">Renewal Forecast (Next 90 Days)</h3>
       </div>
 
       {data.total.count === 0 ? (
