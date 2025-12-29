@@ -1,10 +1,11 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Building2 } from 'lucide-react';
+import { Search, Building2, Calendar } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { NotificationsDropdown } from './NotificationsDropdown';
+import { format } from 'date-fns';
 
 const pageTitles: Record<string, string> = {
   '/priority': 'Priority Accounts',
@@ -30,6 +31,11 @@ export function AppHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Get demo date from environment and parse as local date to avoid timezone issues
+  const demoDate = process.env.NEXT_PUBLIC_DEMO_DATE || new Date().toISOString().split('T')[0];
+  const [year, month, day] = demoDate.split('-').map(Number);
+  const formattedDemoDate = format(new Date(year, month - 1, day), 'MMM d, yyyy');
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -98,6 +104,23 @@ export function AppHeader() {
           <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
 
           <div className="flex items-center gap-4">
+            {/* Demo Date Badge */}
+            <div className="relative group">
+              <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <span className="text-blue-700 font-medium">{formattedDemoDate}</span>
+              </div>
+
+              {/* Tooltip */}
+              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="font-semibold mb-1">Demo Date</div>
+                <div className="text-gray-300">
+                  This is a simulated date for demo purposes. All data, health scores, and analytics are calculated as if today is this date.
+                </div>
+                <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              </div>
+            </div>
+
             {/* Search Box */}
             <div className="relative w-[280px]" ref={searchRef}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
