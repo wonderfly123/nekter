@@ -3,13 +3,16 @@
 import { useState } from 'react';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { PageContainer } from '@/components/layout/page-container';
-import { StatsCards } from '@/components/portfolio/stats-cards';
-import { HealthScoreChart } from '@/components/portfolio/health-score-chart';
+import { AnimatedGradientBackground } from '@/components/portfolio/animated-gradient-bg';
+import { MetricCards } from '@/components/portfolio/metric-cards';
+import { DynamicMetricChart } from '@/components/portfolio/dynamic-metric-chart';
+import { KeyMetricsCard } from '@/components/portfolio/key-metrics-card';
 import { RenewalForecast } from '@/components/portfolio/renewal-forecast';
 import { CsmFilter } from '@/components/portfolio/csm-filter';
+import { TimeRangeFilter } from '@/components/portfolio/time-range-filter';
 import { StatCardSkeleton } from '@/components/shared/loading-skeleton';
 import { usePortfolioStats } from '@/hooks/use-portfolio-stats';
-import { usePortfolioHealthHistory } from '@/hooks/use-portfolio-health-history';
+import { usePortfolioMetricHistory } from '@/hooks/use-portfolio-metric-history';
 import { useRenewalForecast } from '@/hooks/use-renewal-forecast';
 import { useCsmList } from '@/hooks/use-csm-list';
 
@@ -23,60 +26,94 @@ export default function PortfolioPage() {
 
 function PortfolioContent() {
   const [selectedCsm, setSelectedCsm] = useState<string | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<string>('health');
+  const [timeRange, setTimeRange] = useState<string>('7d');
 
-  // Fetch all data with CSM filter
+  // Convert timeRange to days
+  const getDaysFromTimeRange = (range: string): number => {
+    const map: Record<string, number> = {
+      '24h': 1,
+      '7d': 7,
+      '14d': 14,
+      '30d': 30,
+      '90d': 90,
+      'month': 30,
+    };
+    return map[range] || 7;
+  };
+
+  const days = getDaysFromTimeRange(timeRange);
+
+  // Fetch all data
   const { data: stats, isLoading: statsLoading } = usePortfolioStats(selectedCsm);
-  const { data: healthHistory90d, isLoading: history90dLoading } = usePortfolioHealthHistory(90, selectedCsm);
-  const { data: healthHistory30d, isLoading: history30dLoading } = usePortfolioHealthHistory(30, selectedCsm);
-  const { data: healthHistory7d, isLoading: history7dLoading } = usePortfolioHealthHistory(7, selectedCsm);
+  const { data: metricHistory, isLoading: historyLoading } = usePortfolioMetricHistory({ days, csmName: selectedCsm });
   const { data: renewalForecast, isLoading: renewalLoading } = useRenewalForecast(selectedCsm);
   const { data: csmList } = useCsmList();
 
-  const isLoading = statsLoading || history90dLoading || history30dLoading || history7dLoading || renewalLoading;
+  const isLoading = statsLoading || historyLoading || renewalLoading;
 
   return (
-    <PageContainer>
-      {/* CSM Filter */}
-      {csmList && csmList.length > 0 && (
-        <CsmFilter
-          selectedCsm={selectedCsm}
-          onCsmChange={setSelectedCsm}
-          csmList={csmList}
-        />
-      )}
-
-      {/* Stats Cards */}
-      {statsLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <StatCardSkeleton />
-          <StatCardSkeleton />
-          <StatCardSkeleton />
+    <>
+      <AnimatedGradientBackground />
+      <PageContainer>
+        {/* Header with Title and Filters */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-2">
+            <div>
+              <h1 className="text-[32px] font-bold text-gray-900 mb-2">Portfolio Analytics</h1>
+              <p className="text-[15px] text-gray-500 font-medium">
+                Track key metrics and trends across your customer portfolio
+              </p>
+            </div>
+            <div className="flex gap-3">
+              {csmList && csmList.length > 0 && (
+                <CsmFilter
+                  selectedCsm={selectedCsm}
+                  onCsmChange={setSelectedCsm}
+                  csmList={csmList}
+                />
+              )}
+              <TimeRangeFilter value={timeRange} onChange={setTimeRange} />
+            </div>
+          </div>
         </div>
-      ) : stats ? (
-        <StatsCards stats={stats} />
-      ) : null}
 
-      {/* Charts Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6 h-[350px] animate-pulse" />
-          <div className="bg-white rounded-lg border border-gray-200 p-6 h-[350px] animate-pulse" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Health Score Chart */}
-          {healthHistory90d && healthHistory30d && healthHistory7d && (
-            <HealthScoreChart
-              data90d={healthHistory90d}
-              data30d={healthHistory30d}
-              data7d={healthHistory7d}
-            />
-          )}
+        {/* Metric Cards */}
+        {statsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        ) : stats ? (
+          <MetricCards
+            stats={stats}
+            selectedMetric={selectedMetric}
+            onMetricSelect={setSelectedMetric}
+          />
+        ) : null}
 
-          {/* Renewal Forecast */}
-          {renewalForecast && <RenewalForecast data={renewalForecast} />}
-        </div>
-      )}
-    </PageContainer>
+        {/* Dynamic Chart */}
+        {historyLoading ? (
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 h-[400px] animate-pulse" />
+        ) : metricHistory ? (
+          <DynamicMetricChart data={metricHistory} selectedMetric={selectedMetric} />
+        ) : null}
+
+        {/* Bottom Section - Key Metrics and Renewal Forecast */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <KeyMetricsCard />
+            {renewalForecast && <RenewalForecast data={renewalForecast} />}
+          </div>
+        )}
+      </PageContainer>
+    </>
   );
 }
