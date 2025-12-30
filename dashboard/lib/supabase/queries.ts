@@ -11,7 +11,7 @@ import type {
   MetricHistoryPoint,
   RenewalForecastData,
 } from './types';
-import { getDemoDateString, getCurrentDate } from '../config/demo';
+import { getDemoDateString } from '../config/demo';
 import { calculatePriorityScore, getTopSignals } from '../utils/health-calculations';
 import { calculateMetrics } from '../utils/metrics-calculations';
 
@@ -589,34 +589,103 @@ export async function getPortfolioMetricHistory(
   days: number,
   csmName?: string | null
 ): Promise<MetricHistoryPoint[]> {
-  const demoDate = getCurrentDate();
-  const startDate = new Date(demoDate);
+  const demoDateString = getDemoDateString();
+  const endOfDay = `${demoDateString}T23:59:59`;
+  const startDate = new Date(demoDateString);
   startDate.setDate(startDate.getDate() - days);
 
-  // Call ONCE before the loop
-  const stats = await getPortfolioOverviewStats(csmName);
+  try {
+    // Get all accounts (with optional CSM filter)
+    let accountsQuery = supabase.from('accounts').select('sf_account_id, arr, csm_name');
 
-  const result: MetricHistoryPoint[] = [];
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
 
-  // Generate data points for each day
-  for (let i = 0; i < days; i++) {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(currentDate.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const { data: accounts, error: accountsError } = await accountsQuery;
 
-    // Add slight random variation for demo purposes
-    const variation = 1 + (Math.random() - 0.5) * 0.05; // ±5% variation
+    if (accountsError) throw accountsError;
+    if (!accounts || accounts.length === 0) return [];
 
-    result.push({
-      date: dateStr,
-      arr: stats.totalARR * variation,
-      avgHealthScore: stats.avgHealthScore,
-      churnRiskPercent: stats.churnRiskPercent * variation,
-      grr: stats.grr * variation,
+    const accountIds = accounts.map((a) => a.sf_account_id);
+
+    // Get health history for these accounts for the entire date range
+    const { data: healthHistory, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('sf_account_id, health_score, health_status, created_at')
+      .in('sf_account_id', accountIds)
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endOfDay)
+      .order('created_at', { ascending: true });
+
+    if (healthError) throw healthError;
+    if (!healthHistory || healthHistory.length === 0) return [];
+
+    // Create a map of ARR by account
+    const arrMap = new Map(accounts.map((a) => [a.sf_account_id, a.arr || 0]));
+
+    // Group health data by date
+    const dateMap = new Map<string, {
+      healthScoreSum: number;
+      healthScoreCount: number;
+      criticalARR: number;
+      atRiskARR: number;
+      totalARR: number;
+    }>();
+
+    healthHistory.forEach((record) => {
+      if (!record.created_at) return;
+
+      const date = record.created_at.split('T')[0]; // Get YYYY-MM-DD
+      const arr = arrMap.get(record.sf_account_id) || 0;
+      const existing = dateMap.get(date) || {
+        healthScoreSum: 0,
+        healthScoreCount: 0,
+        criticalARR: 0,
+        atRiskARR: 0,
+        totalARR: 0
+      };
+
+      // Add health score
+      if (record.health_score !== null) {
+        existing.healthScoreSum += record.health_score;
+        existing.healthScoreCount++;
+      }
+
+      // Add ARR by health status
+      if (record.health_status === 'Critical') {
+        existing.criticalARR += arr;
+      } else if (record.health_status === 'At Risk') {
+        existing.atRiskARR += arr;
+      }
+      existing.totalARR += arr;
+
+      dateMap.set(date, existing);
     });
-  }
 
-  return result;
+    // Calculate total ARR (constant across all dates for demo purposes)
+    const totalARR = accounts.reduce((sum, acc) => sum + (acc.arr || 0), 0);
+
+    // Convert to array and calculate metrics for each day
+    const result: MetricHistoryPoint[] = Array.from(dateMap.entries())
+      .map(([date, metrics]) => ({
+        date,
+        arr: totalARR,
+        avgHealthScore: metrics.healthScoreCount > 0
+          ? metrics.healthScoreSum / metrics.healthScoreCount
+          : null,
+        churnRiskPercent: metrics.totalARR > 0
+          ? ((metrics.criticalARR + metrics.atRiskARR) / metrics.totalARR) * 100
+          : 0,
+        grr: 100, // Placeholder - GRR calculation would require historical data
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching portfolio metric history:', error);
+    return [];
+  }
 }
 
 /**
