@@ -46,12 +46,6 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
       formatter: (value) => `${value.toFixed(1)}%`,
       domain: [0, (dataMax: number) => Math.ceil(dataMax * 1.2)],
     },
-    grr: {
-      dataKey: 'grr',
-      label: 'GRR (%)',
-      formatter: (value) => `${Math.round(value)}%`,
-      domain: [85, 100],
-    },
   };
 
   const config = metricConfig[selectedMetric] || metricConfig.health;
@@ -61,7 +55,7 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
       data
         .filter((point) => point[config.dataKey] !== null)
         .map((point) => {
-          let value = point[config.dataKey]!;
+          let value: number = Number(point[config.dataKey]);
           // Convert ARR to MRR by dividing by 12
           if (config.dataKey === 'arr') {
             value = value / 12;
