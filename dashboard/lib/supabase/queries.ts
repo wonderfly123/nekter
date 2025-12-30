@@ -444,7 +444,6 @@ export async function getPortfolioOverviewStats(
         accountCount: 0,
         avgHealthScore: null,
         churnRiskPercent: 0,
-        grr: 100, // Default to 100% GRR when no accounts
       };
     }
 
@@ -491,16 +490,11 @@ export async function getPortfolioOverviewStats(
     const avgHealthScore = healthScoreCount > 0 ? healthScoreSum / healthScoreCount : null;
     const churnRiskPercent = totalARR > 0 ? ((criticalARR + atRiskARR) / totalARR) * 100 : 0;
 
-    // For demo purposes, calculate GRR as 100 - churnRiskPercent/2
-    // In production, this would be actual retention calculation
-    const grr = Math.max(85, Math.min(100, 100 - (churnRiskPercent / 2)));
-
     return {
       totalARR,
       accountCount,
       avgHealthScore,
       churnRiskPercent,
-      grr,
     };
   } catch (error) {
     console.error('Error fetching portfolio overview stats:', error);
@@ -509,7 +503,6 @@ export async function getPortfolioOverviewStats(
       accountCount: 0,
       avgHealthScore: null,
       churnRiskPercent: 0,
-      grr: 100, // Default to 100% GRR when no data
     };
   }
 }
@@ -582,7 +575,7 @@ export async function getPortfolioHealthHistory(
 }
 
 /**
- * Get portfolio metric history (ARR, health score, churn risk, GRR over time)
+ * Get portfolio metric history (ARR, health score, churn risk over time)
  * Returns daily data points for the specified number of days
  */
 export async function getPortfolioMetricHistory(
@@ -677,7 +670,6 @@ export async function getPortfolioMetricHistory(
         churnRiskPercent: metrics.totalARR > 0
           ? ((metrics.criticalARR + metrics.atRiskARR) / metrics.totalARR) * 100
           : 0,
-        grr: 100, // Placeholder - GRR calculation would require historical data
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
