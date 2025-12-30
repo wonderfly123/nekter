@@ -36,16 +36,10 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
       value: `${stats.churnRiskPercent.toFixed(1)}%`,
       tooltip: 'Churn Risk represents the percentage of MRR at risk of not renewing in the next 90 days. This is calculated based on health scores, engagement patterns, and renewal signals.',
     },
-    {
-      id: 'grr',
-      label: 'GRR',
-      value: `${stats.grr.toFixed(1)}%`,
-      tooltip: 'Gross Revenue Retention (GRR) measures the percentage of recurring revenue retained from existing customers, excluding expansion. A GRR above 90% is considered excellent for SaaS businesses.',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       {metrics.map((metric) => (
         <button
           key={metric.id}
