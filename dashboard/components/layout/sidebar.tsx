@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon } from 'lucide-react';
+import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -62,7 +62,7 @@ export function Sidebar() {
             className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
             onClick={toggleCollapsed}
           >
-            <Zap className="w-4 h-4 text-white fill-white" />
+            <Droplet className="w-4 h-4 text-white fill-white" />
           </div>
           {!isCollapsed && (
             <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">

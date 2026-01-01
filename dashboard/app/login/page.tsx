@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/use-auth';
+import { Droplet } from 'lucide-react';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -144,11 +145,16 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
         <div>
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+              <Droplet className="w-8 h-8 text-white fill-white" />
+            </div>
+          </div>
           <h2 className="text-3xl font-bold text-center text-gray-900">
-            {mode === 'login' ? 'Sign in' : 'Sign up'}
+            {mode === 'login' ? 'Sign in to Nekter' : 'Sign up for Nekter'}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Customer Success Dashboard
+            Customer Success powered by Smart Robots
           </p>
         </div>
 
