@@ -19,7 +19,8 @@ import { calculateMetrics } from '../utils/metrics-calculations';
  * Get priority accounts (Critical and At Risk) sorted by priority score
  */
 export async function getPriorityAccounts(
-  includeRenewalsOnly: boolean
+  includeRenewalsOnly: boolean,
+  csmName?: string | null
 ): Promise<PriorityAccount[]> {
   const demoDate = getDemoDateString();
   const ninetyDaysAgo = new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000);
@@ -45,11 +46,17 @@ export async function getPriorityAccounts(
 
     const accountIds = Array.from(latestHealthMap.keys());
 
-    // Get account details for these accounts
-    const { data: accounts, error: accountsError } = await supabase
+    // Get account details for these accounts (with optional CSM filter)
+    let accountsQuery = supabase
       .from('accounts')
       .select('*')
       .in('sf_account_id', accountIds);
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
 
     if (accountsError) throw accountsError;
     if (!accounts) return [];
@@ -154,16 +161,46 @@ export async function getPriorityAccounts(
 /**
  * Get dashboard statistics (counts and ARR by health status)
  */
-export async function getDashboardStats(): Promise<PortfolioStats> {
+export async function getDashboardStats(
+  csmName?: string | null
+): Promise<PortfolioStats> {
   const demoDate = getDemoDateString();
   const startOfDay = `${demoDate}T00:00:00`;
   const endOfDay = `${demoDate}T23:59:59`;
 
   try {
-    // Get today's health snapshot for ALL accounts
+    // Get accounts (with optional CSM filter)
+    let accountsQuery = supabase
+      .from('accounts')
+      .select('sf_account_id, arr');
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!accounts || accounts.length === 0) {
+      return {
+        criticalCount: 0,
+        criticalARR: 0,
+        atRiskCount: 0,
+        atRiskARR: 0,
+        renewalsCount: 0,
+        renewalsARR: 0,
+        healthyCount: 0,
+        healthyARR: 0,
+      };
+    }
+
+    const accountIds = accounts.map((a) => a.sf_account_id);
+
+    // Get today's health snapshot for these accounts
     const { data: healthData, error: healthError } = await supabase
       .from('account_health_history')
       .select('sf_account_id, health_status')
+      .in('sf_account_id', accountIds)
       .gte('created_at', startOfDay)
       .lte('created_at', endOfDay);
 
@@ -180,15 +217,6 @@ export async function getDashboardStats(): Promise<PortfolioStats> {
         healthyARR: 0,
       };
     }
-
-    // Get account details
-    const accountIds = healthData.map((h) => h.sf_account_id);
-    const { data: accounts, error: accountsError } = await supabase
-      .from('accounts')
-      .select('sf_account_id, arr')
-      .in('sf_account_id', accountIds);
-
-    if (accountsError) throw accountsError;
 
     // Create a map of account ARR
     const arrMap = new Map(accounts?.map((a) => [a.sf_account_id, a.arr || 0]) || []);
@@ -223,13 +251,14 @@ export async function getDashboardStats(): Promise<PortfolioStats> {
       }
     );
 
-    // Get renewal opportunities (next 90 days)
+    // Get renewal opportunities (next 90 days) for these accounts
     const ninetyDaysFromNow = new Date(demoDate);
     ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
 
     const { data: renewals, error: renewalsError } = await supabase
       .from('opportunities')
       .select('sf_account_id, amount')
+      .in('sf_account_id', accountIds)
       .eq('type', 'Renewal')
       .eq('is_closed', false)
       .lte('close_date', ninetyDaysFromNow.toISOString().split('T')[0]);
