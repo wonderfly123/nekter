@@ -1,25 +1,28 @@
 'use client';
 
-import { useState, KeyboardEvent } from 'react';
+import { KeyboardEvent } from 'react';
 import { Send } from 'lucide-react';
 
 interface ChatInputProps {
+  value: string;
+  onChange: (value: string) => void;
   onSend: (message: string) => void;
   disabled?: boolean;
   placeholder?: string;
 }
 
 export function ChatInput({
+  value,
+  onChange,
   onSend,
   disabled = false,
   placeholder = 'Ask Barry anything about your accounts, health scores, expansion opportunities...',
 }: ChatInputProps) {
-  const [message, setMessage] = useState('');
 
   const handleSend = () => {
-    if (message.trim() && !disabled) {
-      onSend(message.trim());
-      setMessage('');
+    if (value.trim() && !disabled) {
+      onSend(value.trim());
+      onChange('');
     }
   };
 
@@ -35,8 +38,8 @@ export function ChatInput({
       <div className="flex gap-4 items-end">
         <div className="flex-1">
           <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
@@ -45,11 +48,11 @@ export function ChatInput({
         </div>
         <button
           onClick={handleSend}
-          disabled={disabled || !message.trim()}
-          className="px-6 py-3.5 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-lg font-semibold text-[15px] flex items-center gap-2 hover:shadow-lg transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          disabled={disabled || !value.trim()}
+          className="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>Send</span>
-          <Send className="w-[18px] h-[18px]" />
+          <Send className="w-4 h-4" />
         </button>
       </div>
     </div>

@@ -48,9 +48,9 @@ export function ChatHistorySidebar({
       <div className="p-4 border-b border-gray-200">
         <button
           onClick={onNewChat}
-          className="w-full px-4 py-3 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-lg font-semibold text-[15px] flex items-center justify-center gap-2 hover:shadow-lg transition-all hover:-translate-y-0.5"
+          className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-orange-700 transition-colors"
         >
-          <Plus className="w-[18px] h-[18px]" />
+          <Plus className="w-4 h-4" />
           <span>New Chat</span>
         </button>
       </div>

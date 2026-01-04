@@ -5,9 +5,9 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { PageContainer } from '@/components/layout/page-container';
 import { AnimatedGradientBackground } from '@/components/portfolio/animated-gradient-bg';
 import { ChatHistorySidebar } from '@/components/chat/chat-history-sidebar';
-import { QuickActionsSidebar } from '@/components/chat/quick-actions-sidebar';
 import { MessageBubble } from '@/components/chat/message-bubble';
 import { ChatInput } from '@/components/chat/chat-input';
+import { QuickActionChips } from '@/components/chat/quick-action-chips';
 import { useChatSessions } from '@/hooks/use-chat-sessions';
 import { useChatMessages } from '@/hooks/use-chat-messages';
 import { useSendMessage } from '@/hooks/use-send-message';
@@ -25,6 +25,7 @@ export default function ChatPage() {
 function ChatContent() {
   const { user } = useAuth();
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: sessions, isLoading: sessionsLoading } = useChatSessions();
@@ -54,7 +55,7 @@ function ChatContent() {
       await sendMessage.mutateAsync({
         sessionId: newSession.id,
         content:
-          "Hey! 👋 I'm Barry, your AI customer success assistant. I can help you with account planning, deep interaction analysis, expansion opportunities, and much more.\n\nI have access to your full portfolio and can pull insights from all your customer interactions. What would you like to work on today?",
+          "Hey! 👋 I'm Barry, your Smart Nekter Assistant. I can help you with:",
         role: 'assistant',
       });
     } catch (error) {
@@ -85,8 +86,8 @@ function ChatContent() {
     }
   };
 
-  const handleQuickPrompt = (prompt: string) => {
-    handleSendMessage(prompt);
+  const handleQuickActionClick = (prompt: string) => {
+    setInputValue(prompt);
   };
 
   return (
@@ -129,13 +130,20 @@ function ChatContent() {
                 </div>
               ) : messages && messages.length > 0 ? (
                 <>
-                  {messages.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      content={message.content}
-                      role={message.role}
-                      timestamp={message.created_at}
-                    />
+                  {messages.map((message, index) => (
+                    <div key={message.id}>
+                      <MessageBubble
+                        content={message.content}
+                        role={message.role}
+                        timestamp={message.created_at}
+                      />
+                      {/* Show quick action chips after first message (Barry's welcome) */}
+                      {index === 0 && message.role === 'assistant' && messages.length === 1 && (
+                        <div className="ml-14">
+                          <QuickActionChips onActionClick={handleQuickActionClick} />
+                        </div>
+                      )}
+                    </div>
                   ))}
                   <div ref={messagesEndRef} />
                 </>
@@ -146,13 +154,12 @@ function ChatContent() {
 
             {/* Chat Input */}
             <ChatInput
+              value={inputValue}
+              onChange={setInputValue}
               onSend={handleSendMessage}
               disabled={!activeSessionId || sendMessage.isPending}
             />
           </div>
-
-          {/* Quick Actions Sidebar */}
-          <QuickActionsSidebar onQuickPrompt={handleQuickPrompt} />
         </div>
       </PageContainer>
     </>

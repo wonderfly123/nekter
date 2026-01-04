@@ -13,6 +13,7 @@ const pageTitles: Record<string, string> = {
   '/all-accounts': 'All Accounts',
   '/analytics': 'Analytics',
   '/team': 'Team Performance',
+  '/chat': 'Chat with Barry',
 };
 
 interface SearchResult {
