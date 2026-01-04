@@ -28,7 +28,7 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
       id: 'health',
       label: 'Health Score',
       value: stats.avgHealthScore !== null ? Math.round(stats.avgHealthScore).toString() : 'N/A',
-      tooltip: 'Customer Health Score is a composite metric (0-100) that measures account engagement, product usage, support interactions, and sentiment. Higher scores indicate healthier, more likely to renew customers.',
+      tooltip: 'Customer Health Score is a composite metric (0-100) that measures account engagement, product usage, support interactions, and sentiment.',
     },
     {
       id: 'churn',
@@ -40,7 +40,7 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-      {metrics.map((metric) => (
+      {metrics.map((metric, index) => (
         <button
           key={metric.id}
           onClick={() => onMetricSelect(metric.id)}
@@ -64,10 +64,14 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
               <div className="w-4 h-4 border-[1.5px] border-gray-400 rounded-full flex items-center justify-center text-[10px] text-gray-400 font-bold cursor-help transition-all hover:border-amber-500 hover:text-amber-500 hover:bg-amber-50">
                 ?
               </div>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[280px] p-3 bg-gray-900 text-white text-[13px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+              <div className={`absolute top-full mt-2 w-[280px] p-3 bg-gray-900 text-white text-[13px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none ${
+                index === metrics.length - 1 ? 'right-0' : 'left-0'
+              }`}>
                 <div className="font-semibold mb-1">About this metric</div>
                 <div className="text-gray-300">{metric.tooltip}</div>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-gray-900" />
+                <div className={`absolute bottom-full border-[6px] border-transparent border-b-gray-900 ${
+                  index === metrics.length - 1 ? 'right-2' : 'left-2'
+                }`} />
               </div>
             </div>
           </div>

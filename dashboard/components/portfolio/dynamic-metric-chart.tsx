@@ -127,6 +127,8 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
             fontFamily="'JetBrains Mono', monospace"
           />
           <Tooltip
+            wrapperStyle={{ zIndex: 1000 }}
+            allowEscapeViewBox={{ x: false, y: false }}
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
