@@ -10,6 +10,9 @@ import type {
   PortfolioHealthHistoryPoint,
   MetricHistoryPoint,
   RenewalForecastData,
+  ChatSession,
+  ChatMessage,
+  ChatSessionWithPreview,
 } from './types';
 import { getDemoDateString } from '../config/demo';
 import { calculatePriorityScore, getTopSignals } from '../utils/health-calculations';
@@ -1070,4 +1073,95 @@ export async function getRenewalForecast(
       total: { arr: 0, count: 0 },
     };
   }
+}
+
+// =====================================================
+// CHAT QUERIES
+// =====================================================
+
+export async function getChatSessions(userId: string): Promise<ChatSessionWithPreview[]> {
+  const { data, error } = await supabase
+    .from('chat_sessions')
+    .select(`
+      *,
+      chat_messages (
+        content,
+        role,
+        created_at
+      )
+    `)
+    .eq('user_id', userId)
+    .order('last_message_at', { ascending: false });
+
+  if (error) throw error;
+
+  // Transform data to include preview and count
+  return (data || []).map((session: any) => {
+    const messages = session.chat_messages || [];
+    const lastUserMessage = messages.find((m: any) => m.role === 'user');
+
+    return {
+      id: session.id,
+      title: session.title,
+      user_id: session.user_id,
+      created_at: session.created_at,
+      updated_at: session.updated_at,
+      last_message_at: session.last_message_at,
+      preview: lastUserMessage?.content || 'No messages yet',
+      message_count: messages.length,
+    };
+  });
+}
+
+export async function getChatMessages(sessionId: string): Promise<ChatMessage[]> {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createChatSession(userId: string, title: string): Promise<ChatSession> {
+  const { data, error } = await supabase
+    .from('chat_sessions')
+    .insert({
+      user_id: userId,
+      title,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function addChatMessage(
+  sessionId: string,
+  content: string,
+  role: 'user' | 'assistant'
+): Promise<ChatMessage> {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .insert({
+      session_id: sessionId,
+      content,
+      role,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteChatSession(sessionId: string): Promise<void> {
+  const { error } = await supabase
+    .from('chat_sessions')
+    .delete()
+    .eq('id', sessionId);
+
+  if (error) throw error;
 }
