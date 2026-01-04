@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet } from 'lucide-react';
+import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet, MessageSquare } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
   { name: 'Portfolio', href: '/portfolio', icon: LayoutDashboard },
   { name: 'Priority', href: '/priority', icon: Zap }, // badge will be added dynamically in Part 2
   { name: 'All Accounts', href: '/all-accounts', icon: Users },
+  { name: 'Chat with Barry', href: '/chat', icon: MessageSquare },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ];
 
