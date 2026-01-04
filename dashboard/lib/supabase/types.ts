@@ -259,3 +259,26 @@ export interface RenewalForecastData {
     count: number;
   };
 }
+
+// Chat types
+export interface ChatSession {
+  id: string;
+  title: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  last_message_at: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  session_id: string;
+  created_at: string;
+}
+
+export interface ChatSessionWithPreview extends ChatSession {
+  preview: string;
+  message_count: number;
+}
