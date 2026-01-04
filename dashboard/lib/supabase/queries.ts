@@ -1165,3 +1165,12 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
 
   if (error) throw error;
 }
+
+export async function updateChatSessionTitle(sessionId: string, title: string): Promise<void> {
+  const { error } = await supabase
+    .from('chat_sessions')
+    .update({ title })
+    .eq('id', sessionId);
+
+  if (error) throw error;
+}

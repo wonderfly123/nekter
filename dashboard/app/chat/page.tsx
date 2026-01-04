@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { Sparkles } from 'lucide-react';
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { PageContainer } from '@/components/layout/page-container';
 import { AnimatedGradientBackground } from '@/components/portfolio/animated-gradient-bg';
 import { ChatHistorySidebar } from '@/components/chat/chat-history-sidebar';
 import { MessageBubble } from '@/components/chat/message-bubble';
@@ -11,6 +11,8 @@ import { QuickActionChips } from '@/components/chat/quick-action-chips';
 import { useChatSessions } from '@/hooks/use-chat-sessions';
 import { useChatMessages } from '@/hooks/use-chat-messages';
 import { useSendMessage } from '@/hooks/use-send-message';
+import { useDeleteChatSession } from '@/hooks/use-delete-chat-session';
+import { useUpdateChatSession } from '@/hooks/use-update-chat-session';
 import { createChatSession } from '@/lib/supabase/queries';
 import { useAuth } from '@/lib/auth/use-auth';
 
@@ -31,6 +33,8 @@ function ChatContent() {
   const { data: sessions, isLoading: sessionsLoading } = useChatSessions();
   const { data: messages, isLoading: messagesLoading } = useChatMessages(activeSessionId);
   const sendMessage = useSendMessage();
+  const deleteSession = useDeleteChatSession();
+  const updateSession = useUpdateChatSession();
 
   // Auto-select first session or create new one
   useEffect(() => {
@@ -48,6 +52,16 @@ function ChatContent() {
     if (!user) return;
 
     try {
+      // Check if there's already an empty session (only has welcome message)
+      const emptySession = sessions?.find(session => session.message_count === 1);
+
+      if (emptySession) {
+        // Just switch to the existing empty session
+        setActiveSessionId(emptySession.id);
+        return;
+      }
+
+      // Create new session only if no empty one exists
       const newSession = await createChatSession(user.id, 'New conversation');
       setActiveSessionId(newSession.id);
 
@@ -90,78 +104,93 @@ function ChatContent() {
     setInputValue(prompt);
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      await deleteSession.mutateAsync(sessionId);
+      // If we deleted the active session, clear the active session
+      if (sessionId === activeSessionId) {
+        setActiveSessionId(null);
+      }
+    } catch (error) {
+      console.error('Error deleting chat session:', error);
+    }
+  };
+
+  const handleRenameSession = async (sessionId: string, newTitle: string) => {
+    try {
+      await updateSession.mutateAsync({ sessionId, title: newTitle });
+    } catch (error) {
+      console.error('Error renaming chat session:', error);
+    }
+  };
+
   return (
     <>
       <AnimatedGradientBackground />
-      <PageContainer className="!p-0 h-[calc(100vh-88px)]">
-        <div className="flex h-full">
-          {/* Chat History Sidebar */}
-          <ChatHistorySidebar
-            sessions={sessions || []}
-            activeSessionId={activeSessionId}
-            onSessionSelect={setActiveSessionId}
-            onNewChat={handleNewChat}
-          />
+      <div className="h-full flex">
+        {/* Chat History Sidebar */}
+        <ChatHistorySidebar
+          sessions={sessions || []}
+          activeSessionId={activeSessionId}
+          onSessionSelect={setActiveSessionId}
+          onNewChat={handleNewChat}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRenameSession}
+        />
 
-          {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col bg-white">
-            {/* Chat Header */}
-            <div className="px-6 py-6 border-b border-gray-200 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-white text-lg">
-                B
-              </div>
-              <div className="flex-1">
-                <div className="font-bold text-lg text-gray-900">Barry</div>
-                <div className="text-[13px] text-gray-500 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Your AI CS Assistant
-                </div>
-              </div>
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col bg-white min-w-0">
+          {/* Chat Header */}
+          <div className="px-6 py-3 border-b border-gray-200 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md">
+              <Sparkles className="w-4 h-4" />
             </div>
+            <div className="font-semibold text-lg text-gray-900">Barry</div>
+          </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-              {messagesLoading ? (
-                <div className="text-center text-gray-500 py-8">Loading messages...</div>
-              ) : !activeSessionId ? (
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50">
+            {messagesLoading ? (
+              <div className="text-center text-gray-500 py-8">Loading messages...</div>
+            ) : !activeSessionId ? (
+              <div className="flex items-center justify-center h-full">
                 <div className="text-center text-gray-500 py-8">
                   <p className="text-lg font-semibold mb-2">Welcome to Chat with Barry!</p>
                   <p className="text-sm">Start a new conversation to get started.</p>
                 </div>
-              ) : messages && messages.length > 0 ? (
-                <>
-                  {messages.map((message, index) => (
-                    <div key={message.id}>
-                      <MessageBubble
-                        content={message.content}
-                        role={message.role}
-                        timestamp={message.created_at}
-                      />
-                      {/* Show quick action chips after first message (Barry's welcome) */}
-                      {index === 0 && message.role === 'assistant' && messages.length === 1 && (
-                        <div className="ml-14">
-                          <QuickActionChips onActionClick={handleQuickActionClick} />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </>
-              ) : (
+              </div>
+            ) : messages && messages.length === 1 && messages[0].role === 'assistant' ? (
+              <div className="max-w-3xl mx-auto">
+                <QuickActionChips onActionClick={handleQuickActionClick} />
+              </div>
+            ) : messages && messages.length > 0 ? (
+              <div className="py-2">
+                {messages.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    content={message.content}
+                    role={message.role}
+                    timestamp={message.created_at}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
                 <div className="text-center text-gray-500 py-8">No messages yet</div>
-              )}
-            </div>
-
-            {/* Chat Input */}
-            <ChatInput
-              value={inputValue}
-              onChange={setInputValue}
-              onSend={handleSendMessage}
-              disabled={!activeSessionId || sendMessage.isPending}
-            />
+              </div>
+            )}
           </div>
+
+          {/* Chat Input */}
+          <ChatInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            disabled={!activeSessionId || sendMessage.isPending}
+          />
         </div>
-      </PageContainer>
+      </div>
     </>
   );
 }

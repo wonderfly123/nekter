@@ -9,6 +9,8 @@ interface ChatHistorySidebarProps {
   activeSessionId: string | null;
   onSessionSelect: (sessionId: string) => void;
   onNewChat: () => void;
+  onDeleteSession: (sessionId: string) => void;
+  onRenameSession: (sessionId: string, newTitle: string) => void;
 }
 
 export function ChatHistorySidebar({
@@ -16,8 +18,14 @@ export function ChatHistorySidebar({
   activeSessionId,
   onSessionSelect,
   onNewChat,
+  onDeleteSession,
+  onRenameSession,
 }: ChatHistorySidebarProps) {
-  // Group sessions by time
+  // Separate new/unused sessions (only welcome message) from used ones
+  const newSessions = sessions.filter((s) => s.message_count === 1);
+  const usedSessions = sessions.filter((s) => s.message_count > 1);
+
+  // Group used sessions by time
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
@@ -25,20 +33,20 @@ export function ChatHistorySidebar({
   const last7Days = new Date(today);
   last7Days.setDate(last7Days.getDate() - 7);
 
-  const todaySessions = sessions.filter(
+  const todaySessions = usedSessions.filter(
     (s) => new Date(s.last_message_at) >= today
   );
-  const yesterdaySessions = sessions.filter(
+  const yesterdaySessions = usedSessions.filter(
     (s) =>
       new Date(s.last_message_at) >= yesterday &&
       new Date(s.last_message_at) < today
   );
-  const last7DaysSessions = sessions.filter(
+  const last7DaysSessions = usedSessions.filter(
     (s) =>
       new Date(s.last_message_at) >= last7Days &&
       new Date(s.last_message_at) < yesterday
   );
-  const olderSessions = sessions.filter(
+  const olderSessions = usedSessions.filter(
     (s) => new Date(s.last_message_at) < last7Days
   );
 
@@ -57,6 +65,22 @@ export function ChatHistorySidebar({
 
       {/* Chat History List */}
       <div className="flex-1 overflow-y-auto p-2">
+        {/* New/unused conversations always at top */}
+        {newSessions.length > 0 && (
+          <div className="mb-4">
+            {newSessions.map((session) => (
+              <ChatHistoryItem
+                key={session.id}
+                session={session}
+                isActive={session.id === activeSessionId}
+                onClick={() => onSessionSelect(session.id)}
+                onDelete={onDeleteSession}
+                onRename={onRenameSession}
+              />
+            ))}
+          </div>
+        )}
+
         {todaySessions.length > 0 && (
           <div className="mb-6">
             <div className="text-xs font-bold uppercase tracking-wide text-gray-500 px-3 py-2">
@@ -68,6 +92,8 @@ export function ChatHistorySidebar({
                 session={session}
                 isActive={session.id === activeSessionId}
                 onClick={() => onSessionSelect(session.id)}
+                onDelete={onDeleteSession}
+                onRename={onRenameSession}
               />
             ))}
           </div>
@@ -84,6 +110,8 @@ export function ChatHistorySidebar({
                 session={session}
                 isActive={session.id === activeSessionId}
                 onClick={() => onSessionSelect(session.id)}
+                onDelete={onDeleteSession}
+                onRename={onRenameSession}
               />
             ))}
           </div>
@@ -100,6 +128,8 @@ export function ChatHistorySidebar({
                 session={session}
                 isActive={session.id === activeSessionId}
                 onClick={() => onSessionSelect(session.id)}
+                onDelete={onDeleteSession}
+                onRename={onRenameSession}
               />
             ))}
           </div>
@@ -116,6 +146,8 @@ export function ChatHistorySidebar({
                 session={session}
                 isActive={session.id === activeSessionId}
                 onClick={() => onSessionSelect(session.id)}
+                onDelete={onDeleteSession}
+                onRename={onRenameSession}
               />
             ))}
           </div>

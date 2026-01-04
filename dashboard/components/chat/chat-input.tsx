@@ -34,25 +34,24 @@ export function ChatInput({
   };
 
   return (
-    <div className="p-6 border-t border-gray-200 bg-gray-50">
-      <div className="flex gap-4 items-end">
-        <div className="flex-1">
-          <textarea
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            disabled={disabled}
-            className="w-full min-h-[60px] max-h-[120px] px-3.5 py-3 border border-gray-300 rounded-lg font-sans text-[15px] resize-y focus:outline-none focus:border-amber-500 focus:ring-3 focus:ring-amber-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-          />
-        </div>
+    <div className="px-6 py-3 border-t border-gray-200 bg-white">
+      <div className="max-w-3xl mx-auto flex gap-2 items-end">
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          rows={1}
+          className="flex-1 min-h-[38px] max-h-[120px] px-3 py-2 border border-gray-200 rounded-lg font-sans text-sm resize-none focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        />
         <button
           onClick={handleSend}
           disabled={disabled || !value.trim()}
-          className="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-[38px] px-4 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg font-medium text-sm flex items-center gap-1.5 shadow-sm hover:shadow-md hover:-translate-y-px transition-all disabled:bg-gray-200 disabled:from-gray-200 disabled:to-gray-200 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed disabled:text-gray-400"
         >
           <span>Send</span>
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
