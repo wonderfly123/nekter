@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "nekter.io - CS Command Center",
+  title: "nekter.io - Admin Panel",
   description: "Customer Success dashboard for monitoring account health and prioritizing at-risk accounts",
 };
 

@@ -15,6 +15,8 @@ const pageTitles: Record<string, string> = {
   '/analytics': 'Analytics',
   '/team': 'Team Performance',
   '/chat': 'Chat with Barry',
+  '/settings': 'Settings',
+  '/admin': 'Admin Panel',
 };
 
 interface SearchResult {
@@ -27,7 +29,7 @@ export function AppHeader() {
   const router = useRouter();
   const openBarryPanel = useBarryPanelStore((state) => state.openPanel);
   const pageTitle =
-    pathname.startsWith('/account/') ? 'Account Detail' : pageTitles[pathname] || 'CS Command Center';
+    pathname.startsWith('/account/') ? 'Account Detail' : pageTitles[pathname] || 'Admin Panel';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
