@@ -88,15 +88,30 @@ function ChatContent() {
         role: 'user',
       });
 
-      // Add placeholder Barry response
+      // Call Barry API
+      const response = await fetch('/api/barry/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: content }),
+      });
+
+      const data = await response.json();
+
+      // Add Barry's response
       await sendMessage.mutateAsync({
         sessionId: activeSessionId,
-        content:
-          "I'm analyzing that request for you now...\n\n*(This is a demo - AI integration will be added in the next phase)*",
+        content: data.success
+          ? data.response
+          : `Sorry, I encountered an error: ${data.error || 'Unknown error'}`,
         role: 'assistant',
       });
     } catch (error) {
       console.error('Error sending message:', error);
+      await sendMessage.mutateAsync({
+        sessionId: activeSessionId,
+        content: "Sorry, I'm having trouble connecting right now. Please try again.",
+        role: 'assistant',
+      });
     }
   };
 
