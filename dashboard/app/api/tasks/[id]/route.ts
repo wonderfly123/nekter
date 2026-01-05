@@ -217,6 +217,14 @@ export async function DELETE(
 
     const { id } = await params;
 
+    // Delete related notifications first
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('related_entity_type', 'task')
+      .eq('related_entity_id', id);
+
+    // Delete the task
     const { error } = await supabase
       .from('tasks')
       .delete()

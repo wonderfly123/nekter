@@ -43,14 +43,24 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
 
-    // Build query
+    // Calculate 3-day TTL cutoff for read notifications
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const ttlCutoff = threeDaysAgo.toISOString();
+
+    // Build query - fetch unread OR (read AND within 3 days)
     let query = supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .or(`is_read.eq.false,and(is_read.eq.true,read_at.gt.${ttlCutoff})`);
 
     if (unreadOnly) {
-      query = query.eq('is_read', false);
+      query = supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_read', false);
     }
 
     // Order by created date (newest first)
