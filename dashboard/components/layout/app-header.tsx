@@ -1,11 +1,12 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Building2, Calendar } from 'lucide-react';
+import { Search, Building2, Calendar, Sparkles } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { format } from 'date-fns';
+import { useBarryPanelStore } from '@/lib/stores/barry-panel-store';
 
 const pageTitles: Record<string, string> = {
   '/priority': 'Priority Accounts',
@@ -24,6 +25,7 @@ interface SearchResult {
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
+  const openBarryPanel = useBarryPanelStore((state) => state.openPanel);
   const pageTitle =
     pathname.startsWith('/account/') ? 'Account Detail' : pageTitles[pathname] || 'CS Command Center';
 
@@ -171,6 +173,15 @@ export function AppHeader() {
 
             {/* Notifications */}
             <NotificationsDropdown />
+
+            {/* Barry Assistant Button */}
+            <button
+              onClick={openBarryPanel}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-medium text-sm hover:from-amber-600 hover:to-orange-700 transition-all shadow-md hover:shadow-lg"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Assistant</span>
+            </button>
           </div>
         </div>
       </div>
