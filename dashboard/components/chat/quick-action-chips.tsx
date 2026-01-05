@@ -53,7 +53,7 @@ export function QuickActionChips({ onActionClick }: QuickActionChipsProps) {
           Welcome to Barry
         </h2>
         <p className="text-base text-gray-600">
-          Your Smart Customer Success Assistant
+          Your Customer Success Assistant
         </p>
       </div>
 
