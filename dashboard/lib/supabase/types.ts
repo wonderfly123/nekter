@@ -290,7 +290,10 @@ export interface SearchFilters {
   interaction_type: 'transcript' | 'email' | 'zendesk' | null;
   days_back: number;
   needs_full_content: boolean;
-  query_type: 'specific_topic' | 'account_overview' | 'risk_review' | 'opportunity_review' | 'general';
+  query_type: 'specific_topic' | 'account_overview' | 'risk_review' | 'opportunity_review' | 'general' | 'pleasantry';
+  pleasantry_response?: string | null;
+  churn_risk?: boolean | null;
+  expansion_opportunity?: boolean | null;
 }
 
 export interface SearchResult {

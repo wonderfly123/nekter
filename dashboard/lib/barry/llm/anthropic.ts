@@ -34,6 +34,9 @@ export class AnthropicService implements LLMService {
         days_back: parsed.days_back || 90,
         needs_full_content: parsed.needs_full_content || false,
         query_type: parsed.query_type || 'general',
+        pleasantry_response: parsed.pleasantry_response || null,
+        churn_risk: parsed.churn_risk ?? null,
+        expansion_opportunity: parsed.expansion_opportunity ?? null,
       };
     } catch {
       // Default filters if parsing fails
@@ -44,6 +47,8 @@ export class AnthropicService implements LLMService {
         days_back: 90,
         needs_full_content: false,
         query_type: 'general',
+        churn_risk: null,
+        expansion_opportunity: null,
       };
     }
   }
@@ -62,5 +67,25 @@ export class AnthropicService implements LLMService {
     });
 
     return response.content[0].type === 'text' ? response.content[0].text : '';
+  }
+
+  async *analyzeResultsStream(userQuery: string, context: string): AsyncIterable<string> {
+    const stream = this.client.messages.stream({
+      model: this.model,
+      max_tokens: 4096,
+      system: ANALYSIS_SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: `User Question: ${userQuery}\n\n${context}`,
+        },
+      ],
+    });
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        yield event.delta.text;
+      }
+    }
   }
 }

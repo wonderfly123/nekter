@@ -32,8 +32,7 @@ const quickActions: QuickAction[] = [
     icon: TrendingUp,
     label: 'Expansion Analysis',
     description: 'Find upsell and cross-sell opportunities based on usage patterns',
-    prompt:
-      'Identify expansion opportunities in my portfolio based on product usage, engagement levels, and comparable accounts',
+    prompt: 'Identify expansion opportunities in my portfolio',
   },
   {
     icon: Mail,

@@ -1,12 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createLLMService } from '@/lib/barry/llm/factory';
-import { searchInteractions } from '@/lib/barry/services/data-retrieval';
-import { buildContext } from '@/lib/barry/services/context-builder';
-import { BarryResponse } from '@/lib/supabase/types';
+
+type BarryResponse = {
+  success: boolean;
+  response?: string;
+  sources?: { type: string; title: string; date: string; account: string | null }[];
+  data_count?: number;
+  query_filters?: any;
+  error?: string;
+};
 
 export async function POST(request: NextRequest) {
+  console.log('[Barry] Handler called');
+
   try {
-    const { query } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      console.log('[Barry] Failed to parse body');
+      return NextResponse.json({ success: false, error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const { query } = body;
+    console.log('[Barry] Received query:', query);
+
+    // Test mode - return early to check basic connectivity
+    if (query === 'test') {
+      return NextResponse.json({ success: true, response: 'Barry API is working!' });
+    }
 
     if (!query || typeof query !== 'string') {
       return NextResponse.json<BarryResponse>({
@@ -15,13 +36,37 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Dynamic imports to avoid module loading issues
+    console.log('[Barry] Loading modules...');
+    const { createLLMService } = await import('@/lib/barry/llm/factory');
+    console.log('[Barry] Loaded factory');
+    const { searchInteractions } = await import('@/lib/barry/services/data-retrieval');
+    console.log('[Barry] Loaded data-retrieval');
+    const { buildContext } = await import('@/lib/barry/services/context-builder');
+    console.log('[Barry] Loaded context-builder');
+
+    console.log('[Barry] Creating LLM service...');
     const llm = createLLMService();
 
     // Phase 1: Extract search filters from natural language
+    console.log('[Barry] Phase 1: Extracting search params...');
     const filters = await llm.extractSearchParams(query);
+    console.log('[Barry] Filters:', JSON.stringify(filters));
+
+    // Handle pleasantries without data lookup
+    if (filters.query_type === 'pleasantry' && filters.pleasantry_response) {
+      console.log('[Barry] Pleasantry detected, returning quick response');
+      return NextResponse.json<BarryResponse>({
+        success: true,
+        response: filters.pleasantry_response,
+        data_count: 0,
+      });
+    }
 
     // Phase 2: Retrieve matching interactions
+    console.log('[Barry] Phase 2: Searching interactions...');
     const results = await searchInteractions(filters);
+    console.log('[Barry] Found', results.length, 'results');
 
     // Handle no results
     if (results.length === 0) {
@@ -60,10 +105,11 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Barry API error:', error);
+    console.error('[Barry] API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json<BarryResponse>({
       success: false,
-      error: 'An error occurred while processing your request',
+      error: `Error: ${errorMessage}`,
     }, { status: 500 });
   }
 }

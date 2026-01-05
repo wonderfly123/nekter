@@ -47,6 +47,7 @@ export function ChatHistoryItem({ session, isActive, onClick, onDelete, onRename
 
   const handleRename = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setEditTitle(session.title); // Sync with current title before editing
     setIsEditing(true);
     setShowMenu(false);
   };
