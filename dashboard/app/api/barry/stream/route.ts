@@ -68,23 +68,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Phase 2: Retrieve matching interactions
-    const results = await searchInteractions(filters);
+    // Phase 2: Retrieve matching interactions (if filters suggest we need data)
+    const needsData = filters.account_name || filters.search_term || filters.churn_risk ||
+                      filters.expansion_opportunity || filters.health_status;
 
-    // Handle no results
-    if (results.length === 0) {
-      const noResultsMsg = `I couldn't find any interactions matching your query. ${
-        filters.account_name
-          ? `I searched for "${filters.account_name}" but found no matching accounts or interactions.`
-          : 'Try being more specific about which account or topic you want to explore.'
-      }`;
-      return new Response(noResultsMsg, {
-        headers: { 'Content-Type': 'text/plain' },
-      });
+    let context = '';
+    if (needsData) {
+      const results = await searchInteractions(filters);
+      if (results.length > 0) {
+        context = await buildContext(results, filters);
+      } else if (filters.account_name) {
+        // Only add "no results" context if they asked for a specific account
+        context = `No interactions found for "${filters.account_name}". The account may not exist in the system or may not have any recorded interactions.`;
+      }
     }
-
-    // Phase 3: Build context
-    const context = await buildContext(results, filters);
 
     // Phase 4: Stream the analysis (with conversation history)
     const stream = new ReadableStream({

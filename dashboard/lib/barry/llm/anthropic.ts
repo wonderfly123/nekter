@@ -15,11 +15,11 @@ export class AnthropicService implements LLMService {
     // Build messages with conversation history for context
     const messages: Anthropic.MessageParam[] = [];
 
-    // Add conversation history (summarized) if present
+    // Add conversation history for context
     if (conversationHistory.length > 0) {
       const historyContext = conversationHistory
         .slice(-6) // Last 3 exchanges
-        .map(m => `${m.role === 'user' ? 'User' : 'Barry'}: ${m.content.slice(0, 200)}`)
+        .map(m => `${m.role === 'user' ? 'User' : 'Barry'}: ${m.content.slice(0, 1500)}`)
         .join('\n');
       messages.push({
         role: 'user',
