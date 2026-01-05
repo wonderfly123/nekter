@@ -13,27 +13,33 @@ interface MetricConfig {
   id: string;
   label: string;
   value: string;
+  subheading: string;
   tooltip: string;
 }
 
 export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCardsProps) {
+  const atRiskARR = (stats.churnRiskPercent / 100) * (stats.totalARR / 12);
+
   const metrics: MetricConfig[] = [
     {
       id: 'arr',
       label: 'Total MRR',
       value: formatCompactCurrency(stats.totalARR / 12),
+      subheading: `${stats.accountCount} Accounts`,
       tooltip: 'Monthly Recurring Revenue (MRR) is the total value of all recurring subscription revenue normalized to a one-month period. This metric shows the predictable revenue your business can expect monthly.',
     },
     {
       id: 'health',
       label: 'Health Score',
       value: stats.avgHealthScore !== null ? Math.round(stats.avgHealthScore).toString() : 'N/A',
+      subheading: `Average across ${stats.accountCount} accounts`,
       tooltip: 'Customer Health Score is a composite metric (0-100) that measures account engagement, product usage, support interactions, and sentiment.',
     },
     {
       id: 'churn',
       label: 'Churn Risk',
       value: `${stats.churnRiskPercent.toFixed(1)}%`,
+      subheading: `${formatCompactCurrency(atRiskARR)} at risk`,
       tooltip: 'Churn Risk represents the percentage of MRR at risk of not renewing in the next 90 days. This is calculated based on health scores, engagement patterns, and renewal signals.',
     },
   ];
@@ -77,6 +83,9 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
           </div>
           <div className="text-[32px] font-bold font-mono text-gray-900 leading-none">
             {metric.value}
+          </div>
+          <div className="text-[13px] text-gray-500 mt-1">
+            {metric.subheading}
           </div>
         </button>
       ))}

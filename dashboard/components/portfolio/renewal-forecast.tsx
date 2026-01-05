@@ -47,7 +47,9 @@ export function RenewalForecast({ data }: RenewalForecastProps) {
           {segments.map((segment) => (
             <div key={segment.key} className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <span className="text-[15px] text-gray-600 font-semibold">{segment.label}</span>
+                <span className="text-[15px] text-gray-600 font-semibold">
+                  {segment.label} <span className="text-gray-400 font-normal">({segment.data.count})</span>
+                </span>
                 <span className="font-mono font-bold text-[15px] text-gray-900">
                   {formatCompactCurrency(segment.data.arr)} ({segment.data.percent.toFixed(0)}%)
                 </span>
