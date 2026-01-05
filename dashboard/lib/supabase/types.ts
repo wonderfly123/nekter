@@ -282,3 +282,45 @@ export interface ChatSessionWithPreview extends ChatSession {
   preview: string;
   message_count: number;
 }
+
+// Barry AI Types
+export interface SearchFilters {
+  account_name: string | null;
+  search_term: string | null;
+  interaction_type: 'transcript' | 'email' | 'zendesk' | null;
+  days_back: number;
+  needs_full_content: boolean;
+  query_type: 'specific_topic' | 'account_overview' | 'risk_review' | 'opportunity_review' | 'general';
+}
+
+export interface SearchResult {
+  source_type: 'transcript' | 'email' | 'zendesk';
+  source_id: string;
+  account_name: string | null;
+  sf_account_id: string | null;
+  created_at: string;
+  title: string;
+  content_preview: string;
+  full_content: string;
+  participants: any;
+  sentiment_score: number | null;
+  churn_risk: boolean;
+  expansion_opportunity: boolean;
+}
+
+export interface BarryResponse {
+  success: boolean;
+  response?: string;
+  sources?: {
+    type: string;
+    title: string;
+    date: string;
+    account: string | null;
+  }[];
+  data_count?: number;
+  query_filters?: SearchFilters;
+  needs_clarification?: boolean;
+  question?: string;
+  suggestions?: string[];
+  error?: string;
+}
