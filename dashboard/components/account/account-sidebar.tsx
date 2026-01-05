@@ -63,7 +63,17 @@ export function AccountSidebar({ data }: AccountSidebarProps) {
                     <div className="text-sm font-medium text-gray-900 mb-1 truncate">
                       {ticket.subject || 'No subject'}
                     </div>
-                    <div className="flex items-center justify-between text-xs">
+                    {ticket.description && (
+                      <div className="group relative mb-2">
+                        <div className="text-xs text-gray-600 line-clamp-2 cursor-help">
+                          {ticket.description}
+                        </div>
+                        <div className="absolute left-0 top-full mt-1 w-64 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+                          {ticket.description}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs flex-wrap">
                       <span
                         className={`px-2 py-0.5 rounded ${
                           ticket.priority === 'urgent' || ticket.priority === 'high'
@@ -73,8 +83,21 @@ export function AccountSidebar({ data }: AccountSidebarProps) {
                       >
                         {ticket.priority || 'normal'}
                       </span>
-                      <span className="text-gray-500">
-                        {ticket.created_at && formatDate(ticket.created_at)}
+                      {ticket.status && (
+                        <span
+                          className={`px-2 py-0.5 rounded ${
+                            ticket.status === 'open'
+                              ? 'bg-amber-100 text-amber-700'
+                              : ticket.status === 'pending'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}
+                        >
+                          {ticket.status}
+                        </span>
+                      )}
+                      <span className="text-gray-500 ml-auto">
+                        Created {ticket.created_at && formatDate(ticket.created_at)}
                       </span>
                     </div>
                   </div>

@@ -18,7 +18,7 @@ interface MetricConfig {
 }
 
 export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCardsProps) {
-  const atRiskARR = (stats.churnRiskPercent / 100) * (stats.totalARR / 12);
+  const atRiskMRR = (stats.churnRiskPercent / 100) * (stats.totalARR / 12);
 
   const metrics: MetricConfig[] = [
     {
@@ -33,13 +33,13 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
       label: 'Health Score',
       value: stats.avgHealthScore !== null ? Math.round(stats.avgHealthScore).toString() : 'N/A',
       subheading: `Average across ${stats.accountCount} accounts`,
-      tooltip: 'Customer Health Score is a composite metric (0-100) that measures account engagement, product usage, support interactions, and sentiment.',
+      tooltip: 'Customer Health Score is a composite metric (0-100) that measures account engagement, support interactions, and sentiment.',
     },
     {
       id: 'churn',
       label: 'Churn Risk',
       value: `${stats.churnRiskPercent.toFixed(1)}%`,
-      subheading: `${formatCompactCurrency(atRiskARR)} at risk`,
+      subheading: `${formatCompactCurrency(atRiskMRR)} MRR at risk`,
       tooltip: 'Churn Risk represents the percentage of MRR at risk of not renewing in the next 90 days. This is calculated based on health scores, engagement patterns, and renewal signals.',
     },
   ];
