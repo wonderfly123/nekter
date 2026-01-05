@@ -22,6 +22,7 @@ export async function searchInteractions(filters: SearchFilters): Promise<Search
     p_limit: filters.needs_full_content ? 5 : 20,
     p_churn_risk: filters.churn_risk ?? null,
     p_expansion_opportunity: filters.expansion_opportunity ?? null,
+    p_health_status: filters.health_status ?? null,
   };
   console.log('[Barry] RPC params:', JSON.stringify(rpcParams, null, 2));
 

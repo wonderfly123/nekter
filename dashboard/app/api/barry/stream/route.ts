@@ -1,8 +1,26 @@
 import { NextRequest } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// Lazy-load Supabase client
+let supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!supabase) {
+    supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return supabase;
+}
+
+interface ConversationMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { query } = await request.json();
+    const { query, sessionId } = await request.json();
 
     if (!query || typeof query !== 'string') {
       return new Response(JSON.stringify({ error: 'Query is required' }), {
@@ -11,6 +29,26 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Fetch conversation history if sessionId provided
+    let conversationHistory: ConversationMessage[] = [];
+    if (sessionId) {
+      const { data: messages } = await getSupabase()
+        .from('chat_messages')
+        .select('role, content')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true })
+        .limit(20) as { data: { role: string; content: string }[] | null };
+
+      if (messages && messages.length > 0) {
+        // Exclude the current message (last user message) since we pass it separately
+        conversationHistory = messages.slice(0, -1).map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content
+        }));
+      }
+    }
+    console.log('[Barry] Conversation history length:', conversationHistory.length);
+
     // Dynamic imports
     const { createLLMService } = await import('@/lib/barry/llm/factory');
     const { searchInteractions } = await import('@/lib/barry/services/data-retrieval');
@@ -18,8 +56,8 @@ export async function POST(request: NextRequest) {
 
     const llm = createLLMService();
 
-    // Phase 1: Extract search filters
-    const filters = await llm.extractSearchParams(query);
+    // Phase 1: Extract search filters (with conversation context)
+    const filters = await llm.extractSearchParams(query, conversationHistory);
     console.log('[Barry] Query:', query);
     console.log('[Barry] Extracted filters:', JSON.stringify(filters, null, 2));
 
@@ -48,11 +86,11 @@ export async function POST(request: NextRequest) {
     // Phase 3: Build context
     const context = await buildContext(results, filters);
 
-    // Phase 4: Stream the analysis
+    // Phase 4: Stream the analysis (with conversation history)
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of llm.analyzeResultsStream(query, context)) {
+          for await (const chunk of llm.analyzeResultsStream(query, context, conversationHistory)) {
             controller.enqueue(new TextEncoder().encode(chunk));
           }
           controller.close();

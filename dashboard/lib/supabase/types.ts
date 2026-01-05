@@ -294,6 +294,7 @@ export interface SearchFilters {
   pleasantry_response?: string | null;
   churn_risk?: boolean | null;
   expansion_opportunity?: boolean | null;
+  health_status?: 'Critical' | 'At Risk' | 'Healthy' | null;
 }
 
 export interface SearchResult {
@@ -309,6 +310,7 @@ export interface SearchResult {
   sentiment_score: number | null;
   churn_risk: boolean;
   expansion_opportunity: boolean;
+  health_status: string | null;
 }
 
 export interface BarryResponse {

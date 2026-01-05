@@ -109,7 +109,7 @@ export function BarryPanel() {
       const response = await fetch('/api/barry/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: content }),
+        body: JSON.stringify({ query: content, sessionId: activeSessionId }),
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

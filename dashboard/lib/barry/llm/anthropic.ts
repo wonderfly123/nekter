@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { LLMService } from './interface';
+import { LLMService, ConversationMessage } from './interface';
 import { SearchFilters } from '@/lib/supabase/types';
 import { QUERY_EXTRACTION_PROMPT, ANALYSIS_SYSTEM_PROMPT } from '../prompts';
 
@@ -11,12 +11,29 @@ export class AnthropicService implements LLMService {
     this.client = new Anthropic({ apiKey });
   }
 
-  async extractSearchParams(userQuery: string): Promise<SearchFilters> {
+  async extractSearchParams(userQuery: string, conversationHistory: ConversationMessage[] = []): Promise<SearchFilters> {
+    // Build messages with conversation history for context
+    const messages: Anthropic.MessageParam[] = [];
+
+    // Add conversation history (summarized) if present
+    if (conversationHistory.length > 0) {
+      const historyContext = conversationHistory
+        .slice(-6) // Last 3 exchanges
+        .map(m => `${m.role === 'user' ? 'User' : 'Barry'}: ${m.content.slice(0, 200)}`)
+        .join('\n');
+      messages.push({
+        role: 'user',
+        content: `Previous conversation for context:\n${historyContext}\n\n---\n\nNow extract filters for this new query: ${userQuery}`
+      });
+    } else {
+      messages.push({ role: 'user', content: userQuery });
+    }
+
     const response = await this.client.messages.create({
       model: this.model,
       max_tokens: 1024,
       system: QUERY_EXTRACTION_PROMPT,
-      messages: [{ role: 'user', content: userQuery }],
+      messages,
     });
 
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
@@ -37,6 +54,7 @@ export class AnthropicService implements LLMService {
         pleasantry_response: parsed.pleasantry_response || null,
         churn_risk: parsed.churn_risk ?? null,
         expansion_opportunity: parsed.expansion_opportunity ?? null,
+        health_status: parsed.health_status || null,
       };
     } catch {
       // Default filters if parsing fails
@@ -49,37 +67,62 @@ export class AnthropicService implements LLMService {
         query_type: 'general',
         churn_risk: null,
         expansion_opportunity: null,
+        health_status: null,
       };
     }
   }
 
-  async analyzeResults(userQuery: string, context: string): Promise<string> {
+  async analyzeResults(userQuery: string, context: string, conversationHistory: ConversationMessage[] = []): Promise<string> {
+    // Build messages with full conversation history
+    const messages: Anthropic.MessageParam[] = [];
+
+    // Add previous conversation exchanges
+    for (const msg of conversationHistory.slice(-10)) {
+      messages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    }
+
+    // Add current query with context
+    messages.push({
+      role: 'user',
+      content: `User Question: ${userQuery}\n\n${context}`,
+    });
+
     const response = await this.client.messages.create({
       model: this.model,
       max_tokens: 4096,
       system: ANALYSIS_SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: `User Question: ${userQuery}\n\n${context}`,
-        },
-      ],
+      messages,
     });
 
     return response.content[0].type === 'text' ? response.content[0].text : '';
   }
 
-  async *analyzeResultsStream(userQuery: string, context: string): AsyncIterable<string> {
+  async *analyzeResultsStream(userQuery: string, context: string, conversationHistory: ConversationMessage[] = []): AsyncIterable<string> {
+    // Build messages with full conversation history
+    const messages: Anthropic.MessageParam[] = [];
+
+    // Add previous conversation exchanges
+    for (const msg of conversationHistory.slice(-10)) {
+      messages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    }
+
+    // Add current query with context
+    messages.push({
+      role: 'user',
+      content: `User Question: ${userQuery}\n\n${context}`,
+    });
+
     const stream = this.client.messages.stream({
       model: this.model,
       max_tokens: 4096,
       system: ANALYSIS_SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: `User Question: ${userQuery}\n\n${context}`,
-        },
-      ],
+      messages,
     });
 
     for await (const event of stream) {
