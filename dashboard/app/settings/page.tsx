@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { PageContainer } from '@/components/layout/page-container';
 import { useAuth } from '@/lib/auth/use-auth';
 import { supabase } from '@/lib/supabase/client';
-import { User, Mail, Building2, Check, MessageSquare, ExternalLink, Loader2 } from 'lucide-react';
+import { User, Mail, Building2, Check, MessageSquare, Loader2 } from 'lucide-react';
 
 interface SlackInstallation {
   slack_team_id: string;
