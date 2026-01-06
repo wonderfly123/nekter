@@ -155,7 +155,8 @@ function SettingsContent() {
   };
 
   const handleConnectSlack = () => {
-    window.location.href = '/api/integrations/slack/authorize';
+    if (!user) return;
+    window.location.href = `/api/integrations/slack/authorize?userId=${user.id}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
