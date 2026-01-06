@@ -10,7 +10,7 @@ export const slackConfig = {
   clientId: process.env.SLACK_CLIENT_ID || '',
   clientSecret: process.env.SLACK_CLIENT_SECRET || '',
   redirectUri: process.env.SLACK_REDIRECT_URI || '',
-  scopes: ['users:read.email', 'chat:write', 'im:write'].join(','),
+  scopes: ['users:read', 'users:read.email', 'chat:write', 'im:write'].join(' '),
 };
 
 // Check if Slack is configured
