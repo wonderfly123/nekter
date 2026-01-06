@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { sendTaskAssignmentEmail, sendImmediateReminderEmail } from '@/lib/email/send-task-email';
+import { sendTaskSlackNotification } from '@/lib/slack';
 
 // Create Supabase client
 const supabase = createClient(
@@ -207,6 +208,21 @@ export async function POST(request: Request) {
               related_entity_type: 'task',
               related_entity_id: task.id
             });
+
+          // Send Slack notification
+          await sendTaskSlackNotification(
+            assigneeId,
+            assigneeData.user.email || '',
+            {
+              type: 'task_assigned',
+              taskTitle: task.title,
+              taskId: task.id,
+              assignerName: creatorName,
+              accountName: accountData.name,
+              priority: task.priority,
+              dueDate: task.due_date ? new Date(task.due_date).toLocaleDateString() : undefined,
+            }
+          );
         } catch (notifError) {
           console.error('Error creating notification:', notifError);
           // Don't fail the request if notification creation fails
