@@ -217,6 +217,7 @@ export async function POST(request: Request) {
               type: 'task_assigned',
               taskTitle: task.title,
               taskId: task.id,
+              accountId: task.sf_account_id,
               assignerName: creatorName,
               accountName: accountData.name,
               priority: task.priority,

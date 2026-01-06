@@ -119,6 +119,7 @@ export async function sendTaskSlackNotification(
     type: 'task_assigned' | 'task_reassigned' | 'reminder_3d' | 'reminder_1d' | 'overdue';
     taskTitle: string;
     taskId: string;
+    accountId?: string;
     assignerName?: string;
     accountName?: string;
     priority?: string;
@@ -171,13 +172,16 @@ function buildTaskNotificationBlocks(notification: {
   type: 'task_assigned' | 'task_reassigned' | 'reminder_3d' | 'reminder_1d' | 'overdue';
   taskTitle: string;
   taskId: string;
+  accountId?: string;
   assignerName?: string;
   accountName?: string;
   priority?: string;
   dueDate?: string;
 }): any[] {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://nekter.io';
-  const taskUrl = `${appUrl}/tasks?taskId=${notification.taskId}`;
+  const taskUrl = notification.accountId
+    ? `${appUrl}/account/${notification.accountId}?tab=tasks&taskId=${notification.taskId}`
+    : `${appUrl}/priority`; // Fallback to priority page if no account
 
   // Determine header and color based on type
   let header: string;

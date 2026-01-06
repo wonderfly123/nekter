@@ -198,6 +198,7 @@ export async function PATCH(
                 type: 'task_reassigned',
                 taskTitle: task.title,
                 taskId: task.id,
+                accountId: task.sf_account_id,
                 assignerName: reassignerName,
                 accountName: accountData.name,
                 priority: task.priority,
