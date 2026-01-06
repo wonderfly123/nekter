@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { formatDate } from '@/lib/utils/date-utils';
 import { Mail, Phone, MessageSquare, TrendingUp, TrendingDown } from 'lucide-react';
 import type { InteractionInsight } from '@/lib/supabase/types';
@@ -9,6 +11,28 @@ interface InteractionTimelineProps {
 }
 
 export function InteractionTimeline({ interactions }: InteractionTimelineProps) {
+  const searchParams = useSearchParams();
+  const interactionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  // Handle interaction highlighting from URL
+  useEffect(() => {
+    const interactionId = searchParams.get('interactionId');
+    if (interactionId && interactions.length > 0) {
+      const id = parseInt(interactionId, 10);
+      const exists = interactions.some(i => i.id === id);
+      if (exists) {
+        setTimeout(() => {
+          const element = interactionRefs.current[interactionId];
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHighlightedId(id);
+            setTimeout(() => setHighlightedId(null), 2000);
+          }
+        }, 100);
+      }
+    }
+  }, [interactions, searchParams]);
   const getInteractionIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'email':
@@ -42,10 +66,17 @@ export function InteractionTimeline({ interactions }: InteractionTimelineProps) 
             const Icon = getInteractionIcon(interaction.interaction_type);
             const sentimentColor = getSentimentColor(interaction.sentiment_score);
 
+            const isHighlighted = highlightedId === interaction.id;
+
             return (
               <div
                 key={interaction.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:border-amber-500 transition-colors"
+                ref={(el) => { interactionRefs.current[String(interaction.id)] = el; }}
+                className={`bg-white border rounded-lg p-4 transition-all duration-300 ${
+                  isHighlighted
+                    ? 'border-orange-500 ring-2 ring-orange-200 bg-orange-50'
+                    : 'border-gray-200 hover:border-amber-500'
+                }`}
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">

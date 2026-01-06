@@ -15,7 +15,7 @@ function getSentimentEmoji(score: number): string {
  */
 export function buildBadInteractionSlackBlocks(payload: BadInteractionAlertPayload): any[] {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://nekter.io';
-  const accountUrl = `${appUrl}/account/${payload.accountId}?tab=interactions`;
+  const accountUrl = `${appUrl}/account/${payload.accountId}?tab=interactions&interactionId=${payload.details.interactionId}`;
 
   const sentimentEmoji = getSentimentEmoji(payload.details.sentimentScore);
 

@@ -152,6 +152,24 @@ export function NotificationsDropdown() {
       } catch (error) {
         console.error('Error fetching task for navigation:', error);
       }
+    } else if (notification.related_entity_type === 'account' && notification.related_entity_id) {
+      // Health drop alert - navigate to account page
+      router.push(`/account/${notification.related_entity_id}`);
+    } else if (notification.related_entity_type === 'interaction' && notification.related_entity_id) {
+      // Bad interaction alert - need to look up the account ID from the interaction
+      try {
+        const { data: interaction } = await supabase
+          .from('interaction_insights')
+          .select('sf_account_id')
+          .eq('id', notification.related_entity_id)
+          .single();
+
+        if (interaction) {
+          router.push(`/account/${interaction.sf_account_id}?tab=interactions&interactionId=${notification.related_entity_id}`);
+        }
+      } catch (error) {
+        console.error('Error fetching interaction for navigation:', error);
+      }
     }
 
     setIsOpen(false);

@@ -95,7 +95,7 @@ async function sendAlertEmail(payload: AlertPayload): Promise<boolean> {
         churnReasons: payload.details.churnReasons,
         summary: payload.details.summary,
         interactionDate: payload.details.interactionDate,
-        accountUrl: `${accountUrl}?tab=interactions`,
+        accountUrl: `${accountUrl}?tab=interactions&interactionId=${payload.details.interactionId}`,
       });
     }
 
