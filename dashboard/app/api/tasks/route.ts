@@ -193,13 +193,17 @@ export async function POST(request: Request) {
 
         // Create notification for task assignment
         try {
+          const creatorName = user.user_metadata?.first_name && user.user_metadata?.last_name
+            ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+            : user.email || 'Someone';
+
           await supabase
             .from('notifications')
             .insert({
               user_id: assigneeId,
               type: 'task_assigned',
               title: 'New Task Assigned',
-              message: `You have been assigned a new task: ${task.title}`,
+              message: `${creatorName} assigned you a task: ${task.title}`,
               related_entity_type: 'task',
               related_entity_id: task.id
             });

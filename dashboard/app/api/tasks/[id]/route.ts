@@ -174,13 +174,17 @@ export async function PATCH(
 
           // Create notification for task reassignment
           try {
+            const reassignerName = user.user_metadata?.first_name && user.user_metadata?.last_name
+              ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+              : user.email || 'Someone';
+
             await supabase
               .from('notifications')
               .insert({
                 user_id: assigneeId,
                 type: 'task_reassigned',
-                title: 'Task Reassigned to You',
-                message: `You have been reassigned a task: ${task.title}`,
+                title: 'Task Assigned to You',
+                message: `${reassignerName} assigned you a task: ${task.title}`,
                 related_entity_type: 'task',
                 related_entity_id: task.id
               });

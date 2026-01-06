@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nekter.io - CS Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --accent-primary: #f59e0b;
+            --accent-secondary: #d97706;
+            --accent-danger: #ef4444;
+            --accent-warning: #fb923c;
+            --accent-success: #10b981;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(245, 158, 11, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.02) 0%, transparent 50%);
+            z-index: -1;
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .nav-badge,
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 88px;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 2rem 0.75rem;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .sidebar.collapsed .logo {
+            gap: 0;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar.collapsed .logo-icon:hover {
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            cursor: pointer;
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        /* Navigation */
+        .nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-item {
+            padding: 0.875rem 0;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(245, 158, 11, 0.06);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .sidebar.collapsed .sidebar-footer {
+            padding: 1.5rem 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .user-profile:hover {
+            opacity: 0.8;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar.collapsed .user-avatar:hover {
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            overflow-y: auto;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+        }
+
+        .notifications {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notifications:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .notifications svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-secondary);
+        }
+
+        .notifications-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chat with Barry Styles */
+        .chat-container {
+            display: flex;
+            gap: 0;
+            height: calc(100vh - 180px);
+        }
+
+        /* Chat History Sidebar */
+        .chat-history-sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-history-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .new-chat-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .new-chat-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .chat-history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .chat-history-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-history-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .chat-history-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-history-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .chat-history-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .chat-history-item.active {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 2px solid var(--accent-primary);
+        }
+
+        .chat-history-item-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-history-item-preview {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-primary);
+        }
+
+        .barry-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.125rem;
+        }
+
+        .barry-info {
+            flex: 1;
+        }
+
+        .barry-name {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+
+        .barry-status {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-success);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 85%;
+        }
+
+        .message.barry {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-bubble {
+            background: var(--bg-secondary);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        .message.barry .message-bubble {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+
+        .message.user .message-bubble {
+            background: var(--bg-tertiary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+
+        .chat-input-container {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chat-input textarea {
+            width: 100%;
+            min-height: 60px;
+            max-height: 120px;
+            padding: 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9375rem;
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .send-btn {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .chat-sidebar {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        .sidebar-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .sidebar-card-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .quick-action {
+            padding: 0.875rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .quick-action:hover {
+            border-color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.05);
+            transform: translateX(2px);
+        }
+
+        .quick-action:last-child {
+            margin-bottom: 0;
+        }
+
+        .quick-action-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .quick-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(245, 158, 11, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent-primary);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+        }
+
+        .quick-action-description {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            padding-left: 2.5rem;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: help;
+        }
+
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-card.critical {
+            border-color: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.02);
+        }
+
+        .filter-card.at-risk {
+            border-color: rgba(251, 146, 60, 0.2);
+            background: rgba(251, 146, 60, 0.02);
+        }
+
+        .filter-card.clickable {
+            cursor: pointer;
+        }
+
+        .filter-card.clickable:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-card.active {
+            border-color: var(--accent-primary);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .filter-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .filter-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .filter-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .filter-card.active .filter-checkbox {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .filter-checkbox svg {
+            width: 12px;
+            height: 12px;
+            stroke: white;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .filter-card.active .filter-checkbox svg {
+            opacity: 1;
+        }
+
+        .filter-count {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .filter-card.critical .filter-count {
+            color: var(--accent-danger);
+        }
+
+        .filter-card.at-risk .filter-count {
+            color: var(--accent-warning);
+        }
+
+        .filter-arr {
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Placeholder content */
+        .placeholder-content {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .placeholder-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .placeholder-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--text-muted);
+        }
+
+        .placeholder-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-description {
+            font-size: 0.9375rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Utility Classes */
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">nekter.io</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="nav">
+                <div class="nav-item" onclick="switchTab('portfolio')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Portfolio</span>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('priority')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span>Priority</span>
+                    <div class="nav-badge">25</div>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('accounts')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <span>All Accounts</span>
+                </div>
+
+                <div class="nav-item active" onclick="switchTab('barry')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <span>Chat with Barry</span>
+                </div>
+
+                <div class="nav-item" onclick="switchTab('analytics')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" onclick="toggleSidebar()">AH</div>
+                    <div class="user-info">
+                        <div class="user-name">Anthony Huni</div>
+                        <div class="user-role">CSM Owner</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-content">
+                    <h1 class="page-title">Chat with Barry</h1>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" placeholder="Search accounts...">
+                        </div>
+                        <div class="notifications">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="notifications-badge">3</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Chat with Barry Tab -->
+                <div id="barry" class="tab-content active">
+                    <div class="chat-container">
+                        <!-- Chat History Sidebar -->
+                        <div class="chat-history-sidebar">
+                            <div class="chat-history-header">
+                                <button class="new-chat-btn" onclick="startNewChat()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                    <span>New Chat</span>
+                                </button>
+                            </div>
+                            
+                            <div class="chat-history-list">
+                                <div class="chat-history-section">
+                                    <div class="chat-history-section-title">Today</div>
+                                    <div class="chat-history-item active">
+                                        <div class="chat-history-item-title">Account Planning Discussion</div>
+                                        <div class="chat-history-item-preview">Hey Anthony! 👋 I'm Barry, your AI customer...</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="chat-history-section">
+                                    <div class="chat-history-section-title">Yesterday</div>
+                                    <div class="chat-history-item">
+                                        <div class="chat-history-item-title">DataCore Solutions Analysis</div>
+                                        <div class="chat-history-item-preview">Analyze the churn risk for DataCore...</div>
+                                    </div>
+                                    <div class="chat-history-item">
+                                        <div class="chat-history-item-title">Q1 Expansion Opportunities</div>
+                                        <div class="chat-history-item-preview">Which accounts have the highest...</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="chat-history-section">
+                                    <div class="chat-history-section-title">Last 7 Days</div>
+                                    <div class="chat-history-item">
+                                        <div class="chat-history-item-title">Health Score Deep Dive</div>
+                                        <div class="chat-history-item-preview">Explain the factors affecting health scores...</div>
+                                    </div>
+                                    <div class="chat-history-item">
+                                        <div class="chat-history-item-title">Renewal Strategy Review</div>
+                                        <div class="chat-history-item-preview">Help me prepare for upcoming renewals...</div>
+                                    </div>
+                                    <div class="chat-history-item">
+                                        <div class="chat-history-item-title">Customer Sentiment Trends</div>
+                                        <div class="chat-history-item-preview">Show me sentiment trends across my portfolio...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-main">
+                            <div class="chat-header">
+                                <div class="barry-avatar">B</div>
+                                <div class="barry-info">
+                                    <div class="barry-name">Barry</div>
+                                    <div class="barry-status">
+                                        <span class="status-dot"></span>
+                                        Your AI CS Assistant
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- Barry's Welcome Message -->
+                                <div class="message barry">
+                                    <div class="message-avatar">B</div>
+                                    <div class="message-content">
+                                        <div class="message-bubble">
+                                            Hey Anthony! 👋 I'm Barry, your AI customer success assistant. I can help you with account planning, deep interaction analysis, expansion opportunities, and much more.
+                                            <br><br>
+                                            I have access to your full portfolio and can pull insights from all your customer interactions. What would you like to work on today?
+                                        </div>
+                                        <div class="message-time">Just now</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-input-container">
+                                <div class="chat-input-wrapper">
+                                    <div class="chat-input">
+                                        <textarea id="messageInput" placeholder="Ask Barry anything about your accounts, health scores, expansion opportunities..."></textarea>
+                                    </div>
+                                    <button class="send-btn" onclick="sendMessage()">
+                                        <span>Send</span>
+                                        <svg viewBox="0 0 24 24">
+                                            <line x1="22" y1="2" x2="11" y2="13"/>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-sidebar">
+                            <!-- Quick Actions -->
+                            <div class="sidebar-card">
+                                <div class="sidebar-card-title">Quick Actions</div>
+                                
+                                <div class="quick-action" onclick="quickPrompt('Create a comprehensive account plan for DataCore Solutions including success criteria, key stakeholders, and quarterly objectives')">
+                                    <div class="tooltip" title="Creates a structured account plan that automatically populates the Account Overview tab">?</div>
+                                    <div class="quick-action-header">
+                                        <div class="quick-action-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                <polyline points="14 2 14 8 20 8"/>
+                                            </svg>
+                                        </div>
+                                        <div class="quick-action-title">Create Account Plan</div>
+                                    </div>
+                                    <div class="quick-action-description">
+                                        Generate a strategic account plan with goals, stakeholders, and success metrics
+                                    </div>
+                                </div>
+
+                                <div class="quick-action" onclick="quickPrompt('Analyze all interactions with my critical accounts over the last 30 days. Identify sentiment trends, key concerns, and action items.')">
+                                    <div class="tooltip" title="Deep dive into email, calls, and meeting transcripts to surface insights">?</div>
+                                    <div class="quick-action-header">
+                                        <div class="quick-action-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                            </svg>
+                                        </div>
+                                        <div class="quick-action-title">Deep Interaction Analysis</div>
+                                    </div>
+                                    <div class="quick-action-description">
+                                        Surface patterns, sentiment shifts, and hidden signals from all touchpoints
+                                    </div>
+                                </div>
+
+                                <div class="quick-action" onclick="quickPrompt('Identify expansion opportunities in my portfolio based on product usage, engagement levels, and comparable accounts')">
+                                    <div class="tooltip" title="Uses usage data and predictive models to find upsell/cross-sell opportunities">?</div>
+                                    <div class="quick-action-header">
+                                        <div class="quick-action-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                            </svg>
+                                        </div>
+                                        <div class="quick-action-title">Expansion Analysis</div>
+                                    </div>
+                                    <div class="quick-action-description">
+                                        Find upsell and cross-sell opportunities based on usage patterns
+                                    </div>
+                                </div>
+
+                                <div class="quick-action" onclick="quickPrompt('Draft a follow-up email to DataCore Solutions addressing their recent concerns and proposing next steps')">
+                                    <div class="tooltip" title="AI-generated emails based on account context, sentiment, and recent interactions">?</div>
+                                    <div class="quick-action-header">
+                                        <div class="quick-action-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                                <polyline points="22,6 12,13 2,6"/>
+                                            </svg>
+                                        </div>
+                                        <div class="quick-action-title">Draft Email</div>
+                                    </div>
+                                    <div class="quick-action-description">
+                                        Generate personalized emails with account context and sentiment awareness
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Tab (Placeholder) -->
+                <div id="portfolio" class="tab-content">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-title">Portfolio Overview</div>
+                        <div class="placeholder-description">
+                            View your entire portfolio health, trends, and key metrics at a glance.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Priority Tab (Placeholder) -->
+                <div id="priority" class="tab-content">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-title">Priority Accounts</div>
+                        <div class="placeholder-description">
+                            Focus on your most critical accounts requiring immediate attention.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Accounts Tab (Placeholder) -->
+                <div id="accounts" class="tab-content">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-title">All Accounts</div>
+                        <div class="placeholder-description">
+                            Browse and manage your complete account list with advanced filtering.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab (Placeholder) -->
+                <div id="analytics" class="tab-content">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-title">Analytics Dashboard</div>
+                        <div class="placeholder-description">
+                            Deep dive into portfolio performance, trends, and predictive insights.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function startNewChat() {
+            // Clear the chat messages
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="message barry">
+                    <div class="message-avatar">B</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Hey Anthony! 👋 I'm Barry, your AI customer success assistant. I can help you with account planning, deep interaction analysis, expansion opportunities, and much more.
+                            <br><br>
+                            I have access to your full portfolio and can pull insights from all your customer interactions. What would you like to work on today?
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove active state from all chat history items
+            document.querySelectorAll('.chat-history-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Clear input
+            document.getElementById('messageInput').value = '';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update page title
+            const titles = {
+                priority: 'Priority Accounts',
+                portfolio: 'Portfolio Overview',
+                accounts: 'All Accounts',
+                analytics: 'Analytics Dashboard',
+                barry: 'Chat with Barry'
+            };
+            document.querySelector('.page-title').textContent = titles[tabName] || 'CS Command Center';
+        }
+
+        function quickPrompt(prompt) {
+            const input = document.getElementById('messageInput');
+            input.value = prompt;
+            input.focus();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message to chat
+            const messagesContainer = document.getElementById('chatMessages');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-avatar">AH</div>
+                <div class="message-content">
+                    <div class="message-bubble">${message}</div>
+                    <div class="message-time">Just now</div>
+                </div>
+            `;
+            messagesContainer.appendChild(userMessage);
+
+            // Clear input
+            input.value = '';
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Simulate Barry's response (in production, this would call your AI backend)
+            setTimeout(() => {
+                const barryResponse = document.createElement('div');
+                barryResponse.className = 'message barry';
+                barryResponse.innerHTML = `
+                    <div class="message-avatar">B</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            I'm analyzing that request for you now... 
+                            <br><br>
+                            <em>(This is a demo - connect to your AI backend to enable real responses)</em>
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(barryResponse);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        // Allow Enter to send message
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Add subtle parallax effect to background
+        document.addEventListener('mousemove', (e) => {
+            const gradient = document.querySelector('.bg-gradient');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            gradient.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
+    </script>
+</body>
+</html>

@@ -26,7 +26,7 @@ export default function PortfolioPage() {
 function PortfolioContent() {
   const [selectedCsm, setSelectedCsm] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string>('health');
-  const [timeRange, setTimeRange] = useState<string>('7d');
+  const [timeRange, setTimeRange] = useState<string>('30d');
 
   // Convert timeRange to days
   const getDaysFromTimeRange = (range: string): number => {
