@@ -58,6 +58,7 @@ function SettingsContent() {
   const [slackLoading, setSlackLoading] = useState(true);
   const [slackToggleLoading, setSlackToggleLoading] = useState(false);
   const [slackMessage, setSlackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -161,10 +162,8 @@ function SettingsContent() {
 
   const handleDisconnectSlack = async () => {
     if (!user) return;
-    if (!confirm('Are you sure you want to disconnect Slack? You will no longer receive Slack notifications.')) {
-      return;
-    }
 
+    setShowDisconnectModal(false);
     setSlackLoading(true);
     try {
       const response = await fetch('/api/integrations/slack/disconnect', {
@@ -426,10 +425,10 @@ function SettingsContent() {
                     Reconnect workspace
                   </button>
                   <button
-                    onClick={handleDisconnectSlack}
+                    onClick={() => setShowDisconnectModal(true)}
                     className="text-sm text-red-600 hover:text-red-700"
                   >
-                    Disconnect Slack
+                    Disconnect
                   </button>
                 </div>
               </div>
@@ -437,6 +436,36 @@ function SettingsContent() {
           </div>
         </div>
       </div>
+
+      {/* Disconnect Slack Modal */}
+      {showDisconnectModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Disconnect Slack</h3>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to disconnect Slack? You will no longer receive notifications via Slack DM.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDisconnectModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDisconnectSlack}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }
