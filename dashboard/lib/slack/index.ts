@@ -183,81 +183,109 @@ function buildTaskNotificationBlocks(notification: {
     ? `${appUrl}/account/${notification.accountId}?tab=tasks&taskId=${notification.taskId}`
     : `${appUrl}/priority`; // Fallback to priority page if no account
 
-  // Determine header and color based on type
+  // Determine header based on type
   let header: string;
-  let emoji: string;
-
   switch (notification.type) {
     case 'task_assigned':
-      header = notification.assignerName
-        ? `${notification.assignerName} assigned you a task`
-        : 'New task assigned to you';
-      emoji = ':clipboard:';
+      header = 'New Task Assigned';
       break;
     case 'task_reassigned':
-      header = notification.assignerName
-        ? `${notification.assignerName} reassigned a task to you`
-        : 'Task reassigned to you';
-      emoji = ':arrows_counterclockwise:';
+      header = 'Task Reassigned';
       break;
     case 'reminder_3d':
-      header = 'Task due in 3 days';
-      emoji = ':calendar:';
+      header = 'Task Due in 3 Days';
       break;
     case 'reminder_1d':
-      header = 'Task due tomorrow';
-      emoji = ':warning:';
+      header = 'Task Due Tomorrow';
       break;
     case 'overdue':
-      header = 'Task is overdue';
-      emoji = ':rotating_light:';
+      header = 'Task Overdue';
       break;
   }
 
+  // Format priority display
+  const formatPriority = (priority: string): string => {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return '🔴 High';
+      case 'medium':
+        return '🟡 Medium';
+      case 'low':
+        return '🟢 Low';
+      default:
+        return priority;
+    }
+  };
+
   const blocks: any[] = [
+    // Header
     {
       type: 'header',
       text: {
         type: 'plain_text',
-        text: `${emoji} ${header}`,
-        emoji: true,
+        text: header,
+        emoji: false,
       },
     },
+    // Divider
+    {
+      type: 'divider',
+    },
+    // Task title
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*${notification.taskTitle}*`,
+        text: `*Task:* ${notification.taskTitle}`,
       },
     },
   ];
 
-  // Add details section
-  const details: string[] = [];
-  if (notification.accountName) {
-    details.push(`:office: *Account:* ${notification.accountName}`);
-  }
-  if (notification.priority) {
-    const priorityEmoji = notification.priority === 'high' ? ':red_circle:'
-      : notification.priority === 'medium' ? ':large_yellow_circle:'
-      : ':white_circle:';
-    details.push(`${priorityEmoji} *Priority:* ${notification.priority}`);
-  }
-  if (notification.dueDate) {
-    details.push(`:calendar: *Due:* ${notification.dueDate}`);
-  }
+  // Build fields for two-column layout
+  const fields: { type: string; text: string }[] = [];
 
-  if (details.length > 0) {
-    blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: details.join('\n'),
-      },
+  if (notification.accountName) {
+    fields.push({
+      type: 'mrkdwn',
+      text: `*Account*\n${notification.accountName}`,
     });
   }
 
-  // Add action button
+  if (notification.priority) {
+    fields.push({
+      type: 'mrkdwn',
+      text: `*Priority*\n${formatPriority(notification.priority)}`,
+    });
+  }
+
+  if (notification.dueDate) {
+    fields.push({
+      type: 'mrkdwn',
+      text: `*Due*\n${notification.dueDate}`,
+    });
+  }
+
+  if (notification.assignerName) {
+    fields.push({
+      type: 'mrkdwn',
+      text: `*Assigned by*\n${notification.assignerName}`,
+    });
+  }
+
+  // Add fields section if we have any
+  if (fields.length > 0) {
+    blocks.push({
+      type: 'section',
+      fields: fields,
+    });
+  }
+
+  // Divider before button
+  blocks.push({
+    type: 'divider',
+  });
+
+  // Action button
   blocks.push({
     type: 'actions',
     elements: [
@@ -266,7 +294,7 @@ function buildTaskNotificationBlocks(notification: {
         text: {
           type: 'plain_text',
           text: 'View Task',
-          emoji: true,
+          emoji: false,
         },
         url: taskUrl,
         style: 'primary',
