@@ -159,6 +159,36 @@ function SettingsContent() {
     window.location.href = `/api/integrations/slack/authorize?userId=${user.id}`;
   };
 
+  const handleDisconnectSlack = async () => {
+    if (!user) return;
+    if (!confirm('Are you sure you want to disconnect Slack? You will no longer receive Slack notifications.')) {
+      return;
+    }
+
+    setSlackLoading(true);
+    try {
+      const response = await fetch('/api/integrations/slack/disconnect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (response.ok) {
+        setSlackInstallation(null);
+        setSlackSettings(null);
+        setSlackMessage({ type: 'success', text: 'Slack disconnected successfully' });
+        setTimeout(() => setSlackMessage(null), 3000);
+      } else {
+        throw new Error('Failed to disconnect');
+      }
+    } catch (err) {
+      console.error('Error disconnecting Slack:', err);
+      setSlackMessage({ type: 'error', text: 'Failed to disconnect Slack' });
+    } finally {
+      setSlackLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -388,12 +418,18 @@ function SettingsContent() {
                   </button>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
                   <button
                     onClick={handleConnectSlack}
                     className="text-sm text-gray-600 hover:text-gray-900 underline"
                   >
-                    Reconnect Slack workspace
+                    Reconnect workspace
+                  </button>
+                  <button
+                    onClick={handleDisconnectSlack}
+                    className="text-sm text-red-600 hover:text-red-700"
+                  >
+                    Disconnect Slack
                   </button>
                 </div>
               </div>
