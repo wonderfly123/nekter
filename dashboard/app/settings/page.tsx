@@ -353,7 +353,7 @@ function SettingsContent() {
               />
             </div>
             <p className="mt-1 text-sm text-gray-600">
-              Receive task notifications via Slack DM
+              Receive notifications via Slack DM
             </p>
           </div>
 
@@ -399,8 +399,8 @@ function SettingsContent() {
                     </p>
                     <p className="text-sm text-gray-500">
                       {slackSettings?.slack_notifications_enabled
-                        ? 'You will receive task notifications via Slack DM'
-                        : 'Enable to receive task notifications via Slack DM'}
+                        ? 'You will receive notifications via Slack DM'
+                        : 'Enable to receive notifications via Slack DM'}
                     </p>
                   </div>
                   <button
