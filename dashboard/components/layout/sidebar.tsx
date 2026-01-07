@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet, MessageSquare, Home } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -17,8 +17,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { name: 'Welcome', href: '/welcome', icon: Home },
   { name: 'Portfolio', href: '/portfolio', icon: LayoutDashboard },
-  { name: 'Priority', href: '/priority', icon: Zap }, // badge will be added dynamically in Part 2
+  { name: 'Priority', href: '/priority', icon: Zap },
   { name: 'All Accounts', href: '/all-accounts', icon: Users },
   { name: 'Chat with Barry', href: '/chat', icon: MessageSquare },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
@@ -74,7 +75,7 @@ export function Sidebar() {
         <div className="flex items-center gap-2.5 pl-0.5">
           <div
             className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0"
-            onClick={() => router.push('/portfolio')}
+            onClick={() => router.push('/welcome')}
           >
             <Droplet className="w-3.5 h-3.5 text-white fill-white" />
           </div>
@@ -83,7 +84,7 @@ export function Sidebar() {
               "text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent whitespace-nowrap overflow-hidden cursor-pointer transition-opacity duration-200",
               isCollapsed ? "opacity-0 w-0" : "opacity-100"
             )}
-            onClick={() => router.push('/portfolio')}
+            onClick={() => router.push('/welcome')}
           >
             nekter.io
           </span>

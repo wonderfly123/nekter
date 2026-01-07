@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { useBarryPanelStore } from '@/lib/stores/barry-panel-store';
 
 const pageTitles: Record<string, string> = {
+  '/welcome': 'Welcome',
   '/priority': 'Priority Accounts',
   '/portfolio': 'Portfolio Overview',
   '/all-accounts': 'All Accounts',
@@ -29,7 +30,7 @@ export function AppHeader() {
   const router = useRouter();
   const openBarryPanel = useBarryPanelStore((state) => state.openPanel);
   const pageTitle =
-    pathname.startsWith('/account/') ? 'Account Detail' : pageTitles[pathname] || 'Admin Panel';
+    pathname.startsWith('/account/') ? 'Account Detail' : pageTitles[pathname] || 'Nekter';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
