@@ -222,7 +222,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
           <h2 className="text-lg font-semibold text-gray-900">Alert Notifications</h2>
         </div>
         <p className="mt-1 text-sm text-gray-600">
-          Get notified about health changes and concerning interactions
+          Get notified about health changes, concerning interactions, and expansion opportunities
         </p>
       </div>
 
