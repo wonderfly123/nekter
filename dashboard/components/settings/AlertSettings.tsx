@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Mail, MessageSquare, AlertTriangle, TrendingDown, TrendingUp, Loader2, Check } from 'lucide-react';
+import { Bell, Mail, MessageSquare, AlertTriangle, TrendingDown, TrendingUp, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/use-auth';
 
 interface AlertTypeSettings {
@@ -46,11 +46,10 @@ interface AlertRowProps {
   description: string;
   settings: AlertTypeSettings;
   onToggle: (channel: 'email' | 'slack' | 'bell') => void;
-  loading: boolean;
   hasSlack: boolean;
 }
 
-function AlertRow({ icon, title, description, settings, onToggle, loading, hasSlack }: AlertRowProps) {
+function AlertRow({ icon, title, description, settings, onToggle, hasSlack }: AlertRowProps) {
   return (
     <div className="py-4 first:pt-0 last:pb-0">
       <div className="flex items-start gap-3 mb-3">
@@ -69,7 +68,6 @@ function AlertRow({ icon, title, description, settings, onToggle, loading, hasSl
           <Toggle
             enabled={settings.email_enabled}
             onChange={() => onToggle('email')}
-            disabled={loading}
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -78,7 +76,7 @@ function AlertRow({ icon, title, description, settings, onToggle, loading, hasSl
           <Toggle
             enabled={settings.slack_enabled && hasSlack}
             onChange={() => onToggle('slack')}
-            disabled={loading || !hasSlack}
+            disabled={!hasSlack}
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -87,7 +85,6 @@ function AlertRow({ icon, title, description, settings, onToggle, loading, hasSl
           <Toggle
             enabled={settings.bell_enabled}
             onChange={() => onToggle('bell')}
-            disabled={loading}
           />
         </label>
       </div>
@@ -103,8 +100,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
   const { user } = useAuth();
   const [settings, setSettings] = useState<AlertSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -137,7 +133,10 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
   const handleToggle = async (alertType: 'health_drop' | 'bad_interaction' | 'expansion_opportunity', channel: 'email' | 'slack' | 'bell') => {
     if (!settings || !user) return;
 
-    // Optimistically update UI
+    // Clear any previous error
+    setError(null);
+
+    // Optimistically update UI immediately
     const currentSettings = settings[alertType];
     const channelKey = `${channel}_enabled` as keyof AlertTypeSettings;
     const newValue = !currentSettings[channelKey];
@@ -150,13 +149,9 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
       },
     });
 
-    setUpdating(true);
     try {
       const { data: { session } } = await (await import('@/lib/supabase/client')).supabase.auth.getSession();
       if (!session) return;
-
-      // Get the current settings for this alert type
-      const typeSettings = settings[alertType];
 
       const response = await fetch('/api/settings/alerts', {
         method: 'PUT',
@@ -166,28 +161,24 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
         },
         body: JSON.stringify({
           alertType,
-          emailEnabled: channel === 'email' ? newValue : typeSettings.email_enabled,
-          slackEnabled: channel === 'slack' ? newValue : typeSettings.slack_enabled,
-          bellEnabled: channel === 'bell' ? newValue : typeSettings.bell_enabled,
+          emailEnabled: channel === 'email' ? newValue : currentSettings.email_enabled,
+          slackEnabled: channel === 'slack' ? newValue : currentSettings.slack_enabled,
+          bellEnabled: channel === 'bell' ? newValue : currentSettings.bell_enabled,
         }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to update settings');
       }
-
-      setMessage({ type: 'success', text: 'Settings updated' });
-      setTimeout(() => setMessage(null), 2000);
-    } catch (error) {
-      console.error('Error updating alert settings:', error);
+    } catch (err) {
+      console.error('Error updating alert settings:', err);
       // Revert on error
       setSettings({
         ...settings,
         [alertType]: currentSettings,
       });
-      setMessage({ type: 'error', text: 'Failed to update settings' });
-    } finally {
-      setUpdating(false);
+      setError('Failed to update settings');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -227,16 +218,9 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
       </div>
 
       <div className="p-6">
-        {message && (
-          <div
-            className={`mb-4 px-4 py-3 rounded-lg text-sm flex items-center gap-2 ${
-              message.type === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-700'
-                : 'bg-red-50 border border-red-200 text-red-700'
-            }`}
-          >
-            {message.type === 'success' && <Check className="w-4 h-4" />}
-            {message.text}
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700">
+            {error}
           </div>
         )}
 
@@ -253,7 +237,6 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="When an account's health status drops (Healthy → At Risk or At Risk → Critical)"
             settings={settings.health_drop}
             onToggle={(channel) => handleToggle('health_drop', channel)}
-            loading={updating}
             hasSlack={hasSlackInstallation}
           />
           <AlertRow
@@ -262,7 +245,6 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="Churn risk detected or sentiment score below 60"
             settings={settings.bad_interaction}
             onToggle={(channel) => handleToggle('bad_interaction', channel)}
-            loading={updating}
             hasSlack={hasSlackInstallation}
           />
           <AlertRow
@@ -271,7 +253,6 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="Growth signals detected in customer interactions"
             settings={settings.expansion_opportunity}
             onToggle={(channel) => handleToggle('expansion_opportunity', channel)}
-            loading={updating}
             hasSlack={hasSlackInstallation}
           />
         </div>
