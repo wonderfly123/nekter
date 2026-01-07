@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Mail, MessageSquare, AlertTriangle, TrendingDown, Loader2, Check } from 'lucide-react';
+import { Bell, Mail, MessageSquare, AlertTriangle, TrendingDown, TrendingUp, Loader2, Check } from 'lucide-react';
 import { useAuth } from '@/lib/auth/use-auth';
 
 interface AlertTypeSettings {
@@ -13,6 +13,7 @@ interface AlertTypeSettings {
 interface AlertSettings {
   health_drop: AlertTypeSettings;
   bad_interaction: AlertTypeSettings;
+  expansion_opportunity: AlertTypeSettings;
 }
 
 interface ToggleProps {
@@ -133,7 +134,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
     }
   };
 
-  const handleToggle = async (alertType: 'health_drop' | 'bad_interaction', channel: 'email' | 'slack' | 'bell') => {
+  const handleToggle = async (alertType: 'health_drop' | 'bad_interaction' | 'expansion_opportunity', channel: 'email' | 'slack' | 'bell') => {
     if (!settings || !user) return;
 
     // Optimistically update UI
@@ -154,6 +155,9 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
       const { data: { session } } = await (await import('@/lib/supabase/client')).supabase.auth.getSession();
       if (!session) return;
 
+      // Get the current settings for this alert type
+      const typeSettings = settings[alertType];
+
       const response = await fetch('/api/settings/alerts', {
         method: 'PUT',
         headers: {
@@ -162,15 +166,9 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
         },
         body: JSON.stringify({
           alertType,
-          emailEnabled: alertType === 'health_drop'
-            ? (channel === 'email' ? newValue : settings.health_drop.email_enabled)
-            : (channel === 'email' ? newValue : settings.bad_interaction.email_enabled),
-          slackEnabled: alertType === 'health_drop'
-            ? (channel === 'slack' ? newValue : settings.health_drop.slack_enabled)
-            : (channel === 'slack' ? newValue : settings.bad_interaction.slack_enabled),
-          bellEnabled: alertType === 'health_drop'
-            ? (channel === 'bell' ? newValue : settings.health_drop.bell_enabled)
-            : (channel === 'bell' ? newValue : settings.bad_interaction.bell_enabled),
+          emailEnabled: channel === 'email' ? newValue : typeSettings.email_enabled,
+          slackEnabled: channel === 'slack' ? newValue : typeSettings.slack_enabled,
+          bellEnabled: channel === 'bell' ? newValue : typeSettings.bell_enabled,
         }),
       });
 
@@ -264,6 +262,15 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="Churn risk detected or sentiment score below 60"
             settings={settings.bad_interaction}
             onToggle={(channel) => handleToggle('bad_interaction', channel)}
+            loading={updating}
+            hasSlack={hasSlackInstallation}
+          />
+          <AlertRow
+            icon={<TrendingUp className="w-4 h-4 text-green-600" />}
+            title="Expansion Opportunity Alerts"
+            description="Growth signals detected in customer interactions"
+            settings={settings.expansion_opportunity}
+            onToggle={(channel) => handleToggle('expansion_opportunity', channel)}
             loading={updating}
             hasSlack={hasSlackInstallation}
           />

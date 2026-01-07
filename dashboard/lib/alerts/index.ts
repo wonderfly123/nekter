@@ -4,9 +4,11 @@ import { getUserAlertSettings } from './settings';
 import { getSlackInstallation, getUserSlackSettings, lookupSlackUserByEmail, sendSlackDM } from '../slack';
 import { generateHealthDropEmail } from '../email/templates/health-drop';
 import { generateBadInteractionEmail } from '../email/templates/bad-interaction';
+import { generateExpansionOpportunityEmail } from '../email/templates/expansion-opportunity';
 import { buildHealthDropSlackBlocks, buildHealthDropSlackText } from '../slack/health-drop';
 import { buildBadInteractionSlackBlocks, buildBadInteractionSlackText } from '../slack/bad-interaction';
-import type { AlertPayload, HealthDropAlertPayload, BadInteractionAlertPayload } from './types';
+import { buildExpansionOpportunitySlackBlocks, buildExpansionOpportunitySlackText } from '../slack/expansion-opportunity';
+import type { AlertPayload, HealthDropAlertPayload, BadInteractionAlertPayload, ExpansionOpportunityAlertPayload } from './types';
 
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
@@ -85,7 +87,7 @@ async function sendAlertEmail(payload: AlertPayload): Promise<boolean> {
         healthScore: payload.details.healthScore,
         accountUrl,
       });
-    } else {
+    } else if (payload.type === 'bad_interaction') {
       subject = `Interaction Alert: ${payload.accountName}`;
       html = generateBadInteractionEmail({
         accountName: payload.accountName,
@@ -93,6 +95,18 @@ async function sendAlertEmail(payload: AlertPayload): Promise<boolean> {
         sentimentScore: payload.details.sentimentScore,
         churnRisk: payload.details.churnRisk,
         churnReasons: payload.details.churnReasons,
+        summary: payload.details.summary,
+        interactionDate: payload.details.interactionDate,
+        accountUrl: `${accountUrl}?tab=interactions&interactionId=${payload.details.interactionId}`,
+      });
+    } else {
+      // expansion_opportunity
+      subject = `Expansion Opportunity: ${payload.accountName}`;
+      html = generateExpansionOpportunityEmail({
+        accountName: payload.accountName,
+        interactionType: payload.details.interactionType,
+        sentimentScore: payload.details.sentimentScore,
+        expansionReasons: payload.details.expansionReasons,
         summary: payload.details.summary,
         interactionDate: payload.details.interactionDate,
         accountUrl: `${accountUrl}?tab=interactions&interactionId=${payload.details.interactionId}`,
@@ -155,9 +169,13 @@ async function sendAlertSlack(payload: AlertPayload): Promise<boolean> {
     if (payload.type === 'health_drop') {
       blocks = buildHealthDropSlackBlocks(payload);
       text = buildHealthDropSlackText(payload);
-    } else {
+    } else if (payload.type === 'bad_interaction') {
       blocks = buildBadInteractionSlackBlocks(payload);
       text = buildBadInteractionSlackText(payload);
+    } else {
+      // expansion_opportunity
+      blocks = buildExpansionOpportunitySlackBlocks(payload);
+      text = buildExpansionOpportunitySlackText(payload);
     }
 
     return await sendSlackDM(installation.bot_token, slackUserId, blocks, text);
@@ -182,12 +200,19 @@ async function createAlertNotification(payload: AlertPayload): Promise<boolean> 
       message = `${payload.details.previousStatus} → ${payload.details.newStatus}`;
       relatedEntityType = 'account';
       relatedEntityId = payload.accountId;
-    } else {
+    } else if (payload.type === 'bad_interaction') {
       title = `Bad interaction: ${payload.accountName}`;
       const reasons: string[] = [];
       if (payload.details.churnRisk) reasons.push('Churn risk');
       if (payload.details.sentimentScore < 60) reasons.push(`Low sentiment (${payload.details.sentimentScore})`);
       message = reasons.join(' • ') || 'Review recommended';
+      relatedEntityType = 'interaction';
+      relatedEntityId = String(payload.details.interactionId);
+    } else {
+      // expansion_opportunity
+      title = `Expansion opportunity: ${payload.accountName}`;
+      const reasons = payload.details.expansionReasons?.slice(0, 2) || [];
+      message = reasons.length > 0 ? reasons.join(' • ') : 'Growth signals detected';
       relatedEntityType = 'interaction';
       relatedEntityId = String(payload.details.interactionId);
     }

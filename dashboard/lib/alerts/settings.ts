@@ -48,7 +48,7 @@ export async function getUserAlertSettings(
 }
 
 /**
- * Get all alert settings for a user (both health_drop and bad_interaction)
+ * Get all alert settings for a user (health_drop, bad_interaction, expansion_opportunity)
  */
 export async function getAllUserAlertSettings(
   userId: string
@@ -58,10 +58,11 @@ export async function getAllUserAlertSettings(
     .select('alert_type, email_enabled, slack_enabled, bell_enabled')
     .eq('user_id', userId);
 
-  // Start with defaults for both types
+  // Start with defaults for all types
   const result: Record<AlertType, { email_enabled: boolean; slack_enabled: boolean; bell_enabled: boolean }> = {
     health_drop: { ...DEFAULT_SETTINGS },
     bad_interaction: { ...DEFAULT_SETTINGS },
+    expansion_opportunity: { ...DEFAULT_SETTINGS },
   };
 
   if (error || !data) {
@@ -71,7 +72,7 @@ export async function getAllUserAlertSettings(
   // Override with actual settings
   for (const row of data) {
     const alertType = row.alert_type as AlertType;
-    if (alertType === 'health_drop' || alertType === 'bad_interaction') {
+    if (alertType === 'health_drop' || alertType === 'bad_interaction' || alertType === 'expansion_opportunity') {
       result[alertType] = {
         email_enabled: row.email_enabled,
         slack_enabled: row.slack_enabled,

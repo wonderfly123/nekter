@@ -1,7 +1,7 @@
 import type { HealthStatus } from '../supabase/types';
 
 // Alert types that can be configured
-export type AlertType = 'health_drop' | 'bad_interaction';
+export type AlertType = 'health_drop' | 'bad_interaction' | 'expansion_opportunity';
 
 // User's alert settings for a specific alert type
 export interface UserAlertSettings {
@@ -33,6 +33,16 @@ export interface BadInteractionDetails {
   interactionDate: string;
 }
 
+// Details for expansion opportunity alerts
+export interface ExpansionOpportunityDetails {
+  interactionId: number;
+  interactionType: string;
+  sentimentScore: number;
+  expansionReasons: string[] | null;
+  summary: string | null;
+  interactionDate: string;
+}
+
 // Base alert payload
 interface BaseAlertPayload {
   accountId: string;
@@ -53,5 +63,11 @@ export interface BadInteractionAlertPayload extends BaseAlertPayload {
   details: BadInteractionDetails;
 }
 
+// Expansion opportunity alert payload
+export interface ExpansionOpportunityAlertPayload extends BaseAlertPayload {
+  type: 'expansion_opportunity';
+  details: ExpansionOpportunityDetails;
+}
+
 // Union type for all alert payloads
-export type AlertPayload = HealthDropAlertPayload | BadInteractionAlertPayload;
+export type AlertPayload = HealthDropAlertPayload | BadInteractionAlertPayload | ExpansionOpportunityAlertPayload;

@@ -81,9 +81,9 @@ export async function PUT(request: Request) {
     const { alertType, emailEnabled, slackEnabled, bellEnabled } = body;
 
     // Validate alert type
-    if (!alertType || !['health_drop', 'bad_interaction'].includes(alertType)) {
+    if (!alertType || !['health_drop', 'bad_interaction', 'expansion_opportunity'].includes(alertType)) {
       return NextResponse.json(
-        { error: 'Invalid alertType. Must be "health_drop" or "bad_interaction"' },
+        { error: 'Invalid alertType. Must be "health_drop", "bad_interaction", or "expansion_opportunity"' },
         { status: 400 }
       );
     }

@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { sendAlert } from '@/lib/alerts';
 import type { HealthStatus } from '@/lib/supabase/types';
-import type { HealthDropAlertPayload, BadInteractionAlertPayload } from '@/lib/alerts/types';
+import type { HealthDropAlertPayload, BadInteractionAlertPayload, ExpansionOpportunityAlertPayload } from '@/lib/alerts/types';
 
 // Create Supabase client with service role
 const supabase = createClient(
@@ -173,15 +173,18 @@ export async function POST(request: Request) {
       const sentimentScore = record.sentiment_score;
       const churnRisk = record.churn_risk;
       const churnReasons = record.churn_reasons;
+      const expansionOpportunity = record.expansion_opportunity;
+      const expansionReasons = record.expansion_reasons;
       const summary = record.insight_summary;
       const interactionType = record.interaction_type;
       const interactionId = record.id;
       const createdAt = record.created_at;
 
-      // Check if this qualifies as a "bad" interaction
+      // Check what alerts to send
       const isBad = churnRisk || sentimentScore < 60;
+      const isExpansion = expansionOpportunity === true;
 
-      if (!isBad) {
+      if (!isBad && !isExpansion) {
         return NextResponse.json({ message: 'Interaction does not qualify for alert' });
       }
 
@@ -192,37 +195,71 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: 'No CSM assigned' });
       }
 
-      const alertPayload: BadInteractionAlertPayload = {
-        type: 'bad_interaction',
-        accountId: sfAccountId,
-        accountName: accountInfo.accountName,
-        csmUserId: accountInfo.csmUserId,
-        csmEmail: accountInfo.csmEmail,
-        details: {
-          interactionId,
-          interactionType,
-          sentimentScore,
-          churnRisk,
-          churnReasons,
-          summary,
-          interactionDate: new Date(createdAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          }),
-        },
-      };
-
-      const result = await sendAlert(alertPayload);
-      console.log('Bad interaction alert sent:', {
-        account: sfAccountId,
-        interactionId,
-        churnRisk,
-        sentiment: sentimentScore,
-        channels: result,
+      const interactionDate = new Date(createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
       });
 
-      return NextResponse.json({ success: true, alertSent: true, channels: result });
+      const results: { badInteraction?: any; expansion?: any } = {};
+
+      // Send bad interaction alert if applicable
+      if (isBad) {
+        const badAlertPayload: BadInteractionAlertPayload = {
+          type: 'bad_interaction',
+          accountId: sfAccountId,
+          accountName: accountInfo.accountName,
+          csmUserId: accountInfo.csmUserId,
+          csmEmail: accountInfo.csmEmail,
+          details: {
+            interactionId,
+            interactionType,
+            sentimentScore,
+            churnRisk,
+            churnReasons,
+            summary,
+            interactionDate,
+          },
+        };
+
+        results.badInteraction = await sendAlert(badAlertPayload);
+        console.log('Bad interaction alert sent:', {
+          account: sfAccountId,
+          interactionId,
+          churnRisk,
+          sentiment: sentimentScore,
+          channels: results.badInteraction,
+        });
+      }
+
+      // Send expansion opportunity alert if applicable
+      if (isExpansion) {
+        const expansionAlertPayload: ExpansionOpportunityAlertPayload = {
+          type: 'expansion_opportunity',
+          accountId: sfAccountId,
+          accountName: accountInfo.accountName,
+          csmUserId: accountInfo.csmUserId,
+          csmEmail: accountInfo.csmEmail,
+          details: {
+            interactionId,
+            interactionType,
+            sentimentScore,
+            expansionReasons,
+            summary,
+            interactionDate,
+          },
+        };
+
+        results.expansion = await sendAlert(expansionAlertPayload);
+        console.log('Expansion opportunity alert sent:', {
+          account: sfAccountId,
+          interactionId,
+          expansionReasons,
+          channels: results.expansion,
+        });
+      }
+
+      return NextResponse.json({ success: true, alertSent: true, results });
     }
 
     return NextResponse.json({ message: `Unhandled table: ${table}` });
