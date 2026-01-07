@@ -10,12 +10,12 @@ import { useBarryPanelStore } from '@/lib/stores/barry-panel-store';
 
 const pageTitles: Record<string, string> = {
   '/welcome': 'Welcome',
-  '/priority': 'Priority Accounts',
+  '/priority': 'Save',
+  '/grow': 'Grow',
   '/portfolio': 'Portfolio Overview',
-  '/all-accounts': 'All Accounts',
-  '/analytics': 'Analytics',
+  '/all-accounts': 'Accounts',
   '/team': 'Team Performance',
-  '/chat': 'Chat with Barry',
+  '/chat': 'Barry',
   '/settings': 'Settings',
   '/admin': 'Admin Panel',
 };

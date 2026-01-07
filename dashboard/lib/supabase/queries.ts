@@ -162,6 +162,159 @@ export async function getPriorityAccounts(
 }
 
 /**
+ * Get expansion opportunity accounts sorted by ARR (highest first)
+ */
+export async function getExpansionAccounts(
+  includeRenewalsOnly: boolean,
+  csmName?: string | null
+): Promise<PriorityAccount[]> {
+  const demoDate = getDemoDateString();
+  const ninetyDaysAgo = new Date(new Date(demoDate).getTime() - 90 * 24 * 60 * 60 * 1000);
+
+  try {
+    // Get interactions with expansion opportunities in last 90 days
+    const { data: expansionInteractions, error: interactionsError } = await supabase
+      .from('interaction_insights')
+      .select('sf_account_id')
+      .eq('expansion_opportunity', true)
+      .gte('created_at', ninetyDaysAgo.toISOString());
+
+    if (interactionsError) throw interactionsError;
+    if (!expansionInteractions || expansionInteractions.length === 0) return [];
+
+    // Get unique account IDs with expansion signals
+    let expansionAccountIds = [...new Set(expansionInteractions.map(i => i.sf_account_id))];
+
+    // If filtering by renewals, get renewal opportunities
+    if (includeRenewalsOnly) {
+      const ninetyDaysFromNow = new Date(demoDate);
+      ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+
+      const { data: renewals, error: renewalsError } = await supabase
+        .from('opportunities')
+        .select('sf_account_id')
+        .eq('type', 'Renewal')
+        .eq('is_closed', false)
+        .lte('close_date', ninetyDaysFromNow.toISOString().split('T')[0]);
+
+      if (renewalsError) throw renewalsError;
+      const renewalAccountIds = new Set(renewals?.map((r) => r.sf_account_id) || []);
+      expansionAccountIds = expansionAccountIds.filter(id => renewalAccountIds.has(id));
+
+      if (expansionAccountIds.length === 0) return [];
+    }
+
+    // Get account details (with optional CSM filter)
+    let accountsQuery = supabase
+      .from('accounts')
+      .select('*')
+      .in('sf_account_id', expansionAccountIds);
+
+    if (csmName) {
+      accountsQuery = accountsQuery.eq('csm_name', csmName);
+    }
+
+    const { data: accounts, error: accountsError } = await accountsQuery;
+
+    if (accountsError) throw accountsError;
+    if (!accounts) return [];
+
+    // Get latest health for each account
+    const { data: healthData, error: healthError } = await supabase
+      .from('account_health_history')
+      .select('health_status, health_score, trend, id, sf_account_id, created_at')
+      .in('sf_account_id', accounts.map(a => a.sf_account_id))
+      .order('created_at', { ascending: false });
+
+    if (healthError) throw healthError;
+
+    // Get most recent health record per account
+    const latestHealthMap = new Map<string, AccountHealth>();
+    healthData?.forEach((h) => {
+      if (!latestHealthMap.has(h.sf_account_id)) {
+        latestHealthMap.set(h.sf_account_id, h);
+      }
+    });
+
+    // Get interactions and tickets for each account
+    const accountIds = accounts.map(a => a.sf_account_id);
+    const dataPromises = accountIds.map(async (accountId) => {
+      const [interactionsResult, ticketsResult] = await Promise.all([
+        supabase
+          .from('interaction_insights')
+          .select('*')
+          .eq('sf_account_id', accountId)
+          .gte('created_at', ninetyDaysAgo.toISOString())
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('zendesk_tickets')
+          .select('*')
+          .eq('sf_account_id', accountId)
+          .in('status', ['new', 'open']),
+      ]);
+
+      return {
+        accountId,
+        interactions: interactionsResult.data || [],
+        tickets: ticketsResult.data || [],
+      };
+    });
+
+    const dataResults = await Promise.all(dataPromises);
+    const dataMap = new Map(dataResults.map((r) => [r.accountId, r]));
+
+    // Build expansion accounts
+    const expansionAccounts = accounts
+      .map((account) => {
+        const health = latestHealthMap.get(account.sf_account_id);
+        if (!health) return null;
+
+        const accountData = dataMap.get(account.sf_account_id);
+        const interactions = accountData?.interactions || [];
+        const tickets = accountData?.tickets || [];
+
+        // Calculate metrics
+        const metrics = calculateMetrics(
+          interactions,
+          tickets,
+          account.last_activity_date
+        );
+
+        // Get expansion signals as top signals
+        const expansionReasons = interactions
+          .filter(i => i.expansion_opportunity && i.expansion_reasons)
+          .flatMap(i => i.expansion_reasons || [])
+          .slice(0, 3);
+
+        const topSignals: string[] = expansionReasons.length > 0
+          ? expansionReasons
+          : ['Expansion opportunity detected'];
+
+        // Priority score for expansion is based on ARR (higher ARR = higher priority)
+        const priorityScore = account.arr || 0;
+
+        return {
+          sf_account_id: account.sf_account_id,
+          name: account.name,
+          arr: account.arr,
+          csm_name: account.csm_name,
+          health,
+          metrics,
+          topSignals,
+          priorityScore,
+        };
+      })
+      .filter((acc): acc is PriorityAccount => acc !== null)
+      .sort((a, b) => b.priorityScore - a.priorityScore); // Sort by ARR descending
+
+    return expansionAccounts;
+  } catch (error) {
+    console.error('Error fetching expansion accounts:', error);
+    return [];
+  }
+}
+
+/**
  * Get dashboard statistics (counts and ARR by health status)
  */
 export async function getDashboardStats(

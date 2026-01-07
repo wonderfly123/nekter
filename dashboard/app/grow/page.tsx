@@ -5,32 +5,25 @@ import { PageContainer } from '@/components/layout/page-container';
 import { AccountList } from '@/components/priority/account-list';
 import { CsmFilter } from '@/components/portfolio/csm-filter';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
-import { usePriorityAccounts } from '@/hooks/use-priority-accounts';
+import { useExpansionAccounts } from '@/hooks/use-expansion-accounts';
 import { useCsmList } from '@/hooks/use-csm-list';
 import { useFilterStore } from '@/lib/stores/filter-store';
-import { ShieldAlert, Calendar, Check } from 'lucide-react';
+import { TrendingUp, Calendar, Check } from 'lucide-react';
 
-export default function PriorityPage() {
+export default function GrowPage() {
   return (
     <AuthGuard>
-      <PriorityContent />
+      <GrowContent />
     </AuthGuard>
   );
 }
 
-function PriorityContent() {
+function GrowContent() {
   const { showRenewalsOnly, setShowRenewalsOnly, selectedCsm, setSelectedCsm } = useFilterStore();
   const { data: csmList } = useCsmList();
-  const { data: accounts, isLoading: accountsLoading } = usePriorityAccounts(
-    showRenewalsOnly,
-    selectedCsm
-  );
+  const { data: accounts, isLoading: accountsLoading } = useExpansionAccounts(showRenewalsOnly, selectedCsm);
 
-  const criticalAccounts = accounts?.filter(acc => acc.health.health_status === 'Critical') || [];
-  const atRiskAccounts = accounts?.filter(acc => acc.health.health_status === 'At Risk') || [];
-
-  const criticalMRR = criticalAccounts.reduce((sum, acc) => sum + ((acc.arr || 0) / 12), 0);
-  const atRiskMRR = atRiskAccounts.reduce((sum, acc) => sum + ((acc.arr || 0) / 12), 0);
+  const totalExpansionMRR = accounts?.reduce((sum, acc) => sum + ((acc.arr || 0) / 12), 0) || 0;
 
   return (
     <PageContainer>
@@ -38,9 +31,9 @@ function PriorityContent() {
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-2">
           <div>
-            <h1 className="text-[32px] font-bold text-gray-900 mb-2">Save</h1>
+            <h1 className="text-[32px] font-bold text-gray-900 mb-2">Grow</h1>
             <p className="text-[15px] text-gray-500 font-medium">
-              At-risk accounts ordered by priority. Focus here to prevent churn.
+              Accounts with expansion signals detected. Prioritized by ARR potential.
             </p>
           </div>
           {csmList && csmList.length > 0 && (
@@ -54,40 +47,22 @@ function PriorityContent() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Critical Summary Card */}
-        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-300 rounded-xl p-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Expansion Summary Card */}
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-red-200 rounded-lg flex items-center justify-center">
-              <ShieldAlert className="w-4 h-4 text-red-700" />
+            <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-green-600" />
             </div>
             <div>
-              <p className="text-xs text-red-700 font-medium uppercase tracking-wide">Critical</p>
-              <p className="text-2xl font-bold text-red-900 leading-none mt-1">
-                {accountsLoading ? '...' : criticalAccounts.length}
+              <p className="text-xs text-green-700 font-medium uppercase tracking-wide">Expansion Opportunities</p>
+              <p className="text-2xl font-bold text-green-900 leading-none mt-1">
+                {accountsLoading ? '...' : accounts?.length || 0}
               </p>
             </div>
           </div>
-          <p className="text-xs text-red-600">
-            ${(criticalMRR / 1000).toFixed(0)}K MRR at risk
-          </p>
-        </div>
-
-        {/* At Risk Summary Card */}
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
-              <ShieldAlert className="w-4 h-4 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-xs text-orange-700 font-medium uppercase tracking-wide">At Risk</p>
-              <p className="text-2xl font-bold text-orange-900 leading-none mt-1">
-                {accountsLoading ? '...' : atRiskAccounts.length}
-              </p>
-            </div>
-          </div>
-          <p className="text-xs text-orange-600">
-            ${(atRiskMRR / 1000).toFixed(0)}K MRR at risk
+          <p className="text-xs text-green-600">
+            ${(totalExpansionMRR / 1000).toFixed(0)}K MRR with growth potential
           </p>
         </div>
 
@@ -133,11 +108,11 @@ function PriorityContent() {
       {!accountsLoading && (!accounts || accounts.length === 0) && (
         <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShieldAlert className="w-8 h-8 text-gray-400" />
+            <TrendingUp className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No at-risk accounts</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No expansion opportunities yet</h3>
           <p className="text-gray-500 max-w-md mx-auto">
-            Great news! No accounts are currently flagged as Critical or At Risk.
+            When our system detects growth signals in customer interactions, they'll appear here.
           </p>
         </div>
       )}

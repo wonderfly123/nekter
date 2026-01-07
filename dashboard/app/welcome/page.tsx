@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth/use-auth';
 import {
   LayoutDashboard,
   Zap,
-  MessageSquare,
   Bell,
   TrendingUp,
   Shield,
@@ -88,21 +87,21 @@ function WelcomeContent() {
           />
           <QuickStartCard
             icon={<Zap className="w-5 h-5" />}
-            title="Priority Accounts"
-            description="Accounts that need your attention now"
+            title="Save"
+            description="At-risk accounts that need attention"
             onClick={() => router.push('/priority')}
             highlight
           />
           <QuickStartCard
-            icon={<MessageSquare className="w-5 h-5" />}
-            title="Ask Barry"
+            icon={<Sparkles className="w-5 h-5" />}
+            title="Barry"
             description="Get instant answers about any account"
             onClick={() => router.push('/chat')}
             highlight
           />
           <QuickStartCard
             icon={<Users className="w-5 h-5" />}
-            title="All Accounts"
+            title="Accounts"
             description="Browse and search your full portfolio"
             onClick={() => router.push('/all-accounts')}
             highlight
@@ -141,10 +140,10 @@ function WelcomeContent() {
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Pro Tips</h2>
         <div className="space-y-3">
-          <ProTip text="Start each day on the Priority page to see which accounts need immediate attention." />
-          <ProTip text="Ask Barry questions like 'What did Acme say about pricing?' to quickly find key moments in transcripts." />
+          <ProTip text="Start each day on the Save page to see which accounts need immediate attention." />
+          <ProTip text="Check Grow regularly to identify upsell and expansion opportunities." />
+          <ProTip text="Ask Barry questions like 'What did Acme say about pricing?' to find key moments fast." />
           <ProTip text="Set up Slack notifications to get real-time alerts without checking the dashboard." />
-          <ProTip text="Use the renewal filter on Priority to focus on accounts with upcoming renewals." />
         </div>
       </div>
     </PageContainer>

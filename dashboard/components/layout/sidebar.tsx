@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet, MessageSquare, Home } from 'lucide-react';
+import { LayoutDashboard, ShieldAlert, TrendingUp, Users, LucideIcon, Droplet, Sparkles, Home } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -19,10 +19,10 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Welcome', href: '/welcome', icon: Home },
   { name: 'Portfolio', href: '/portfolio', icon: LayoutDashboard },
-  { name: 'Priority', href: '/priority', icon: Zap },
-  { name: 'All Accounts', href: '/all-accounts', icon: Users },
-  { name: 'Chat with Barry', href: '/chat', icon: MessageSquare },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Save', href: '/priority', icon: ShieldAlert },
+  { name: 'Grow', href: '/grow', icon: TrendingUp },
+  { name: 'Accounts', href: '/all-accounts', icon: Users },
+  { name: 'Barry', href: '/chat', icon: Sparkles },
 ];
 
 export function Sidebar() {
