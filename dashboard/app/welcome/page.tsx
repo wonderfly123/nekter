@@ -6,10 +6,10 @@ import { PageContainer } from '@/components/layout/page-container';
 import { useAuth } from '@/lib/auth/use-auth';
 import {
   LayoutDashboard,
-  Zap,
   Bell,
   TrendingUp,
   Shield,
+  ShieldAlert,
   ArrowRight,
   Sparkles,
   Target,
@@ -77,26 +77,26 @@ function WelcomeContent() {
       {/* Quick Start Section */}
       <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-12">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Start</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <QuickStartCard
             icon={<LayoutDashboard className="w-5 h-5" />}
-            title="View Portfolio"
+            title="Portfolio"
             description="See your portfolio health at a glance"
             onClick={() => router.push('/portfolio')}
             highlight
           />
           <QuickStartCard
-            icon={<Zap className="w-5 h-5" />}
+            icon={<ShieldAlert className="w-5 h-5" />}
             title="Save"
             description="At-risk accounts that need attention"
-            onClick={() => router.push('/priority')}
+            onClick={() => router.push('/save')}
             highlight
           />
           <QuickStartCard
-            icon={<Sparkles className="w-5 h-5" />}
-            title="Barry"
-            description="Get instant answers about any account"
-            onClick={() => router.push('/chat')}
+            icon={<TrendingUp className="w-5 h-5" />}
+            title="Grow"
+            description="Expansion opportunities to pursue"
+            onClick={() => router.push('/grow')}
             highlight
           />
           <QuickStartCard
@@ -104,6 +104,13 @@ function WelcomeContent() {
             title="Accounts"
             description="Browse and search your full portfolio"
             onClick={() => router.push('/all-accounts')}
+            highlight
+          />
+          <QuickStartCard
+            icon={<Sparkles className="w-5 h-5" />}
+            title="Barry"
+            description="Get instant answers about any account"
+            onClick={() => router.push('/chat')}
             highlight
           />
         </div>

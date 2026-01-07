@@ -19,7 +19,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Welcome', href: '/welcome', icon: Home },
   { name: 'Portfolio', href: '/portfolio', icon: LayoutDashboard },
-  { name: 'Save', href: '/priority', icon: ShieldAlert },
+  { name: 'Save', href: '/save', icon: ShieldAlert },
   { name: 'Grow', href: '/grow', icon: TrendingUp },
   { name: 'Accounts', href: '/all-accounts', icon: Users },
   { name: 'Barry', href: '/chat', icon: Sparkles },

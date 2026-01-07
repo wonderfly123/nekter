@@ -16,7 +16,7 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
 
   useEffect(() => {
     if (!isLoading && role && !allowedRoles.includes(role)) {
-      router.push('/priority'); // Redirect to safe default
+      router.push('/save'); // Redirect to safe default
     }
   }, [role, isLoading, allowedRoles, router]);
 

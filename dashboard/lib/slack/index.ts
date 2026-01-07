@@ -181,7 +181,7 @@ function buildTaskNotificationBlocks(notification: {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://nekter.io';
   const taskUrl = notification.accountId
     ? `${appUrl}/account/${notification.accountId}?tab=tasks&taskId=${notification.taskId}`
-    : `${appUrl}/priority`; // Fallback to priority page if no account
+    : `${appUrl}/save`; // Fallback to save page if no account
 
   // Determine header based on type
   let header: string;

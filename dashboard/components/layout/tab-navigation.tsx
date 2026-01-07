@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const tabs = [
-  { name: 'Priority', href: '/priority' },
+  { name: 'Save', href: '/save' },
   { name: 'Portfolio', href: '/portfolio' },
   { name: 'All Accounts', href: '/all-accounts' },
   { name: 'Team Performance', href: '/team' },

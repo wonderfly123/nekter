@@ -10,7 +10,7 @@ import { useBarryPanelStore } from '@/lib/stores/barry-panel-store';
 
 const pageTitles: Record<string, string> = {
   '/welcome': 'Welcome',
-  '/priority': 'Save',
+  '/save': 'Save',
   '/grow': 'Grow',
   '/portfolio': 'Portfolio Overview',
   '/all-accounts': 'Accounts',
