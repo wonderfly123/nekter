@@ -46,10 +46,10 @@ interface AlertRowProps {
   description: string;
   settings: AlertTypeSettings;
   onToggle: (channel: 'email' | 'slack' | 'bell') => void;
-  hasSlack: boolean;
+  slackDisabled: boolean;
 }
 
-function AlertRow({ icon, title, description, settings, onToggle, hasSlack }: AlertRowProps) {
+function AlertRow({ icon, title, description, settings, onToggle, slackDisabled }: AlertRowProps) {
   return (
     <div className="py-4 first:pt-0 last:pb-0">
       <div className="flex items-start gap-3 mb-3">
@@ -74,9 +74,9 @@ function AlertRow({ icon, title, description, settings, onToggle, hasSlack }: Al
           <MessageSquare className="w-4 h-4" />
           <span>Slack</span>
           <Toggle
-            enabled={settings.slack_enabled && hasSlack}
+            enabled={settings.slack_enabled && !slackDisabled}
             onChange={() => onToggle('slack')}
-            disabled={!hasSlack}
+            disabled={slackDisabled}
           />
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -94,9 +94,10 @@ function AlertRow({ icon, title, description, settings, onToggle, hasSlack }: Al
 
 interface AlertSettingsProps {
   hasSlackInstallation: boolean;
+  slackEnabled: boolean;
 }
 
-export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
+export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSettingsProps) {
   const { user } = useAuth();
   const [settings, setSettings] = useState<AlertSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -230,6 +231,12 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
           </div>
         )}
 
+        {hasSlackInstallation && !slackEnabled && (
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-amber-50 border border-amber-200 text-amber-700">
+            Enable Slack notifications above to use Slack alerts
+          </div>
+        )}
+
         <div className="divide-y divide-gray-100">
           <AlertRow
             icon={<TrendingDown className="w-4 h-4 text-red-600" />}
@@ -237,7 +244,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="When an account's health status drops (Healthy → At Risk or At Risk → Critical)"
             settings={settings.health_drop}
             onToggle={(channel) => handleToggle('health_drop', channel)}
-            hasSlack={hasSlackInstallation}
+            slackDisabled={!hasSlackInstallation || !slackEnabled}
           />
           <AlertRow
             icon={<AlertTriangle className="w-4 h-4 text-amber-600" />}
@@ -245,7 +252,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="Churn risk detected or sentiment score below 60"
             settings={settings.bad_interaction}
             onToggle={(channel) => handleToggle('bad_interaction', channel)}
-            hasSlack={hasSlackInstallation}
+            slackDisabled={!hasSlackInstallation || !slackEnabled}
           />
           <AlertRow
             icon={<TrendingUp className="w-4 h-4 text-green-600" />}
@@ -253,7 +260,7 @@ export function AlertSettings({ hasSlackInstallation }: AlertSettingsProps) {
             description="Growth signals detected in customer interactions"
             settings={settings.expansion_opportunity}
             onToggle={(channel) => handleToggle('expansion_opportunity', channel)}
-            hasSlack={hasSlackInstallation}
+            slackDisabled={!hasSlackInstallation || !slackEnabled}
           />
         </div>
       </div>

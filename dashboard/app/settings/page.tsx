@@ -57,8 +57,7 @@ function SettingsContent() {
   const [slackInstallation, setSlackInstallation] = useState<SlackInstallation | null>(null);
   const [slackSettings, setSlackSettings] = useState<UserSlackSettings | null>(null);
   const [slackLoading, setSlackLoading] = useState(true);
-  const [slackToggleLoading, setSlackToggleLoading] = useState(false);
-  const [slackMessage, setSlackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [slackError, setSlackError] = useState<string | null>(null);
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   useEffect(() => {
@@ -74,14 +73,12 @@ function SettingsContent() {
   useEffect(() => {
     const slackStatus = searchParams.get('slack');
     if (slackStatus === 'success') {
-      const teamName = searchParams.get('team');
-      setSlackMessage({ type: 'success', text: `Connected to Slack workspace: ${teamName}` });
       loadSlackData();
-      // Clear URL params
       window.history.replaceState({}, '', '/settings');
     } else if (slackStatus === 'error') {
       const message = searchParams.get('message') || 'Failed to connect Slack';
-      setSlackMessage({ type: 'error', text: message });
+      setSlackError(message);
+      setTimeout(() => setSlackError(null), 5000);
       window.history.replaceState({}, '', '/settings');
     }
   }, [searchParams]);
@@ -118,10 +115,19 @@ function SettingsContent() {
   const handleSlackToggle = async () => {
     if (!user || !slackInstallation) return;
 
-    setSlackToggleLoading(true);
-    try {
-      const newEnabled = !slackSettings?.slack_notifications_enabled;
+    const newEnabled = !slackSettings?.slack_notifications_enabled;
+    const previousSettings = slackSettings;
 
+    // Optimistically update UI
+    setSlackError(null);
+    setSlackSettings(prev => ({
+      ...prev,
+      slack_notifications_enabled: newEnabled,
+      slack_team_id: slackInstallation.slack_team_id,
+      slack_user_id: prev?.slack_user_id || null,
+    }));
+
+    try {
       const { error: upsertError } = await supabase
         .from('user_slack_settings')
         .upsert({
@@ -134,25 +140,12 @@ function SettingsContent() {
         });
 
       if (upsertError) throw upsertError;
-
-      setSlackSettings(prev => ({
-        ...prev,
-        slack_notifications_enabled: newEnabled,
-        slack_team_id: slackInstallation.slack_team_id,
-        slack_user_id: prev?.slack_user_id || null,
-      }));
-
-      setSlackMessage({
-        type: 'success',
-        text: newEnabled ? 'Slack notifications enabled' : 'Slack notifications disabled',
-      });
-
-      setTimeout(() => setSlackMessage(null), 3000);
     } catch (err: any) {
       console.error('Error toggling Slack notifications:', err);
-      setSlackMessage({ type: 'error', text: 'Failed to update notification settings' });
-    } finally {
-      setSlackToggleLoading(false);
+      // Revert on error
+      setSlackSettings(previousSettings);
+      setSlackError('Failed to update notification settings');
+      setTimeout(() => setSlackError(null), 5000);
     }
   };
 
@@ -166,6 +159,8 @@ function SettingsContent() {
 
     setShowDisconnectModal(false);
     setSlackLoading(true);
+    setSlackError(null);
+
     try {
       const response = await fetch('/api/integrations/slack/disconnect', {
         method: 'POST',
@@ -176,14 +171,13 @@ function SettingsContent() {
       if (response.ok) {
         setSlackInstallation(null);
         setSlackSettings(null);
-        setSlackMessage({ type: 'success', text: 'Slack disconnected successfully' });
-        setTimeout(() => setSlackMessage(null), 3000);
       } else {
         throw new Error('Failed to disconnect');
       }
     } catch (err) {
       console.error('Error disconnecting Slack:', err);
-      setSlackMessage({ type: 'error', text: 'Failed to disconnect Slack' });
+      setSlackError('Failed to disconnect Slack');
+      setTimeout(() => setSlackError(null), 5000);
     } finally {
       setSlackLoading(false);
     }
@@ -358,16 +352,9 @@ function SettingsContent() {
           </div>
 
           <div className="p-6 space-y-4">
-            {slackMessage && (
-              <div
-                className={`px-4 py-3 rounded-lg text-sm flex items-center gap-2 ${
-                  slackMessage.type === 'success'
-                    ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                }`}
-              >
-                {slackMessage.type === 'success' && <Check className="w-4 h-4" />}
-                {slackMessage.text}
+            {slackError && (
+              <div className="px-4 py-3 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700">
+                {slackError}
               </div>
             )}
 
@@ -405,10 +392,9 @@ function SettingsContent() {
                   </div>
                   <button
                     onClick={handleSlackToggle}
-                    disabled={slackToggleLoading}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
                       slackSettings?.slack_notifications_enabled ? 'bg-orange-600' : 'bg-gray-200'
-                    } ${slackToggleLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    }`}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -438,7 +424,10 @@ function SettingsContent() {
         </div>
 
         {/* Alert Notifications Section */}
-        <AlertSettings hasSlackInstallation={!!slackInstallation} />
+        <AlertSettings
+          hasSlackInstallation={!!slackInstallation}
+          slackEnabled={!!slackSettings?.slack_notifications_enabled}
+        />
       </div>
 
       {/* Disconnect Slack Modal */}
