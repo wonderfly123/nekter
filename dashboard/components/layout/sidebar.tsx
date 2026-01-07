@@ -1,7 +1,8 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Zap, Users, BarChart3, LucideIcon, Droplet, MessageSquare } from 'lucide-react';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
@@ -25,8 +26,24 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isCollapsed, toggleCollapsed, setCollapsed } = useSidebarStore();
+  const router = useRouter();
+  const { isCollapsed, setCollapsed } = useSidebarStore();
   const { user } = useAuth();
+  const collapseTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (collapseTimeout.current) {
+      clearTimeout(collapseTimeout.current);
+      collapseTimeout.current = null;
+    }
+    setCollapsed(false);
+  };
+
+  const handleMouseLeave = () => {
+    collapseTimeout.current = setTimeout(() => {
+      setCollapsed(true);
+    }, 150);
+  };
 
   // Get user name and initials
   const firstName = user?.user_metadata?.first_name || '';
@@ -45,55 +62,36 @@ export function Sidebar() {
 
   return (
     <aside
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={cn(
-        'fixed left-0 top-0 h-screen bg-gray-50 border-r border-gray-200 transition-all duration-300 ease-in-out z-50 flex flex-col',
-        isCollapsed ? 'w-[60px]' : 'w-[260px]'
+        'fixed left-0 top-0 h-screen bg-gray-50 border-r border-gray-200 z-50 flex flex-col transition-[width] duration-200 ease-out',
+        isCollapsed ? 'w-[52px]' : 'w-[220px]'
       )}
     >
       {/* Header */}
-      <div className={cn(
-        "border-b border-gray-200 p-6 min-h-[88px]",
-        isCollapsed ? "flex items-center justify-center" : "flex items-center justify-between"
-      )}>
-        <div className={cn(
-          "flex items-center gap-3",
-          isCollapsed && "flex-col gap-0"
-        )}>
+      <div className="border-b border-gray-200 px-3 py-3 min-h-[56px] flex items-center">
+        <div className="flex items-center gap-2.5 pl-0.5">
           <div
-            className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-            onClick={toggleCollapsed}
+            className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0"
+            onClick={() => router.push('/portfolio')}
           >
-            <Droplet className="w-4 h-4 text-white fill-white" />
+            <Droplet className="w-3.5 h-3.5 text-white fill-white" />
           </div>
-          {!isCollapsed && (
-            <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
-              nekter.io
-            </span>
-          )}
-        </div>
-        {!isCollapsed && (
-          <button
-            onClick={() => setCollapsed(true)}
-            className="text-gray-500 hover:text-gray-700"
+          <span
+            className={cn(
+              "text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent whitespace-nowrap overflow-hidden cursor-pointer transition-opacity duration-200",
+              isCollapsed ? "opacity-0 w-0" : "opacity-100"
+            )}
+            onClick={() => router.push('/portfolio')}
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-        )}
+            nekter.io
+          </span>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
+      <nav className="flex-1 py-2 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -104,23 +102,23 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3.5 px-6 py-3.5 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors border-l-2 font-medium',
+                'flex items-center gap-2.5 py-2.5 pl-4 pr-3 text-[13px] text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 font-medium',
                 isActive
                   ? 'bg-amber-50 text-amber-600 border-amber-500'
-                  : 'border-transparent',
-                isCollapsed && 'justify-center px-0'
+                  : 'border-transparent'
               )}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              {!isCollapsed && (
-                <>
-                  <span>{item.name}</span>
-                  {item.badge && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full font-mono">
-                      {item.badge}
-                    </span>
-                  )}
-                </>
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span className={cn(
+                "whitespace-nowrap overflow-hidden transition-opacity duration-200",
+                isCollapsed ? "opacity-0 w-0" : "opacity-100"
+              )}>
+                {item.name}
+              </span>
+              {item.badge && !isCollapsed && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full font-mono">
+                  {item.badge}
+                </span>
               )}
             </Link>
           );
@@ -128,20 +126,18 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className={cn(
-        "border-t border-gray-200 p-6",
-        isCollapsed && "flex items-center justify-center"
-      )}>
-        {!isCollapsed ? (
-          <UserMenu />
-        ) : (
-          <div
-            className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-xs flex-shrink-0 cursor-pointer hover:bg-orange-700 transition-colors"
-            onClick={() => setCollapsed(false)}
-            title={fullName || user?.email || 'User'}
-          >
-            {getInitials()}
+      <div className="border-t border-gray-200 px-3 py-3">
+        {isCollapsed ? (
+          <div className="pl-0.5">
+            <div
+              className="w-7 h-7 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-[10px] flex-shrink-0"
+              title={fullName || user?.email || 'User'}
+            >
+              {getInitials()}
+            </div>
           </div>
+        ) : (
+          <UserMenu />
         )}
       </div>
     </aside>

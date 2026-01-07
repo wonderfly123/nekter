@@ -50,14 +50,14 @@ export function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-2 pl-0.5 pr-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-xs">
+        <div className="w-7 h-7 rounded-full bg-orange-600 text-white flex items-center justify-center font-medium text-[10px]">
           {getInitials(displayName)}
         </div>
-        <span className="text-sm font-medium text-gray-700 truncate max-w-[140px]">{displayName}</span>
+        <span className="text-[13px] font-medium text-gray-700 truncate max-w-[120px]">{displayName}</span>
         <svg
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3.5 h-3.5 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ export function UserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+        <div className="absolute left-0 bottom-full mb-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
           <div className="px-4 py-2 border-b border-gray-100">
             {fullName && (
               <p className="text-sm font-medium text-gray-900 truncate">{fullName}</p>

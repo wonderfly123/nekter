@@ -24,7 +24,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   // Calculate widths based on sidebar and Barry panel state
-  const sidebarWidth = isCollapsed ? 60 : 260;
+  const sidebarWidth = isCollapsed ? 52 : 220;
   const barryWidth = isBarryOpen ? 420 : 0;
 
   // Authenticated routes get full layout
@@ -33,7 +33,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen overflow-hidden w-screen">
         <Sidebar />
         <div
-          className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+          className="flex flex-col overflow-hidden transition-[margin,width] duration-200 ease-out"
           style={{
             marginLeft: `${sidebarWidth}px`,
             width: `calc(100vw - ${sidebarWidth}px - ${barryWidth}px)`,
