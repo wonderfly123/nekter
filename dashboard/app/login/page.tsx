@@ -150,8 +150,11 @@ export default function LoginPage() {
               <Droplet className="w-8 h-8 text-white fill-white" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-center text-gray-900">
+          <h2 className="text-3xl font-bold text-center text-gray-900 flex items-center justify-center gap-2">
             {mode === 'login' ? 'Sign in to Nekter' : 'Sign up for Nekter'}
+            <span className="px-2 py-0.5 text-xs font-semibold text-white bg-gradient-to-r from-purple-500 to-violet-600 rounded-full">
+              Demo
+            </span>
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Customer Success powered by Smart Robots
