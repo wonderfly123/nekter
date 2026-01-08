@@ -1,7 +1,7 @@
 const stats = [
   {
     value: '7x',
-    description: 'more expensive to acquire a new customer than to retain an existing one',
+    description: 'more expensive to acquire a new customer than to retain an existing one.',
   },
   {
     value: '91%',
@@ -9,7 +9,7 @@ const stats = [
   },
   {
     value: '3',
-    description: 'new customers needed to make up for the loss of one existing customer',
+    description: 'new customers needed to make up for the loss of one existing customer.',
   },
 ];
 

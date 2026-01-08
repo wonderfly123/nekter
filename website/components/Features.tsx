@@ -35,7 +35,7 @@ const features = [
     icon: Globe,
     title: 'Integrations',
     description:
-      'Connect Salesforce, call recording platforms, and support tools. We pull in the data you already have.',
+      'Connect Salesforce, call recordings, support tools, and usage metrics platforms. We pull in the data you already have.',
   },
 ];
 

@@ -17,21 +17,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const { user, isLoading } = useAuth();
-
-  // Track mouse position for parallax effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      // Normalize to -1 to 1 range, centered
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setMousePos({ x, y });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -103,17 +90,13 @@ export default function LoginPage() {
     }
   };
 
-  // Flowing lines background component with mouse parallax
+  // Flowing lines background component (static)
   const FlowBackground = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <svg
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
         className="absolute w-full h-full opacity-[0.06]"
-        style={{
-          transform: `translate(${mousePos.x * 15}px, ${mousePos.y * 10}px) scale(1.1)`,
-          transition: 'transform 0.3s ease-out',
-        }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <g fill="none" stroke="#F26522" strokeWidth="2">

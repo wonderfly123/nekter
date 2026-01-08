@@ -6,7 +6,7 @@ const steps = [
     icon: Link,
     title: 'Connect your tools',
     description:
-      'Sync your CRM, call recordings, support tickets, and email. We pull in the data you already have.',
+      'Sync your CRM, call recordings, support tickets, usage metrics, and email. We pull in the data you already have.',
   },
   {
     number: '2',
