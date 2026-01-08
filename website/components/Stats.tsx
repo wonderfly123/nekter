@@ -5,7 +5,7 @@ const stats = [
   },
   {
     value: '91%',
-    description: 'of unhappy customers leave without complaining—they just churn silently',
+    description: 'of unhappy customers leave without complaining. They just churn silently.',
   },
   {
     value: '3',

@@ -5,7 +5,7 @@ const features = [
     icon: MessageSquare,
     title: 'Unified Inbox',
     description:
-      'All your customer interactions in one place. Calls, emails, tickets, and more—never miss a signal.',
+      'All your customer interactions in one place. Calls, emails, tickets, and more. Never miss a signal.',
   },
   {
     icon: Zap,

@@ -39,23 +39,15 @@ export function Footer() {
                 customer success?
               </h2>
               <p className="text-xl text-white/80 mb-8 max-w-xl mx-auto">
-                Join thousands of teams delivering exceptional customer experiences. Start your free trial today.
+                See how Nekter helps teams deliver exceptional customer experiences.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                  href="https://demo.nekter.io"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-all"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://demo.nekter.io"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg border border-white/30 hover:bg-white/10 transition-all"
-                >
-                  Talk to Sales
-                </a>
-              </div>
+              <a
+                href="https://demo.nekter.io"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-all"
+              >
+                Try the Demo
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>

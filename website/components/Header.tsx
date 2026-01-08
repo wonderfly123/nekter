@@ -49,20 +49,12 @@ export function Header() {
         </nav>
 
         {/* Right Side */}
-        <div className="flex items-center gap-4">
-          <a
-            href="https://demo.nekter.io"
-            className="hidden sm:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Sign In
-          </a>
-          <a
-            href="https://demo.nekter.io"
-            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm"
-          >
-            Get Started
-          </a>
-        </div>
+        <a
+          href="https://demo.nekter.io"
+          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm"
+        >
+          Try the Demo
+        </a>
       </div>
     </header>
   );

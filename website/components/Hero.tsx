@@ -1,4 +1,4 @@
-import { Sparkles, ArrowRight, Play } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -22,25 +22,21 @@ export function Hero() {
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Stop guessing which accounts need attention. Nekter watches the signals you can't—and tells you exactly where to focus.
+          <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
+            Acquiring a customer is expensive. Losing one you could've saved? That's just painful. Our intelligent system watches the signals you can't. Sentiment shifts, engagement drops, expansion moments.
+          </p>
+          <p className="text-2xl font-semibold text-gray-900 mb-10">
+            Be the team that saw it coming.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+          {/* CTA */}
+          <div className="flex justify-center mb-6">
             <a
               href="https://demo.nekter.io"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-orange-500/25"
             >
-              Start Free Trial
+              Try the Demo
               <ArrowRight className="w-4 h-4" />
-            </a>
-            <a
-              href="https://demo.nekter.io"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
-            >
-              <Play className="w-4 h-4" />
-              Watch Demo
             </a>
           </div>
 
