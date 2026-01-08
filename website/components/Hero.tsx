@@ -44,10 +44,6 @@ export function Hero() {
             </a>
           </div>
 
-          {/* Sub-text */}
-          <p className="text-sm text-gray-500">
-            No credit card required · 14-day free trial · Cancel anytime
-          </p>
         </div>
 
         {/* Dashboard Mockup */}
