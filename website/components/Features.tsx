@@ -1,63 +1,71 @@
-import { LayoutDashboard, ShieldAlert, TrendingUp, Sparkles } from 'lucide-react';
+import { MessageSquare, Zap, BarChart3, Users, Shield, Globe } from 'lucide-react';
 
 const features = [
   {
-    icon: LayoutDashboard,
-    iconColor: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-    title: 'See your entire portfolio at a glance',
+    icon: MessageSquare,
+    title: 'Unified Inbox',
     description:
-      'Health scores combine engagement, sentiment, support metrics, and activity into one clear view. Know instantly which accounts are thriving and which need attention.',
+      'All your customer interactions in one place. Calls, emails, tickets, and more—never miss a signal.',
   },
   {
-    icon: ShieldAlert,
-    iconColor: 'text-red-600',
-    bgColor: 'bg-red-100',
-    title: 'Catch warning signs before it\'s too late',
+    icon: Zap,
+    title: 'AI-Powered Detection',
     description:
-      'AI analyzes call transcripts, emails, and tickets to surface churn signals—sentiment drops, competitor mentions, frustration patterns—so you can act fast.',
+      'Smart analysis of sentiment, churn signals, and expansion opportunities. Let AI handle the pattern recognition.',
   },
   {
-    icon: TrendingUp,
-    iconColor: 'text-green-600',
-    bgColor: 'bg-green-100',
-    title: 'Spot growth moments automatically',
+    icon: BarChart3,
+    title: 'Real-Time Analytics',
     description:
-      'Know when customers mention needing more seats, new features, or additional services. Never miss an upsell because it was buried in a call.',
+      'Track health scores, engagement trends, and team performance with beautiful, actionable dashboards.',
   },
   {
-    icon: Sparkles,
-    iconColor: 'text-purple-600',
-    bgColor: 'bg-purple-100',
-    title: 'Ask anything about any account',
+    icon: Users,
+    title: 'Team Collaboration',
     description:
-      'Need to know what Acme said about pricing last month? Just ask Barry. Get instant, evidence-backed answers from all your customer interactions.',
+      'Internal notes, task assignments, and alerts. Work together seamlessly on complex accounts.',
+  },
+  {
+    icon: Shield,
+    title: 'Enterprise Security',
+    description:
+      'SOC 2 compliant with SSO support and granular permissions. Your data is protected at every level.',
+  },
+  {
+    icon: Globe,
+    title: 'Integrations',
+    description:
+      'Connect Salesforce, call recording platforms, and support tools. We pull in the data you already have.',
   },
 ];
 
 export function Features() {
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="features" className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-4">
-          Everything you need to protect and grow your accounts
-        </h2>
-        <p className="text-lg text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-          One platform that brings together health monitoring, risk detection, and AI-powered insights.
-        </p>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Everything you need to deliver
+            <br />
+            <span className="text-gradient">exceptional results</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Powerful features designed for modern CS teams. Scale from startup to enterprise without switching tools.
+          </p>
+        </div>
 
-        {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* Feature Grid - 3x2 */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="p-8 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all"
+              className="p-6 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-200"
             >
-              <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-6`}>
-                <feature.icon className={`w-7 h-7 ${feature.iconColor}`} />
+              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                <feature.icon className="w-6 h-6 text-gray-700" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {feature.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">

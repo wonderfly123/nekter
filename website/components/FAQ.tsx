@@ -5,34 +5,34 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    question: 'What is Nekter?',
+    question: 'How does the free trial work?',
     answer:
-      'Nekter is a customer success intelligence platform that helps you retain and grow accounts. It analyzes your customer interactions—calls, emails, tickets—to surface health risks and expansion opportunities before you\'d otherwise notice them.',
+      'Start with a 14-day free trial with full access to all features. No credit card required. At the end of your trial, choose a plan that fits your team.',
   },
   {
-    question: 'Who is Nekter for?',
+    question: 'Can I switch plans later?',
     answer:
-      'Customer success teams, account managers, and revenue leaders at B2B SaaS companies who want to be proactive instead of reactive.',
-  },
-  {
-    question: 'How does the AI work?',
-    answer:
-      'We use AI to analyze sentiment, detect churn signals, and identify expansion mentions in your call transcripts and communications. Barry, our AI assistant, lets you ask natural questions about any account.',
+      'Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.',
   },
   {
     question: 'What integrations do you support?',
     answer:
-      'We currently integrate with Salesforce, call recording platforms, and support tools. More integrations coming soon.',
+      'We integrate with Salesforce, HubSpot, Gong, Chorus, Intercom, Zendesk, and more. Our API also allows custom integrations for enterprise customers.',
   },
   {
-    question: 'Is there a free trial?',
+    question: 'Is my data secure?',
     answer:
-      'Yes! You can explore the demo environment to see how Nekter works before committing.',
+      'Yes. We\'re SOC 2 Type II compliant with enterprise-grade security. All data is encrypted in transit and at rest. We also support SSO and SAML.',
   },
   {
-    question: 'How much does it cost?',
+    question: 'Do you offer refunds?',
     answer:
-      'We offer flexible pricing based on your team size and needs. Reach out for a custom quote.',
+      'We offer a 30-day money-back guarantee for all new customers. If you\'re not satisfied, contact us for a full refund.',
+  },
+  {
+    question: 'Can I import data from my current tool?',
+    answer:
+      'Yes! We offer free migration support for all customers. Our team will help you import historical data from your existing CS platform.',
   },
 ];
 
@@ -40,33 +40,39 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-3xl mx-auto px-6">
+    <section id="faq" className="py-24 px-6">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
-          Questions? We've got answers.
-        </h2>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Frequently asked{' '}
+            <span className="text-gradient">questions</span>
+          </h2>
+          <p className="text-xl text-gray-600">
+            Got questions? We've got answers.
+          </p>
+        </div>
 
         {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-xl overflow-hidden"
+              className="bg-white rounded-xl border border-gray-100 overflow-hidden"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
+                className="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
               >
-                <span className="font-semibold text-gray-900">{faq.question}</span>
+                <span className="font-medium text-gray-900">{faq.question}</span>
                 <ChevronDown
-                  className={`w-5 h-5 text-gray-500 transition-transform flex-shrink-0 ${
+                  className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === index && (
-                <div className="px-6 pb-5">
+                <div className="px-6 pb-4">
                   <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
                 </div>
               )}
