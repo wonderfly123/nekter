@@ -5,34 +5,34 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    question: 'How does the free trial work?',
+    question: 'What exactly does Nekter do?',
     answer:
-      'Start with a 14-day free trial with full access to all features. No credit card required. At the end of your trial, choose a plan that fits your team.',
+      'Nekter analyzes all your customer interactions, including calls, emails, and support tickets, to surface churn risks and expansion opportunities before you would notice them yourself. It gives every account a health score and tells you exactly which accounts need attention and why.',
   },
   {
-    question: 'Can I switch plans later?',
+    question: 'How does the AI detect churn signals?',
     answer:
-      'Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle.',
+      'Our AI analyzes sentiment patterns, engagement trends, and specific language in customer conversations. It picks up on things like frustration, competitor mentions, declining usage, and negative sentiment shifts that humans often miss when reviewing hundreds of accounts.',
+  },
+  {
+    question: 'Who is Nekter built for?',
+    answer:
+      'Customer success teams, account managers, and revenue leaders at B2B SaaS companies. If you manage a portfolio of accounts and want to be proactive instead of reactive, Nekter is for you.',
+  },
+  {
+    question: 'How is this different from my CRM?',
+    answer:
+      'Your CRM stores data. Nekter interprets it. We connect to your existing tools and layer intelligence on top, surfacing insights you would never find by clicking through Salesforce. Think of it as a CS analyst that never sleeps.',
   },
   {
     question: 'What integrations do you support?',
     answer:
-      'We integrate with Salesforce, HubSpot, Gong, Chorus, Intercom, Zendesk, and more. Our API also allows custom integrations for enterprise customers.',
+      'We integrate with Salesforce, HubSpot, Gong, Chorus, Intercom, Zendesk, and most major CRM and communication platforms. If you have call recordings and customer data, we can analyze it.',
   },
   {
-    question: 'Is my data secure?',
+    question: 'How quickly can I get started?',
     answer:
-      'Yes. We\'re SOC 2 Type II compliant with enterprise-grade security. All data is encrypted in transit and at rest. We also support SSO and SAML.',
-  },
-  {
-    question: 'Do you offer refunds?',
-    answer:
-      'We offer a 30-day money-back guarantee for all new customers. If you\'re not satisfied, contact us for a full refund.',
-  },
-  {
-    question: 'Can I import data from my current tool?',
-    answer:
-      'Yes! We offer free migration support for all customers. Our team will help you import historical data from your existing CS platform.',
+      'Most teams are up and running within a few weeks. Connect your integrations, and Nekter starts analyzing your historical data to build health scores and surface insights.',
   },
 ];
 

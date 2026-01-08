@@ -1,9 +1,9 @@
 const logos = [
-  'Stripe',
-  'Vercel',
-  'Linear',
-  'Notion',
-  'Figma',
+  'Stackly',
+  'Cloudbase',
+  'Pipeflow',
+  'Workstream',
+  'Signalbox',
 ];
 
 export function Logos() {
