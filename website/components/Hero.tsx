@@ -42,7 +42,7 @@ export function Hero() {
 
         </div>
 
-        {/* Dashboard Mockup */}
+        {/* Dashboard Demo Video */}
         <div className="mt-16 relative">
           <div className="bg-white rounded-2xl shadow-2xl shadow-gray-200/50 border border-gray-200 overflow-hidden">
             {/* Browser Chrome */}
@@ -57,50 +57,16 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Dashboard Content Mockup */}
-            <div className="p-8 bg-gradient-to-b from-gray-50 to-white min-h-[400px]">
-              {/* Top Stats */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="h-3 w-16 bg-gray-200 rounded mb-2" />
-                    <div className="h-6 w-12 bg-gradient-to-r from-amber-200 to-orange-200 rounded" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Main Content Area */}
-              <div className="grid grid-cols-3 gap-4">
-                {/* Left Panel - Account List */}
-                <div className="col-span-2 bg-white rounded-xl border border-gray-100 p-4">
-                  <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-orange-100" />
-                      <div className="flex-1">
-                        <div className="h-3 w-24 bg-gray-200 rounded mb-1" />
-                        <div className="h-2 w-16 bg-gray-100 rounded" />
-                      </div>
-                      <div className={`h-6 w-16 rounded-full ${i <= 2 ? 'bg-green-100' : i === 3 ? 'bg-yellow-100' : 'bg-red-100'}`} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Right Panel - Health Score */}
-                <div className="bg-white rounded-xl border border-gray-100 p-4">
-                  <div className="h-4 w-24 bg-gray-200 rounded mb-4" />
-                  <div className="aspect-square rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center mb-4">
-                    <div className="w-20 h-20 rounded-full border-4 border-amber-400 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-gray-400">78</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-2 w-full bg-gray-100 rounded" />
-                    <div className="h-2 w-3/4 bg-gray-100 rounded" />
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Video */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full"
+            >
+              <source src="/demo.mp4" type="video/mp4" />
+            </video>
           </div>
 
           {/* Decorative gradients */}
