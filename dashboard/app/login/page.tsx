@@ -17,8 +17,21 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const { user, isLoading } = useAuth();
+
+  // Track mouse position for parallax effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize to -1 to 1 range, centered
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setMousePos({ x, y });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -90,11 +103,41 @@ export default function LoginPage() {
     }
   };
 
+  // Flowing lines background component with mouse parallax
+  const FlowBackground = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <svg
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        className="absolute w-full h-full opacity-[0.06]"
+        style={{
+          transform: `translate(${mousePos.x * 15}px, ${mousePos.y * 10}px) scale(1.1)`,
+          transition: 'transform 0.3s ease-out',
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g fill="none" stroke="#F26522" strokeWidth="2">
+          <path d="M-100,100 C200,50 400,200 600,150 S900,250 1100,180 S1400,100 1600,200" />
+          <path d="M-100,180 C150,130 350,280 550,230 S850,330 1050,260 S1350,180 1550,280" />
+          <path d="M-100,260 C100,210 300,360 500,310 S800,410 1000,340 S1300,260 1500,360" />
+          <path d="M-100,340 C50,290 250,440 450,390 S750,490 950,420 S1250,340 1450,440" />
+          <path d="M-100,420 C0,370 200,520 400,470 S700,570 900,500 S1200,420 1400,520" />
+          <path d="M-100,500 C-50,450 150,600 350,550 S650,650 850,580 S1150,500 1350,600" />
+          <path d="M-100,580 C-100,530 100,680 300,630 S600,730 800,660 S1100,580 1300,680" />
+          <path d="M-100,660 C-150,610 50,760 250,710 S550,810 750,740 S1050,660 1250,760" />
+          <path d="M-100,740 C-200,690 0,840 200,790 S500,890 700,820 S1000,740 1200,840" />
+          <path d="M-100,820 C-250,770 -50,920 150,870 S450,970 650,900 S950,820 1150,920" />
+        </g>
+      </svg>
+    </div>
+  );
+
   // Show success message after signup
   if (signupSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <FlowBackground />
+        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md text-center relative z-10">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-orange-100">
             <svg
               className="h-8 w-8 text-orange-600"
@@ -142,8 +185,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <FlowBackground />
+      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md relative z-10">
         <div>
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
