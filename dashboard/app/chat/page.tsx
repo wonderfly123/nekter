@@ -194,22 +194,22 @@ function ChatContent() {
         />
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-white min-w-0">
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 min-w-0">
           {/* Chat Header */}
-          <div className="px-6 py-3 border-b border-gray-200 flex items-center gap-3">
+          <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md">
               <Sparkles className="w-4 h-4" />
             </div>
-            <div className="font-semibold text-lg text-gray-900">Barry</div>
+            <div className="font-semibold text-lg text-gray-900 dark:text-white">Barry</div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50">
+          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
             {messagesLoading ? (
-              <div className="text-center text-gray-500 py-8">Loading messages...</div>
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">Loading messages...</div>
             ) : !activeSessionId ? (
               <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500 py-8">
+                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                   <p className="text-lg font-semibold mb-2">Welcome to Chat with Barry!</p>
                   <p className="text-sm">Start a new conversation to get started.</p>
                 </div>
@@ -236,9 +236,9 @@ function ChatContent() {
                       </div>
                       <div className="flex-1 min-w-0 pt-0.5">
                         <div className="flex items-baseline gap-2 mb-1">
-                          <span className="font-semibold text-sm text-gray-900">Barry</span>
+                          <span className="font-semibold text-sm text-gray-900 dark:text-white">Barry</span>
                         </div>
-                        <div className="text-[15px] leading-relaxed text-gray-700 bg-gray-50 rounded-lg rounded-tl-none px-4 py-3 border border-gray-100">
+                        <div className="text-[15px] leading-relaxed text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 rounded-lg rounded-tl-none px-4 py-3 border border-gray-100 dark:border-gray-700">
                           <span className="bg-gradient-to-r from-orange-500 from-0% via-amber-200 via-50% to-orange-500 to-100% bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer">
                             the bees are buzzing...
                           </span>
@@ -257,7 +257,7 @@ function ChatContent() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500 py-8">No messages yet</div>
+                <div className="text-center text-gray-500 dark:text-gray-400 py-8">No messages yet</div>
               </div>
             )}
           </div>

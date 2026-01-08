@@ -45,9 +45,9 @@ const quickActions: QuickAction[] = [
 
 export function QuickActionsSidebar({ onQuickPrompt }: QuickActionsSidebarProps) {
   return (
-    <div className="w-[320px] bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-4">
+    <div className="w-[320px] bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 p-6 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">
           Quick Actions
         </div>
 
@@ -57,17 +57,17 @@ export function QuickActionsSidebar({ onQuickPrompt }: QuickActionsSidebarProps)
             <button
               key={index}
               onClick={() => onQuickPrompt(action.prompt)}
-              className="w-full text-left p-3.5 bg-gray-50 border border-gray-200 rounded-lg mb-3 hover:border-amber-500 hover:bg-amber-50 transition-all hover:translate-x-0.5 group"
+              className="w-full text-left p-3.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg mb-3 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all hover:translate-x-0.5 group"
             >
               <div className="flex items-center gap-3 mb-1.5">
-                <div className="w-8 h-8 rounded-md bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-amber-600" />
+                <div className="w-8 h-8 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 </div>
-                <div className="font-semibold text-[15px] text-gray-900">
+                <div className="font-semibold text-[15px] text-gray-900 dark:text-white">
                   {action.title}
                 </div>
               </div>
-              <div className="text-[13px] text-gray-600 leading-relaxed pl-11">
+              <div className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed pl-11">
                 {action.description}
               </div>
             </button>

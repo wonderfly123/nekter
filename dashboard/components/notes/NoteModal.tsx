@@ -99,15 +99,15 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {note ? 'Edit Note' : 'New Note'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -123,7 +123,7 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -131,7 +131,7 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="Enter note title"
               required
             />
@@ -139,7 +139,7 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
 
           {/* Content */}
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Content
             </label>
             <textarea
@@ -147,7 +147,7 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={5}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               placeholder="Enter note content"
             />
           </div>
@@ -159,9 +159,9 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
               id="isPinned"
               checked={formData.isPinned}
               onChange={(e) => setFormData({ ...formData, isPinned: e.target.checked })}
-              className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+              className="w-4 h-4 text-orange-600 border-gray-300 dark:border-gray-600 rounded focus:ring-orange-500"
             />
-            <label htmlFor="isPinned" className="text-sm font-medium text-gray-700">
+            <label htmlFor="isPinned" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Pin this note
             </label>
           </div>
@@ -171,7 +171,7 @@ export function NoteModal({ sfAccountId, note, onClose }: NoteModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={loading}
             >
               Cancel

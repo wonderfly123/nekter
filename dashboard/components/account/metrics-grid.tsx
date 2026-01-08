@@ -29,46 +29,46 @@ export function MetricsGrid({ data }: MetricsGridProps) {
       icon: HeartPulse,
       color:
         calculatedMetrics.avgSentiment !== null && calculatedMetrics.avgSentiment < 50
-          ? 'text-red-600'
+          ? 'text-status-error-text'
           : calculatedMetrics.avgSentiment !== null &&
             calculatedMetrics.avgSentiment >= 70
-          ? 'text-green-600'
-          : 'text-yellow-600',
+          ? 'text-status-success-text'
+          : 'text-status-warning-text',
       bgColor:
         calculatedMetrics.avgSentiment !== null && calculatedMetrics.avgSentiment < 50
-          ? 'bg-red-50'
+          ? 'bg-status-error-bg'
           : calculatedMetrics.avgSentiment !== null &&
             calculatedMetrics.avgSentiment >= 70
-          ? 'bg-green-50'
-          : 'bg-yellow-50',
+          ? 'bg-status-success-bg'
+          : 'bg-status-warning-bg',
     },
     {
       label: 'Interactions (90d)',
       value: calculatedMetrics.interactionCount,
       icon: MessageSquare,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-status-info-text',
+      bgColor: 'bg-status-info-bg',
     },
     {
       label: 'Churn Signals',
       value: calculatedMetrics.churnSignals,
       icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-status-error-text',
+      bgColor: 'bg-status-error-bg',
     },
     {
       label: 'Expansion Signals',
       value: calculatedMetrics.expansionSignals,
       icon: TrendingUp,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: 'text-status-success-text',
+      bgColor: 'bg-status-success-bg',
     },
     {
       label: 'Open Tickets',
       value: calculatedMetrics.openTicketCount,
       icon: Ticket,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: 'text-status-warning-text',
+      bgColor: 'bg-status-warning-bg',
     },
     {
       label: 'Last Contact',
@@ -77,14 +77,14 @@ export function MetricsGrid({ data }: MetricsGridProps) {
           ? formatDaysAgo(calculatedMetrics.daysSinceActivity)
           : 'N/A',
       icon: Clock,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted',
     },
   ];
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Health Metrics
       </h2>
       <div className="grid grid-cols-2 gap-4">
@@ -93,11 +93,11 @@ export function MetricsGrid({ data }: MetricsGridProps) {
           return (
             <div
               key={index}
-              className={`${metric.bgColor} p-6 rounded-lg border border-gray-200`}
+              className={`${metric.bgColor} p-6 rounded-lg border border-gray-200 dark:border-gray-700`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Icon className={`w-4 h-4 ${metric.color}`} />
-                <div className="text-xs text-gray-600 uppercase tracking-wide">
+                <div className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                   {metric.label}
                 </div>
               </div>

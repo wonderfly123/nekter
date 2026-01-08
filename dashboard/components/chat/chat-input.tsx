@@ -44,7 +44,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="px-6 py-3 border-t border-gray-200 bg-white">
+    <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <div className="max-w-3xl mx-auto flex gap-2 items-end">
         <textarea
           ref={textareaRef}
@@ -54,7 +54,7 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 min-h-[38px] max-h-[120px] px-3 py-2 border border-gray-200 rounded-lg font-sans text-sm resize-none focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors overflow-y-auto"
+          className="flex-1 min-h-[38px] max-h-[120px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg font-sans text-sm resize-none focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors overflow-y-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
         />
         <button
           onClick={handleSend}

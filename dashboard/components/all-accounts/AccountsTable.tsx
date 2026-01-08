@@ -34,10 +34,10 @@ export function AccountsTable({
   // Loading skeleton rows
   const renderLoadingRows = () => {
     return Array.from({ length: 5 }).map((_, index) => (
-      <tr key={`loading-${index}`} className="border-b border-gray-100">
+      <tr key={`loading-${index}`} className="border-b border-gray-100 dark:border-gray-700">
         {Array.from({ length: 9 }).map((_, colIndex) => (
           <td key={colIndex} className="py-4 px-6">
-            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           </td>
         ))}
       </tr>
@@ -47,10 +47,10 @@ export function AccountsTable({
   // Empty state
   if (!loading && accounts.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-12 text-center">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-12 text-center">
         <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No accounts found</h3>
-        <p className="text-gray-600">Try adjusting your search or filters</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No accounts found</h3>
+        <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filters</p>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function AccountsTable({
 
     return (
       <th
-        className={`text-gray-600 text-xs uppercase font-semibold px-6 py-3 cursor-pointer hover:bg-gray-100 transition-colors ${alignClass}`}
+        className={`text-gray-600 dark:text-gray-400 text-xs uppercase font-semibold px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${alignClass}`}
         onClick={() => onSort?.(column)}
       >
         <div className={`flex items-center gap-2 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : ''}`}>
@@ -93,10 +93,10 @@ export function AccountsTable({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+          <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0">
             <tr>
               <SortableHeader column="name" label="Account Name" />
               <SortableHeader column="arr" label="ARR" align="right" />

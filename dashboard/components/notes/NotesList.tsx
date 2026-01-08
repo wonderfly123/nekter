@@ -175,7 +175,7 @@ export function NotesList({ sfAccountId }: NotesListProps) {
   return (
     <div className="space-y-6">
       {/* Search and Create */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex gap-3 items-center">
           {/* Search */}
           <div className="flex-1 relative">
@@ -185,7 +185,7 @@ export function NotesList({ sfAccountId }: NotesListProps) {
               placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
           </div>
 
@@ -202,20 +202,20 @@ export function NotesList({ sfAccountId }: NotesListProps) {
 
       {/* Loading State */}
       {loading ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
           Loading notes...
         </div>
       ) : (
         <>
           {/* Pinned Notes Section */}
           {pinnedNotes.length > 0 && (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="px-5 py-3 bg-yellow-50 border-b border-yellow-200">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 py-3 bg-status-warning-bg border-b border-status-warning-border">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
                   Pinned Notes
                 </h3>
               </div>
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {pinnedNotes.map((note) => (
                   <NoteItem
                     key={note.id}
@@ -230,14 +230,14 @@ export function NotesList({ sfAccountId }: NotesListProps) {
           )}
 
           {/* Regular Notes Section */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="px-5 py-3 border-b border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="px-5 py-3 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
                 Notes
               </h3>
             </div>
             {regularNotes.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 {searchQuery
                   ? 'No notes found matching your search.'
                   : pinnedNotes.length > 0
@@ -245,7 +245,7 @@ export function NotesList({ sfAccountId }: NotesListProps) {
                   : 'No notes yet. Create your first note to get started.'}
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {regularNotes.map((note) => (
                   <NoteItem
                     key={note.id}

@@ -53,21 +53,21 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
           aria-label={`${metric.label}: ${metric.value}${selectedMetric === metric.id ? ' (selected)' : ''}`}
           aria-pressed={selectedMetric === metric.id}
           className={`
-            bg-gray-50 border-2 rounded-xl p-6 text-left transition-all duration-300 cursor-pointer
-            hover:bg-white hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5
+            bg-gray-50 dark:bg-gray-900 border-2 rounded-xl p-6 text-left transition-all duration-300 cursor-pointer
+            hover:bg-white dark:hover:bg-gray-800 hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5
             ${
               selectedMetric === metric.id
-                ? 'bg-white border-amber-500 shadow-md'
-                : 'border-gray-200'
+                ? 'bg-white dark:bg-gray-800 border-amber-500 shadow-md'
+                : 'border-gray-200 dark:border-gray-700'
             }
           `}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="text-[13px] font-semibold text-gray-500 flex-1">
+            <div className="text-[13px] font-semibold text-gray-500 dark:text-gray-400 flex-1">
               {metric.label}
             </div>
             <div className="group relative">
-              <div className="w-4 h-4 border-[1.5px] border-gray-400 rounded-full flex items-center justify-center text-[10px] text-gray-400 font-bold cursor-help transition-all hover:border-amber-500 hover:text-amber-500 hover:bg-amber-50">
+              <div className="w-4 h-4 border-[1.5px] border-gray-400 rounded-full flex items-center justify-center text-[10px] text-gray-400 font-bold cursor-help transition-all hover:border-amber-500 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30">
                 ?
               </div>
               <div className={`absolute top-full mt-2 w-[280px] p-3 bg-gray-900 text-white text-[13px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none ${
@@ -81,10 +81,10 @@ export function MetricCards({ stats, selectedMetric, onMetricSelect }: MetricCar
               </div>
             </div>
           </div>
-          <div className="text-[32px] font-bold font-mono text-gray-900 leading-none">
+          <div className="text-[32px] font-bold font-mono text-gray-900 dark:text-white leading-none">
             {metric.value}
           </div>
-          <div className="text-[13px] text-gray-500 mt-1">
+          <div className="text-[13px] text-gray-500 dark:text-gray-400 mt-1">
             {metric.subheading}
           </div>
         </button>

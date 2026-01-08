@@ -28,7 +28,7 @@ function AccountDetailContent({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="flex h-screen">
-        <div className="w-80 border-r border-gray-200 p-6">
+        <div className="w-80 border-r border-gray-200 dark:border-gray-700 p-6">
           <CardSkeleton />
         </div>
         <div className="flex-1 p-6 space-y-4">
@@ -36,7 +36,7 @@ function AccountDetailContent({ id }: { id: string }) {
           <CardSkeleton />
           <CardSkeleton />
         </div>
-        <div className="w-96 border-l border-gray-200 p-6">
+        <div className="w-96 border-l border-gray-200 dark:border-gray-700 p-6">
           <CardSkeleton />
         </div>
       </div>
@@ -47,10 +47,10 @@ function AccountDetailContent({ id }: { id: string }) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Account Not Found
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Unable to load account details. Please try again.
           </p>
         </div>
@@ -59,7 +59,7 @@ function AccountDetailContent({ id }: { id: string }) {
   }
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-gray-50">
+    <div className="flex h-full w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
       {/* Left Panel: Account Header */}
       <AccountHeader data={data} />
 

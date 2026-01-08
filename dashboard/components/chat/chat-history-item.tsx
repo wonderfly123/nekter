@@ -69,8 +69,8 @@ export function ChatHistoryItem({ session, isActive, onClick, onDelete, onRename
       <button
         onClick={onClick}
         className={cn(
-          'w-full text-left px-3 py-3 rounded-lg mb-2 bg-gray-50 border-2 transition-all duration-300 cursor-pointer hover:bg-white hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5',
-          isActive ? 'bg-white border-amber-500 shadow-md' : 'border-gray-200'
+          'w-full text-left px-3 py-3 rounded-lg mb-2 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 cursor-pointer hover:bg-white dark:hover:bg-gray-700 hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5',
+          isActive ? 'bg-white dark:bg-gray-700 border-amber-500 shadow-md' : 'border-gray-200 dark:border-gray-700'
         )}
       >
         {isEditing ? (
@@ -87,10 +87,10 @@ export function ChatHistoryItem({ session, isActive, onClick, onDelete, onRename
           </form>
         ) : (
           <>
-            <div className="font-semibold text-sm text-gray-900 mb-1 truncate pr-8">
+            <div className="font-semibold text-sm text-gray-900 dark:text-white mb-1 truncate pr-8">
               {session.title}
             </div>
-            <div className="text-xs text-gray-500 truncate">
+            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
               {session.preview}
             </div>
           </>
@@ -104,25 +104,25 @@ export function ChatHistoryItem({ session, isActive, onClick, onDelete, onRename
             e.stopPropagation();
             setShowMenu(!showMenu);
           }}
-          className="absolute right-2 top-3 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 transition-opacity"
+          className="absolute right-2 top-3 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition-opacity"
         >
-          <MoreVertical className="w-4 h-4 text-gray-600" />
+          <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         </button>
       )}
 
       {/* Dropdown Menu */}
       {showMenu && (
-        <div className="absolute right-2 top-12 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 min-w-[120px]">
+        <div className="absolute right-2 top-12 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1 min-w-[120px]">
           <button
             onClick={handleRename}
-            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+            className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
           >
             <Pencil className="w-3.5 h-3.5" />
             Rename
           </button>
           <button
             onClick={handleDelete}
-            className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+            className="w-full px-3 py-2 text-left text-sm hover:bg-status-error-bg text-status-error-text flex items-center gap-2"
           >
             <Trash2 className="w-3.5 h-3.5" />
             Delete

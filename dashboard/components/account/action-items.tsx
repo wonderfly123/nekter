@@ -138,31 +138,31 @@ export function ActionItems({ data }: ActionItemsProps) {
     switch (priority) {
       case 'high':
         return {
-          bg: 'bg-red-50',
-          border: 'border-red-200',
-          icon: 'text-red-600',
-          text: 'text-red-900',
+          bg: 'bg-status-error-bg',
+          border: 'border-status-error-border',
+          icon: 'text-status-error-text',
+          text: 'text-status-error-text',
         };
       case 'medium':
         return {
-          bg: 'bg-yellow-50',
-          border: 'border-yellow-200',
-          icon: 'text-yellow-600',
-          text: 'text-yellow-900',
+          bg: 'bg-status-warning-bg',
+          border: 'border-status-warning-border',
+          icon: 'text-status-warning-text',
+          text: 'text-status-warning-text',
         };
       case 'low':
         return {
-          bg: 'bg-green-50',
-          border: 'border-green-200',
-          icon: 'text-green-600',
-          text: 'text-green-900',
+          bg: 'bg-status-success-bg',
+          border: 'border-status-success-border',
+          icon: 'text-status-success-text',
+          text: 'text-status-success-text',
         };
     }
   };
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Recommended Actions
       </h2>
       <div className="space-y-3">

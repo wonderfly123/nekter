@@ -82,17 +82,17 @@ export function DynamicMetricChart({ data, selectedMetric }: DynamicMetricChartP
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 mb-8">
         <div className="text-center py-16">
-          <p className="text-gray-600">No data available for selected metric</p>
+          <p className="text-gray-600 dark:text-gray-400">No data available for selected metric</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
-      <div className="text-[13px] text-gray-500 mb-6">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 mb-8">
+      <div className="text-[13px] text-gray-500 dark:text-gray-400 mb-6">
         Track how your selected metric performs over time
       </div>
       <ResponsiveContainer width="100%" height={320}>

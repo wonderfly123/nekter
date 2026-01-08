@@ -7,17 +7,18 @@ import type {
 
 /**
  * Returns Tailwind classes for health status badge colors
+ * Uses semantic tokens that automatically switch in dark mode
  */
 export function getHealthStatusColor(status: HealthStatus): string {
   switch (status) {
     case 'Critical':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-status-error-bg text-status-error-text border-status-error-border';
     case 'At Risk':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-status-warning-bg text-status-warning-text border-status-warning-border';
     case 'Healthy':
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-status-success-bg text-status-success-text border-status-success-border';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-muted text-muted-foreground border-border';
   }
 }
 
@@ -75,11 +76,11 @@ export function getTrendText(trend: TrendStatus): string {
 export function getTrendColor(trend: TrendStatus): string {
   switch (trend) {
     case 'Improving':
-      return 'text-green-600';
+      return 'text-green-600 dark:text-green-400';
     case 'Declining':
-      return 'text-red-600';
+      return 'text-red-600 dark:text-red-400';
     case 'Stable':
-      return 'text-gray-600';
+      return 'text-gray-600 dark:text-gray-400';
     default:
       return 'text-gray-400';
   }

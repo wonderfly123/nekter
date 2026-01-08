@@ -47,7 +47,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
 
   // Get health score color
   const getHealthScoreColor = (score: number | null) => {
-    if (score === null) return 'bg-gray-200';
+    if (score === null) return 'bg-gray-200 dark:bg-gray-700';
     if (score >= 70) return 'bg-green-500';
     if (score >= 40) return 'bg-orange-500';
     return 'bg-red-500';
@@ -59,7 +59,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
 
   return (
     <tr
-      className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
       onClick={handleRowClick}
     >
       {/* Account Name */}
@@ -68,7 +68,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
             {getInitials(account.name)}
           </div>
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-gray-900 dark:text-white">
             {account.name}
           </span>
         </div>
@@ -76,7 +76,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
 
       {/* ARR */}
       <td className="py-4 px-6 text-right">
-        <span className="text-sm font-semibold text-gray-900 font-mono">
+        <span className="text-sm font-semibold text-gray-900 dark:text-white font-mono">
           {account.arr ? formatCurrency(account.arr) : '—'}
         </span>
       </td>
@@ -92,11 +92,11 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Health Score */}
       <td className="py-4 px-6">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-gray-900 w-8">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white w-8">
             {account.health_score !== null ? Math.round(account.health_score) : 'N/A'}
           </span>
           {account.health_score !== null && (
-            <div className="flex-1 bg-gray-200 rounded-full h-2 w-20">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 w-20">
               <div
                 className={`h-2 rounded-full transition-all ${getHealthScoreColor(
                   account.health_score
@@ -111,7 +111,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Churn Signals */}
       <td className="py-4 px-6 text-center">
         {account.churn_signals_count > 0 ? (
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold">
             {account.churn_signals_count}
           </span>
         ) : (
@@ -122,7 +122,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Expansion Signals */}
       <td className="py-4 px-6 text-center">
         {account.expansion_signals_count > 0 ? (
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-700 text-xs font-bold">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold">
             {account.expansion_signals_count}
           </span>
         ) : (
@@ -131,17 +131,17 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       </td>
 
       {/* Last Activity */}
-      <td className="py-4 px-6 text-sm text-gray-500">
+      <td className="py-4 px-6 text-sm text-gray-500 dark:text-gray-400">
         {daysSinceActivity || '—'}
       </td>
 
       {/* Renewal Date */}
-      <td className="py-4 px-6 text-sm text-gray-700">
+      <td className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300">
         {account.renewal_date ? format(new Date(account.renewal_date), 'MMM d, yyyy') : '—'}
       </td>
 
       {/* CSM Name */}
-      <td className="py-4 px-6 text-sm text-gray-700">
+      <td className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300">
         {account.csm_name || '—'}
       </td>
     </tr>

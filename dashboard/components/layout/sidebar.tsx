@@ -66,12 +66,12 @@ export function Sidebar() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        'fixed left-0 top-0 h-screen bg-gray-50 border-r border-gray-200 z-50 flex flex-col transition-[width] duration-200 ease-out',
+        'fixed left-0 top-0 h-screen bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-50 flex flex-col transition-[width] duration-200 ease-out',
         isCollapsed ? 'w-[52px]' : 'w-[220px]'
       )}
     >
       {/* Header */}
-      <div className="border-b border-gray-200 px-3 py-3 min-h-[56px] flex items-center">
+      <div className="border-b border-gray-200 dark:border-gray-800 px-3 py-3 min-h-[56px] flex items-center">
         <div className="flex items-center gap-2.5 pl-0.5">
           <div
             className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0"
@@ -103,9 +103,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-2.5 py-2.5 pl-4 pr-3 text-[13px] text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 font-medium',
+                'flex items-center gap-2.5 py-2.5 pl-4 pr-3 text-[13px] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white border-l-2 font-medium',
                 isActive
-                  ? 'bg-amber-50 text-amber-600 border-amber-500'
+                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-500 border-amber-500'
                   : 'border-transparent'
               )}
             >
@@ -127,7 +127,7 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className="border-t border-gray-200 px-3 py-3">
+      <div className="border-t border-gray-200 dark:border-gray-800 px-3 py-3">
         {isCollapsed ? (
           <div className="pl-0.5">
             <div

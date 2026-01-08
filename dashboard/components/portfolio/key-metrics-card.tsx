@@ -42,18 +42,18 @@ export function KeyMetricsCard() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
       <div className="mb-6">
-        <h3 className="text-[18px] font-bold text-gray-900">Key Metrics</h3>
+        <h3 className="text-[18px] font-bold text-gray-900 dark:text-white">Key Metrics</h3>
       </div>
       <div className="space-y-6">
         {metrics.map((metric, index) => (
           <div key={index} className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
-              <span className="text-[15px] text-gray-600 font-semibold">{metric.label}</span>
-              <span className="font-mono font-bold text-[15px] text-gray-900">{metric.value}</span>
+              <span className="text-[15px] text-gray-600 dark:text-gray-400 font-semibold">{metric.label}</span>
+              <span className="font-mono font-bold text-[15px] text-gray-900 dark:text-white">{metric.value}</span>
             </div>
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ${getColorClasses(metric.color)}`}
                 style={{ width: `${metric.percentage}%` }}

@@ -42,15 +42,15 @@ export function HealthTrendChart({ healthHistory }: HealthTrendChartProps) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         90-Day Health Trend
       </h2>
       {chartData.length === 0 ? (
-        <div className="bg-white p-4 rounded-lg border border-gray-200 text-center py-12">
-          <p className="text-gray-600">No health trend data available</p>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400">No health trend data available</p>
         </div>
       ) : (
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
           <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -72,14 +72,14 @@ export function HealthTrendChart({ healthHistory }: HealthTrendChartProps) {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-                      <div className="text-xs text-gray-600 mb-1">
+                    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                         {format(data.date, 'MMM d, yyyy')}
                       </div>
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">
                         Score: {Math.round(data.score)}
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         Status: {data.status}
                       </div>
                     </div>

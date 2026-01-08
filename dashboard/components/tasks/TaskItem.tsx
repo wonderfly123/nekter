@@ -45,9 +45,9 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
   const isDueToday = !isCompleted && dueDate.toDateString() === today.toDateString();
 
   const priorityColors = {
-    high: 'text-red-600 bg-red-50 border-red-200',
-    medium: 'text-orange-600 bg-orange-50 border-orange-200',
-    low: 'text-blue-600 bg-blue-50 border-blue-200'
+    high: 'text-status-error-text bg-status-error-bg border-status-error-border',
+    medium: 'text-status-warning-text bg-status-warning-bg border-status-warning-border',
+    low: 'text-status-info-text bg-status-info-bg border-status-info-border'
   };
 
   const formatDate = (dateString: string) => {
@@ -90,7 +90,7 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
   };
 
   return (
-    <div className={`p-4 hover:bg-gray-50 transition-colors ${isCompleted ? 'opacity-60' : ''} ${highlighted ? 'task-highlight' : ''}`}>
+    <div className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCompleted ? 'opacity-60' : ''} ${highlighted ? 'task-highlight' : ''}`}>
       <div className="flex items-start gap-4">
         {/* Checkbox */}
         <button
@@ -108,7 +108,7 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
         <div className="flex-1 min-w-0">
           {/* Title and Priority */}
           <div className="flex items-start gap-2 mb-1">
-            <h3 className={`flex-1 font-medium text-gray-900 ${isCompleted ? 'line-through' : ''}`}>
+            <h3 className={`flex-1 font-medium text-gray-900 dark:text-white ${isCompleted ? 'line-through' : ''}`}>
               {task.title}
             </h3>
             <span className={`px-2 py-0.5 text-xs font-semibold rounded border uppercase ${priorityColors[task.priority]}`}>
@@ -118,16 +118,16 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
 
           {/* Description */}
           {task.description && (
-            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{task.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{task.description}</p>
           )}
 
           {/* Meta info */}
           <div className="flex items-center gap-4 text-sm">
             {/* Due Date */}
             <div className={`flex items-center gap-1 ${
-              isOverdue ? 'text-red-600 font-medium' :
-              isDueToday ? 'text-orange-600 font-medium' :
-              'text-gray-600'
+              isOverdue ? 'text-status-error-text font-medium' :
+              isDueToday ? 'text-status-warning-text font-medium' :
+              'text-gray-600 dark:text-gray-400'
             }`}>
               {isOverdue && <AlertCircle className="w-4 h-4" />}
               <Calendar className="w-4 h-4" />
@@ -141,7 +141,7 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
               <div className="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-semibold">
                 {getAssigneeInitials()}
               </div>
-              <span className="text-gray-600">{getAssigneeName()}</span>
+              <span className="text-gray-600 dark:text-gray-400">{getAssigneeName()}</span>
             </div>
 
             {/* Tags */}
@@ -150,7 +150,7 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
                 {task.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded"
+                    className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
                   >
                     {tag}
                   </span>
@@ -165,14 +165,14 @@ export function TaskItem({ task, users, onComplete, onEdit, onDelete, highlighte
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(task)}
-              className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+              className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded transition-colors"
               title="Edit task"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(task.id)}
-              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
               title="Delete task"
             >
               <Trash2 className="w-4 h-4" />

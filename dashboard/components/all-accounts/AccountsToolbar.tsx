@@ -94,7 +94,7 @@ export function AccountsToolbar({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 mb-4">
       <div className="flex flex-col gap-4">
         {/* First Row: Search and Sort */}
         <div className="flex flex-col md:flex-row gap-4">
@@ -107,12 +107,12 @@ export function AccountsToolbar({
                 placeholder="Search accounts..."
                 value={localSearch}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
               {localSearch && (
                 <button
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -125,7 +125,7 @@ export function AccountsToolbar({
             <select
               value={sortBy}
               onChange={(e) => onSortByChange(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="name">Account Name</option>
               <option value="health_score">Health Score</option>
@@ -138,11 +138,11 @@ export function AccountsToolbar({
             </select>
             <button
               onClick={toggleSortOrder}
-              className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               title={sortOrder === 'asc' ? 'Sort Ascending' : 'Sort Descending'}
             >
               <ArrowUpDown
-                className={`w-5 h-5 text-gray-600 transition-transform ${
+                className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${
                   sortOrder === 'desc' ? 'rotate-180' : ''
                 }`}
               />
@@ -154,15 +154,15 @@ export function AccountsToolbar({
         <div className="flex flex-col md:flex-row gap-4">
           {/* Health Status Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Health:</span>
+            <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Health:</span>
             <div className="flex gap-2">
               <button
                 onClick={() => toggleHealthStatus('Healthy')}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                   healthStatus.includes('Healthy')
                     ? 'bg-green-100 text-green-700 border-2 border-green-500'
-                    : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 Healthy
@@ -172,7 +172,7 @@ export function AccountsToolbar({
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                   healthStatus.includes('At Risk')
                     ? 'bg-orange-100 text-orange-700 border-2 border-orange-500'
-                    : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 At Risk
@@ -182,7 +182,7 @@ export function AccountsToolbar({
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                   healthStatus.includes('Critical')
                     ? 'bg-red-100 text-red-700 border-2 border-red-500'
-                    : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 Critical
@@ -197,15 +197,15 @@ export function AccountsToolbar({
                 onClick={() => setCsmDropdownOpen(!csmDropdownOpen)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
                   csmFilter.length > 0
-                    ? 'border-2 border-orange-500 bg-orange-50'
-                    : 'border border-gray-300 hover:bg-gray-50'
+                    ? 'border-2 border-orange-500 bg-hover-accent'
+                    : 'border border-gray-300 dark:border-gray-600 hover:bg-hover-subtle'
                 }`}
               >
-                <span className={csmFilter.length > 0 ? 'text-orange-700 font-medium' : 'text-gray-700'}>
+                <span className={csmFilter.length > 0 ? 'text-link font-medium' : 'text-gray-700 dark:text-gray-300'}>
                   CSM {csmFilter.length > 0 && `(${csmFilter.length})`}
                 </span>
                 <svg
-                  className={`w-4 h-4 text-gray-600 transition-transform ${
+                  className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${
                     csmDropdownOpen ? 'rotate-180' : ''
                   }`}
                   fill="none"
@@ -217,20 +217,20 @@ export function AccountsToolbar({
               </button>
 
               {csmDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
                   <div className="p-2">
                     {csmList.map((csm) => (
                       <label
                         key={csm}
-                        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded cursor-pointer"
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer"
                       >
                         <input
                           type="checkbox"
                           checked={csmFilter.includes(csm)}
                           onChange={() => toggleCsmFilter(csm)}
-                          className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                          className="w-4 h-4 text-orange-600 border-gray-300 dark:border-gray-600 rounded focus:ring-orange-500"
                         />
-                        <span className="text-sm text-gray-700">{csm}</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{csm}</span>
                       </label>
                     ))}
                   </div>

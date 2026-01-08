@@ -97,11 +97,11 @@ function AllAccountsContent() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">Failed to load accounts</h3>
-            <p className="text-red-700 mb-4">
+          <div className="bg-status-error-bg border border-status-error-border rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-status-error-text mb-2">Failed to load accounts</h3>
+            <p className="text-status-error-text mb-4">
               {error instanceof Error ? error.message : 'An error occurred'}
             </p>
             <button
@@ -117,12 +117,12 @@ function AllAccountsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">All Accounts</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">All Accounts</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             View and manage all customer accounts with health scores, ARR, and signals
           </p>
         </div>

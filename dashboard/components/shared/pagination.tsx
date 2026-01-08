@@ -50,11 +50,11 @@ export function Pagination({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+    <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
       {/* Info */}
-      <div className="text-sm text-gray-600">
-        Showing <span className="font-semibold font-mono text-gray-900">{startItem}-{endItem}</span> of{' '}
-        <span className="font-semibold font-mono text-gray-900">{totalItems}</span> accounts
+      <div className="text-sm text-gray-600 dark:text-gray-400">
+        Showing <span className="font-semibold font-mono text-gray-900 dark:text-white">{startItem}-{endItem}</span> of{' '}
+        <span className="font-semibold font-mono text-gray-900 dark:text-white">{totalItems}</span> accounts
       </div>
 
       {/* Controls */}
@@ -63,7 +63,7 @@ export function Pagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-600 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600 disabled:hover:bg-white transition-all"
+          className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 dark:disabled:hover:border-gray-700 disabled:hover:text-gray-600 dark:disabled:hover:text-gray-400 disabled:hover:bg-white dark:disabled:hover:bg-gray-800 transition-all"
         >
           <ChevronLeft className="w-4 h-4" />
           Previous
@@ -78,7 +78,7 @@ export function Pagination({
               className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
                 page === currentPage
                   ? 'bg-amber-500 text-white border border-amber-500'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-gray-700'
               }`}
             >
               {page}
@@ -90,7 +90,7 @@ export function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-600 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600 disabled:hover:bg-white transition-all"
+          className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 dark:disabled:hover:border-gray-700 disabled:hover:text-gray-600 dark:disabled:hover:text-gray-400 disabled:hover:bg-white dark:disabled:hover:bg-gray-800 transition-all"
         >
           Next
           <ChevronRight className="w-4 h-4" />

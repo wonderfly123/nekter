@@ -59,8 +59,8 @@ function PortfolioContent() {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-2">
             <div>
-              <h1 className="text-[32px] font-bold text-gray-900 mb-2">Portfolio Analytics</h1>
-              <p className="text-[15px] text-gray-500 font-medium">
+              <h1 className="text-[32px] font-bold text-gray-900 dark:text-white mb-2">Portfolio Analytics</h1>
+              <p className="text-[15px] text-gray-500 dark:text-gray-400 font-medium">
                 Track key metrics and trends across your customer portfolio
               </p>
             </div>
@@ -94,14 +94,14 @@ function PortfolioContent() {
 
         {/* Dynamic Chart */}
         {historyLoading ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 h-[400px] animate-pulse" />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 mb-8 h-[400px] animate-pulse" />
         ) : metricHistory ? (
           <DynamicMetricChart data={metricHistory} selectedMetric={selectedMetric} />
         ) : null}
 
         {/* Renewal Forecast */}
         {isLoading ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 h-[300px] animate-pulse" />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 h-[300px] animate-pulse" />
         ) : (
           renewalForecast && <RenewalForecast data={renewalForecast} />
         )}

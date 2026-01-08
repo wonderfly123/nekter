@@ -28,7 +28,7 @@ function Toggle({ enabled, onChange, disabled }: ToggleProps) {
       onClick={onChange}
       disabled={disabled}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
-        enabled ? 'bg-orange-600' : 'bg-gray-200'
+        enabled ? 'bg-orange-600' : 'bg-gray-200 dark:bg-gray-600'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       <span
@@ -53,16 +53,16 @@ function AlertRow({ icon, title, description, settings, onToggle, slackDisabled 
   return (
     <div className="py-4 first:pt-0 last:pb-0">
       <div className="flex items-start gap-3 mb-3">
-        <div className="p-2 bg-gray-100 rounded-lg">
+        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-gray-900">{title}</h4>
-          <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{description}</p>
         </div>
       </div>
       <div className="flex items-center gap-6 ml-11">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Mail className="w-4 h-4" />
           <span>Email</span>
           <Toggle
@@ -70,7 +70,7 @@ function AlertRow({ icon, title, description, settings, onToggle, slackDisabled 
             onChange={() => onToggle('email')}
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <MessageSquare className="w-4 h-4" />
           <span>Slack</span>
           <Toggle
@@ -79,7 +79,7 @@ function AlertRow({ icon, title, description, settings, onToggle, slackDisabled 
             disabled={slackDisabled}
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Bell className="w-4 h-4" />
           <span>Bell</span>
           <Toggle
@@ -185,15 +185,15 @@ export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSetti
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mt-6">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Alert Notifications</h2>
+            <AlertTriangle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Alert Notifications</h2>
           </div>
         </div>
         <div className="p-6">
-          <div className="flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <Loader2 className="w-4 h-4 animate-spin" />
             Loading alert settings...
           </div>
@@ -207,37 +207,37 @@ export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSetti
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6">
-      <div className="px-6 py-4 border-b border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mt-6">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Alert Notifications</h2>
+          <AlertTriangle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Alert Notifications</h2>
         </div>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Get notified about health changes, concerning interactions, and expansion opportunities
         </p>
       </div>
 
       <div className="p-6">
         {error && (
-          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700">
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-status-error-bg border border-status-error-border text-status-error-text">
             {error}
           </div>
         )}
 
         {!hasSlackInstallation && (
-          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-amber-50 border border-amber-200 text-amber-700">
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-status-warning-bg border border-status-warning-border text-status-warning-text">
             Connect Slack above to enable Slack notifications
           </div>
         )}
 
         {hasSlackInstallation && !slackEnabled && (
-          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-amber-50 border border-amber-200 text-amber-700">
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm bg-status-warning-bg border border-status-warning-border text-status-warning-text">
             Enable Slack notifications above to use Slack alerts
           </div>
         )}
 
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-700">
           <AlertRow
             icon={<TrendingDown className="w-4 h-4 text-red-600" />}
             title="Health Drop Alerts"

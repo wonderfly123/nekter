@@ -47,26 +47,26 @@ export function NoteItem({ note, onPin, onEdit, onDelete }: NoteItemProps) {
   };
 
   return (
-    <div className={`p-4 hover:bg-gray-50 transition-colors ${note.is_pinned ? 'bg-yellow-50' : ''}`}>
+    <div className={`p-4 hover:bg-hover-subtle transition-colors ${note.is_pinned ? 'bg-status-warning-bg' : ''}`}>
       <div className="flex items-start gap-4">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Title */}
           <div className="flex items-start gap-2 mb-2">
-            <h3 className="flex-1 font-semibold text-gray-900 truncate">
+            <h3 className="flex-1 font-semibold text-gray-900 dark:text-white truncate">
               {note.title}
             </h3>
           </div>
 
           {/* Content Preview */}
           {note.content && (
-            <p className="text-sm text-gray-600 mb-2 line-clamp-3 whitespace-pre-wrap">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-3 whitespace-pre-wrap">
               {note.content}
             </p>
           )}
 
           {/* Timestamp */}
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
             <Clock className="w-3 h-3" />
             <span>{formatRelativeTime(note.created_at)}</span>
           </div>
@@ -78,8 +78,8 @@ export function NoteItem({ note, onPin, onEdit, onDelete }: NoteItemProps) {
             onClick={() => onPin(note.id)}
             className={`p-1.5 rounded transition-colors ${
               note.is_pinned
-                ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-100'
-                : 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'
+                ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/30'
+                : 'text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30'
             }`}
             title={note.is_pinned ? 'Unpin note' : 'Pin note'}
           >
@@ -87,14 +87,14 @@ export function NoteItem({ note, onPin, onEdit, onDelete }: NoteItemProps) {
           </button>
           <button
             onClick={() => onEdit(note)}
-            className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+            className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded transition-colors"
             title="Edit note"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(note.id)}
-            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
             title="Delete note"
           >
             <Trash2 className="w-4 h-4" />

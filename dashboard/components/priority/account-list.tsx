@@ -33,7 +33,7 @@ export function AccountList({ accounts }: AccountListProps) {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="text-gray-400 text-lg mb-2">No accounts found</div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             No accounts match the current filters.
           </p>
         </div>

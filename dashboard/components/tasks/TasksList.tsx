@@ -354,36 +354,36 @@ export function TasksList({ sfAccountId }: TasksListProps) {
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-sm text-gray-600">Total Tasks</div>
-          <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-sm text-gray-600">Overdue</div>
-          <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-400">Overdue</div>
+          <div className="text-2xl font-bold text-status-error-text">{stats.overdue}</div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-sm text-gray-600">Due Today</div>
-          <div className="text-2xl font-bold text-orange-600">{stats.dueToday}</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-400">Due Today</div>
+          <div className="text-2xl font-bold text-status-warning-text">{stats.dueToday}</div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-sm text-gray-600">Completed</div>
-          <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <div className="text-sm text-gray-600 dark:text-gray-400">Completed</div>
+          <div className="text-2xl font-bold text-status-success-text">{stats.completed}</div>
         </div>
       </div>
 
       {/* Filters Toolbar */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex flex-col gap-3">
           {/* First Row: Filters */}
           <div className="flex flex-wrap gap-3 items-center">
             {/* Priority Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 font-medium">Priority:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Priority:</span>
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="all">All Priorities</option>
                 <option value="high">High</option>
@@ -394,11 +394,11 @@ export function TasksList({ sfAccountId }: TasksListProps) {
 
             {/* Assignee Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 font-medium">Assigned to:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Assigned to:</span>
               <select
                 value={assigneeFilter}
                 onChange={(e) => setAssigneeFilter(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent min-w-[150px]"
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent min-w-[150px] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
                 <option value="all">All Team</option>
                 {users.map(user => {
@@ -434,7 +434,7 @@ export function TasksList({ sfAccountId }: TasksListProps) {
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -451,18 +451,18 @@ export function TasksList({ sfAccountId }: TasksListProps) {
       </div>
 
       {/* Tasks Section */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* Header with View Toggle and Sort */}
-        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="text-base font-semibold text-gray-900">Tasks</div>
-            <div className="flex gap-1 bg-gray-100 p-1 rounded">
+            <div className="text-base font-semibold text-gray-900 dark:text-white">Tasks</div>
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded">
               <button
                 onClick={() => setCurrentView('active')}
                 className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                   currentView === 'active'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               >
                 Active <span className="ml-1 font-semibold">{stats.activeCount}</span>
@@ -471,8 +471,8 @@ export function TasksList({ sfAccountId }: TasksListProps) {
                 onClick={() => setCurrentView('completed')}
                 className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                   currentView === 'completed'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               >
                 Completed <span className="ml-1 font-semibold">{stats.completedCount}</span>
@@ -482,11 +482,11 @@ export function TasksList({ sfAccountId }: TasksListProps) {
 
           <div className="flex items-center gap-2">
             {/* Sort By */}
-            <span className="text-sm text-gray-500">Sort by:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="dueDate">Due Date</option>
               <option value="priority">Priority</option>
@@ -499,13 +499,13 @@ export function TasksList({ sfAccountId }: TasksListProps) {
         {/* Tasks List */}
         <div className="max-h-[600px] overflow-y-auto">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading tasks...</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading tasks...</div>
           ) : filteredTasks.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               No {currentView} tasks found. {currentView === 'active' && 'Create your first task to get started.'}
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredTasks.map((task) => (
                 <div
                   key={task.id}

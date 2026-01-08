@@ -38,8 +38,8 @@ function PriorityContent() {
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-2">
           <div>
-            <h1 className="text-[32px] font-bold text-gray-900 mb-2">Save</h1>
-            <p className="text-[15px] text-gray-500 font-medium">
+            <h1 className="text-[32px] font-bold text-gray-900 dark:text-white mb-2">Save</h1>
+            <p className="text-[15px] text-gray-500 dark:text-gray-400 font-medium">
               At-risk accounts ordered by priority. Focus here to prevent churn.
             </p>
           </div>
@@ -56,37 +56,37 @@ function PriorityContent() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Critical Summary Card */}
-        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-300 rounded-xl p-5">
+        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 border border-red-300 dark:border-red-800 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-red-200 rounded-lg flex items-center justify-center">
-              <ShieldAlert className="w-4 h-4 text-red-700" />
+            <div className="w-9 h-9 bg-red-200 dark:bg-red-900/50 rounded-lg flex items-center justify-center">
+              <ShieldAlert className="w-4 h-4 text-red-700 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-xs text-red-700 font-medium uppercase tracking-wide">Critical</p>
-              <p className="text-2xl font-bold text-red-900 leading-none mt-1">
+              <p className="text-xs text-red-700 dark:text-red-400 font-medium uppercase tracking-wide">Critical</p>
+              <p className="text-2xl font-bold text-red-900 dark:text-red-300 leading-none mt-1">
                 {accountsLoading ? '...' : criticalAccounts.length}
               </p>
             </div>
           </div>
-          <p className="text-xs text-red-600">
+          <p className="text-xs text-red-600 dark:text-red-400">
             ${(criticalMRR / 1000).toFixed(0)}K MRR at risk
           </p>
         </div>
 
         {/* At Risk Summary Card */}
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
-              <ShieldAlert className="w-4 h-4 text-orange-600" />
+            <div className="w-9 h-9 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center">
+              <ShieldAlert className="w-4 h-4 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
-              <p className="text-xs text-orange-700 font-medium uppercase tracking-wide">At Risk</p>
-              <p className="text-2xl font-bold text-orange-900 leading-none mt-1">
+              <p className="text-xs text-orange-700 dark:text-orange-400 font-medium uppercase tracking-wide">At Risk</p>
+              <p className="text-2xl font-bold text-orange-900 dark:text-orange-300 leading-none mt-1">
                 {accountsLoading ? '...' : atRiskAccounts.length}
               </p>
             </div>
           </div>
-          <p className="text-xs text-orange-600">
+          <p className="text-xs text-orange-600 dark:text-orange-400">
             ${(atRiskMRR / 1000).toFixed(0)}K MRR at risk
           </p>
         </div>
@@ -95,28 +95,28 @@ function PriorityContent() {
         <div
           className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
             showRenewalsOnly
-              ? 'border-amber-500 bg-amber-50/50 shadow-md'
-              : 'border-gray-200 bg-white hover:shadow-md'
+              ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-900/20 shadow-md'
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md'
           }`}
           onClick={() => setShowRenewalsOnly(!showRenewalsOnly)}
         >
           <div className="flex items-center gap-3">
             <div
               className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                showRenewalsOnly ? 'bg-amber-100' : 'bg-gray-100'
+                showRenewalsOnly ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-gray-100 dark:bg-gray-700'
               }`}
             >
               <Calendar
-                className={`w-4 h-4 ${showRenewalsOnly ? 'text-amber-600' : 'text-gray-600'}`}
+                className={`w-4 h-4 ${showRenewalsOnly ? 'text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400'}`}
               />
             </div>
             <div className="flex-1">
               <p className={`text-xs font-medium uppercase tracking-wide ${
-                showRenewalsOnly ? 'text-amber-600' : 'text-gray-600'
+                showRenewalsOnly ? 'text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400'
               }`}>
                 Renewals Only (90D)
               </p>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 Filter to accounts with upcoming renewals
               </p>
             </div>
@@ -131,12 +131,12 @@ function PriorityContent() {
 
       {/* Empty State */}
       {!accountsLoading && (!accounts || accounts.length === 0) && (
-        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No at-risk accounts</h3>
-          <p className="text-gray-500 max-w-md mx-auto">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No at-risk accounts</h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
             Great news! No accounts are currently flagged as Critical or At Risk.
           </p>
         </div>

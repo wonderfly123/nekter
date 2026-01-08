@@ -5,8 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import { PageContainer } from '@/components/layout/page-container';
 import { useAuth } from '@/lib/auth/use-auth';
 import { supabase } from '@/lib/supabase/client';
-import { User, Mail, Building2, Check, MessageSquare, Loader2 } from 'lucide-react';
+import { User, Mail, Building2, Check, MessageSquare, Loader2, Sun, Moon, Monitor } from 'lucide-react';
 import { AlertSettings } from '@/components/settings/AlertSettings';
+import { useTheme } from '@/lib/theme/theme-context';
 
 interface SlackInstallation {
   slack_team_id: string;
@@ -30,10 +31,10 @@ export default function SettingsPage() {
 function SettingsLoading() {
   return (
     <PageContainer>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
       <div className="max-w-2xl">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <div className="flex items-center gap-2 text-gray-500">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <Loader2 className="w-4 h-4 animate-spin" />
             Loading settings...
           </div>
@@ -45,6 +46,7 @@ function SettingsLoading() {
 
 function SettingsContent() {
   const { user, refreshAuthState } = useAuth();
+  const { theme, setTheme } = useTheme();
   const searchParams = useSearchParams();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -217,17 +219,17 @@ function SettingsContent() {
 
   return (
     <PageContainer>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
 
       <div className="max-w-2xl">
         {/* Profile Section */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
+              <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile</h2>
             </div>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Manage your personal information
             </p>
           </div>
@@ -248,7 +250,7 @@ function SettingsContent() {
 
             {/* Email (read-only) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email
               </label>
               <div className="relative">
@@ -257,10 +259,10 @@ function SettingsContent() {
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Contact support to change your email address
               </p>
             </div>
@@ -270,7 +272,7 @@ function SettingsContent() {
               <div>
                 <label
                   htmlFor="firstName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   First Name
                 </label>
@@ -279,13 +281,13 @@ function SettingsContent() {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               </div>
               <div>
                 <label
                   htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Last Name
                 </label>
@@ -294,7 +296,7 @@ function SettingsContent() {
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -303,7 +305,7 @@ function SettingsContent() {
             <div>
               <label
                 htmlFor="company"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Company
               </label>
@@ -314,13 +316,13 @@ function SettingsContent() {
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               </div>
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="submit"
                 disabled={loading}
@@ -332,13 +334,70 @@ function SettingsContent() {
           </form>
         </div>
 
+        {/* Appearance Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mt-6">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2">
+              <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Appearance</h2>
+            </div>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Customize how the dashboard looks
+            </p>
+          </div>
+
+          <div className="p-6">
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setTheme('light')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    theme === 'light'
+                      ? 'border-orange-500 bg-hover-accent text-link'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Sun className="w-5 h-5" />
+                  <span className="text-sm font-medium">Light</span>
+                </button>
+                <button
+                  onClick={() => setTheme('dark')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    theme === 'dark'
+                      ? 'border-orange-500 bg-hover-accent text-link'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Moon className="w-5 h-5" />
+                  <span className="text-sm font-medium">Dark</span>
+                </button>
+                <button
+                  onClick={() => setTheme('system')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                    theme === 'system'
+                      ? 'border-orange-500 bg-hover-accent text-link'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <Monitor className="w-5 h-5" />
+                  <span className="text-sm font-medium">System</span>
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                System will automatically switch between light and dark based on your device settings.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Slack Integration Section */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm mt-6">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mt-6">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Slack Integration</h2>
+                <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Slack Integration</h2>
               </div>
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Slack_icon_2019.svg/2048px-Slack_icon_2019.svg.png"
@@ -346,27 +405,27 @@ function SettingsContent() {
                 className="w-8 h-8"
               />
             </div>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Receive notifications via Slack DM
             </p>
           </div>
 
           <div className="p-6 space-y-4">
             {slackError && (
-              <div className="px-4 py-3 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700">
+              <div className="px-4 py-3 rounded-lg text-sm bg-status-error-bg border border-status-error-border text-status-error-text">
                 {slackError}
               </div>
             )}
 
             {slackLoading ? (
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Loading Slack settings...
               </div>
             ) : !slackInstallation ? (
               // No workspace connected - show connect button
               <div className="space-y-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Connect your Slack workspace to enable notifications for you and your team.
                 </p>
                 <button
@@ -381,10 +440,10 @@ function SettingsContent() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       Connected to: {slackInstallation.slack_team_name || 'Slack Workspace'}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {slackSettings?.slack_notifications_enabled
                         ? 'You will receive notifications via Slack DM'
                         : 'Enable to receive notifications via Slack DM'}
@@ -392,8 +451,8 @@ function SettingsContent() {
                   </div>
                   <button
                     onClick={handleSlackToggle}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
-                      slackSettings?.slack_notifications_enabled ? 'bg-orange-600' : 'bg-gray-200'
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+                      slackSettings?.slack_notifications_enabled ? 'bg-orange-600' : 'bg-gray-200 dark:bg-gray-600'
                     }`}
                   >
                     <span
@@ -404,16 +463,16 @@ function SettingsContent() {
                   </button>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <button
                     onClick={handleConnectSlack}
-                    className="text-sm text-gray-600 hover:text-gray-900 underline"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white underline"
                   >
                     Reconnect workspace
                   </button>
                   <button
                     onClick={() => setShowDisconnectModal(true)}
-                    className="text-sm text-red-600 hover:text-red-700"
+                    className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                   >
                     Disconnect
                   </button>
@@ -433,19 +492,19 @@ function SettingsContent() {
       {/* Disconnect Slack Modal */}
       {showDisconnectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Disconnect Slack</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Disconnect Slack</h3>
             </div>
             <div className="px-6 py-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Are you sure you want to disconnect Slack? You will no longer receive notifications via Slack DM.
               </p>
             </div>
-            <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3">
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 flex justify-end gap-3">
               <button
                 onClick={() => setShowDisconnectModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Cancel
               </button>

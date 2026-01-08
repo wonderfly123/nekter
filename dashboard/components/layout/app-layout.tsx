@@ -40,7 +40,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           }}
         >
           <AppHeader />
-          <main className="flex-1 overflow-y-auto bg-gray-50 h-full w-full">{children}</main>
+          <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 h-full w-full">{children}</main>
         </div>
       </div>
       <BarryPanel />

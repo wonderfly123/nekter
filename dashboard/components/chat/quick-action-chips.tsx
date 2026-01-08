@@ -51,7 +51,7 @@ export function QuickActionChips({ onActionClick }: QuickActionChipsProps) {
         <h2 className="text-3xl font-bold mb-3 tracking-tight bg-gradient-to-r from-orange-500 from-0% via-amber-200 via-50% to-orange-500 to-100% bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer">
           Welcome to Barry
         </h2>
-        <p className="text-base text-gray-600">
+        <p className="text-base text-gray-600 dark:text-gray-400">
           Your Customer Success Assistant
         </p>
       </div>
@@ -64,19 +64,19 @@ export function QuickActionChips({ onActionClick }: QuickActionChipsProps) {
             <button
               key={index}
               onClick={() => onActionClick(action.prompt)}
-              className="bg-gray-50 border-2 border-gray-200 rounded-xl p-5 text-left transition-all duration-300 cursor-pointer hover:bg-white hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5"
+              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-5 text-left transition-all duration-300 cursor-pointer hover:bg-white dark:hover:bg-gray-700 hover:border-amber-500 hover:shadow-lg hover:-translate-y-0.5"
             >
 
               {/* Icon */}
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center mb-3.5">
-                <Icon className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 flex items-center justify-center mb-3.5">
+                <Icon className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               </div>
 
               {/* Content */}
-              <div className="font-semibold text-[15px] text-gray-900 mb-1.5">
+              <div className="font-semibold text-[15px] text-gray-900 dark:text-white mb-1.5">
                 {action.label}
               </div>
-              <div className="text-[13px] text-gray-600 leading-relaxed">
+              <div className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {action.description}
               </div>
             </button>

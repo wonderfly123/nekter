@@ -51,9 +51,9 @@ export function ChatHistorySidebar({
   );
 
   return (
-    <div className="w-[280px] bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden">
+    <div className="w-[280px] bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={onNewChat}
           className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-orange-700 transition-colors"
@@ -83,7 +83,7 @@ export function ChatHistorySidebar({
 
         {todaySessions.length > 0 && (
           <div className="mb-6">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 px-3 py-2">
+            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 px-3 py-2">
               Today
             </div>
             {todaySessions.map((session) => (
@@ -101,7 +101,7 @@ export function ChatHistorySidebar({
 
         {yesterdaySessions.length > 0 && (
           <div className="mb-6">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 px-3 py-2">
+            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 px-3 py-2">
               Yesterday
             </div>
             {yesterdaySessions.map((session) => (
@@ -119,7 +119,7 @@ export function ChatHistorySidebar({
 
         {last7DaysSessions.length > 0 && (
           <div className="mb-6">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 px-3 py-2">
+            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 px-3 py-2">
               Last 7 Days
             </div>
             {last7DaysSessions.map((session) => (
@@ -137,7 +137,7 @@ export function ChatHistorySidebar({
 
         {olderSessions.length > 0 && (
           <div className="mb-6">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 px-3 py-2">
+            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 px-3 py-2">
               Older
             </div>
             {olderSessions.map((session) => (
@@ -154,7 +154,7 @@ export function ChatHistorySidebar({
         )}
 
         {sessions.length === 0 && (
-          <div className="text-center text-gray-500 text-sm py-8">
+          <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-8">
             No chat history yet
           </div>
         )}

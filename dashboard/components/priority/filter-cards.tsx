@@ -16,21 +16,21 @@ export function FilterCards({ stats }: FilterCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Critical Card */}
-      <Card className="border-2 border-red-200 bg-red-50/50 hover:shadow-md transition-shadow">
+      <Card className="border-2 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20 hover:shadow-md transition-shadow">
         <div className="px-4 py-3">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center">
-              <Flame className="w-4 h-4 text-red-600" />
+            <div className="w-7 h-7 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+              <Flame className="w-4 h-4 text-red-600 dark:text-red-400" />
             </div>
-            <div className="text-xs font-medium text-red-600 uppercase tracking-wide">
+            <div className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">
               Critical
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900 leading-none">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
               {formatNumber(stats.criticalCount)}
             </div>
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatCompactCurrency(stats.criticalARR)} ARR
             </div>
           </div>
@@ -38,21 +38,21 @@ export function FilterCards({ stats }: FilterCardsProps) {
       </Card>
 
       {/* At Risk Card */}
-      <Card className="border-2 border-yellow-200 bg-yellow-50/50 hover:shadow-md transition-shadow">
+      <Card className="border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/20 hover:shadow-md transition-shadow">
         <div className="px-4 py-3">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4 text-yellow-600" />
+            <div className="w-7 h-7 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <div className="text-xs font-medium text-yellow-600 uppercase tracking-wide">
+            <div className="text-xs font-medium text-yellow-600 dark:text-yellow-400 uppercase tracking-wide">
               At Risk
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900 leading-none">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
               {formatNumber(stats.atRiskCount)}
             </div>
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatCompactCurrency(stats.atRiskARR)} ARR
             </div>
           </div>
@@ -64,7 +64,7 @@ export function FilterCards({ stats }: FilterCardsProps) {
         className={`border-2 cursor-pointer transition-all ${
           showRenewalsOnly
             ? 'border-amber-500 bg-amber-50/50 shadow-md'
-            : 'border-gray-200 bg-white hover:shadow-md'
+            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md'
         }`}
         onClick={() => setShowRenewalsOnly(!showRenewalsOnly)}
       >
@@ -73,18 +73,18 @@ export function FilterCards({ stats }: FilterCardsProps) {
             <div
               className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                 showRenewalsOnly
-                  ? 'bg-amber-100'
-                  : 'bg-gray-100'
+                  ? 'bg-amber-100 dark:bg-amber-900/30'
+                  : 'bg-gray-100 dark:bg-gray-700'
               }`}
             >
               <Calendar
                 className={`w-4 h-4 ${
-                  showRenewalsOnly ? 'text-amber-600' : 'text-gray-600'
+                  showRenewalsOnly ? 'text-amber-600' : 'text-gray-600 dark:text-gray-400'
                 }`}
               />
             </div>
             <div className={`flex-1 text-xs font-medium uppercase tracking-wide ${
-              showRenewalsOnly ? 'text-amber-600' : 'text-gray-600'
+              showRenewalsOnly ? 'text-amber-600' : 'text-gray-600 dark:text-gray-400'
             }`}>
               Renewals (90D)
             </div>
@@ -95,10 +95,10 @@ export function FilterCards({ stats }: FilterCardsProps) {
             )}
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900 leading-none">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
               {formatNumber(stats.renewalsCount)}
             </div>
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatCompactCurrency(stats.renewalsARR)} ARR
             </div>
           </div>

@@ -33,28 +33,28 @@ export function RenewalForecast({ data }: RenewalForecastProps) {
   ];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8">
       <div className="mb-6">
-        <h3 className="text-[18px] font-bold text-gray-900">Renewal Forecast (Next 90 Days)</h3>
+        <h3 className="text-[18px] font-bold text-gray-900 dark:text-white">Renewal Forecast (Next 90 Days)</h3>
       </div>
 
       {data.total.count === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600">No upcoming renewals in the next 90 days</p>
+          <p className="text-gray-600 dark:text-gray-400">No upcoming renewals in the next 90 days</p>
         </div>
       ) : (
         <div className="space-y-6">
           {segments.map((segment) => (
             <div key={segment.key} className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <span className="text-[15px] text-gray-600 font-semibold">
+                <span className="text-[15px] text-gray-600 dark:text-gray-400 font-semibold">
                   {segment.label} <span className="text-gray-400 font-normal">({segment.data.count})</span>
                 </span>
-                <span className="font-mono font-bold text-[15px] text-gray-900">
+                <span className="font-mono font-bold text-[15px] text-gray-900 dark:text-white">
                   {formatCompactCurrency(segment.data.arr)} ({segment.data.percent.toFixed(0)}%)
                 </span>
               </div>
-              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ${segment.gradient}`}
                   style={{ width: `${segment.data.percent}%` }}

@@ -12,8 +12,8 @@ export function CsmFilter({ selectedCsm, onCsmChange, csmList }: CsmFilterProps)
       value={selectedCsm || 'all'}
       onChange={(e) => onCsmChange(e.target.value === 'all' ? null : e.target.value)}
       className="
-        px-4 py-2.5 pr-10 border border-gray-200 rounded-lg
-        bg-white text-sm font-medium text-gray-900
+        px-4 py-2.5 pr-10 border border-gray-200 dark:border-gray-700 rounded-lg
+        bg-white dark:bg-gray-800 text-sm font-medium text-gray-900 dark:text-white
         cursor-pointer appearance-none
         transition-all duration-200
         hover:border-amber-500
