@@ -88,16 +88,7 @@ function SettingsContent() {
   const loadSlackData = async () => {
     setSlackLoading(true);
     try {
-      // Load Slack installation
-      const { data: installation } = await supabase
-        .from('slack_installations')
-        .select('slack_team_id, slack_team_name')
-        .limit(1)
-        .single();
-
-      setSlackInstallation(installation);
-
-      // Load user's Slack settings
+      // First, load user's Slack settings to see if they're linked to a team
       if (user) {
         const { data: settings } = await supabase
           .from('user_slack_settings')
@@ -106,6 +97,20 @@ function SettingsContent() {
           .single();
 
         setSlackSettings(settings);
+
+        // Only load the Slack installation if user has a linked team
+        if (settings?.slack_team_id) {
+          const { data: installation } = await supabase
+            .from('slack_installations')
+            .select('slack_team_id, slack_team_name')
+            .eq('slack_team_id', settings.slack_team_id)
+            .single();
+
+          setSlackInstallation(installation);
+        } else {
+          // User has no linked team - show "Connect Slack" button
+          setSlackInstallation(null);
+        }
       }
     } catch (err) {
       console.error('Error loading Slack data:', err);

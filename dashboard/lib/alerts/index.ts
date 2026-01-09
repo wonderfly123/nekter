@@ -133,16 +133,16 @@ async function sendAlertEmail(payload: AlertPayload): Promise<boolean> {
  */
 async function sendAlertSlack(payload: AlertPayload): Promise<boolean> {
   try {
-    // Check if user has Slack notifications enabled
+    // Check if user has Slack notifications enabled and is linked to a team
     const userSettings = await getUserSlackSettings(payload.csmUserId);
-    if (!userSettings?.slack_notifications_enabled) {
+    if (!userSettings?.slack_notifications_enabled || !userSettings.slack_team_id) {
       return false;
     }
 
-    // Get Slack installation
-    const installation = await getSlackInstallation();
+    // Get Slack installation for the user's linked team
+    const installation = await getSlackInstallation(userSettings.slack_team_id);
     if (!installation) {
-      console.warn('No Slack installation found');
+      console.warn('No Slack installation found for team:', userSettings.slack_team_id);
       return false;
     }
 

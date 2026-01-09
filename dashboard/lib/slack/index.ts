@@ -28,12 +28,16 @@ interface UserSlackSettings {
   slack_team_id: string | null;
 }
 
-// Get the Slack installation (for now, just get the first one)
-export async function getSlackInstallation(): Promise<SlackInstallation | null> {
+// Get the Slack installation for a specific team
+export async function getSlackInstallation(slackTeamId: string): Promise<SlackInstallation | null> {
+  if (!slackTeamId) {
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('slack_installations')
     .select('*')
-    .limit(1)
+    .eq('slack_team_id', slackTeamId)
     .single();
 
   if (error || !data) {
@@ -129,14 +133,14 @@ export async function sendTaskSlackNotification(
   try {
     // Check if user has Slack notifications enabled
     const userSettings = await getUserSlackSettings(userId);
-    if (!userSettings?.slack_notifications_enabled) {
+    if (!userSettings?.slack_notifications_enabled || !userSettings.slack_team_id) {
       return false;
     }
 
-    // Get Slack installation
-    const installation = await getSlackInstallation();
+    // Get Slack installation for the user's linked team
+    const installation = await getSlackInstallation(userSettings.slack_team_id);
     if (!installation) {
-      console.warn('No Slack installation found');
+      console.warn('No Slack installation found for team:', userSettings.slack_team_id);
       return false;
     }
 
