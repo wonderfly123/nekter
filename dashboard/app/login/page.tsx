@@ -27,8 +27,8 @@ export default function LoginPage() {
     }
   }, [user, isLoading, router]);
 
-  // Show loading while checking auth state
-  if (isLoading) {
+  // Show loading while checking auth state or if user is logged in (about to redirect)
+  if (isLoading || user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
