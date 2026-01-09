@@ -13,11 +13,16 @@ export default function CompleteProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [checkingProfile, setCheckingProfile] = useState(true);
   const router = useRouter();
   const { user, isLoading, signOut, refreshAuthState } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (isLoading) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
 
     // Check if profile is already complete
     const hasFirstName = user.user_metadata?.first_name;
@@ -36,7 +41,10 @@ export default function CompleteProfilePage() {
     setLastName(user.user_metadata.last_name || '');
     setCompany(user.user_metadata.company || '');
     setSignupReason(user.user_metadata.signup_reason || '');
-  }, [user, router]);
+
+    // Profile check complete, show the form
+    setCheckingProfile(false);
+  }, [user, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +86,8 @@ export default function CompleteProfilePage() {
     }
   };
 
-  if (isLoading) {
+  // Show loading while checking auth state or profile completeness
+  if (isLoading || checkingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -87,8 +96,7 @@ export default function CompleteProfilePage() {
   }
 
   if (!user) {
-    router.push('/login');
-    return null;
+    return null; // useEffect will redirect to login
   }
 
   return (
