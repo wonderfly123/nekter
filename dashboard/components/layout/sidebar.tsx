@@ -4,7 +4,8 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, ShieldAlert, TrendingUp, Users, LucideIcon, Droplet, Sparkles, Home } from 'lucide-react';
+import { LayoutDashboard, ShieldAlert, TrendingUp, Users, LucideIcon, Sparkles, Home } from 'lucide-react';
+import Image from 'next/image';
 import { useSidebarStore } from '@/lib/stores/sidebar-store';
 import { UserMenu } from '@/components/user-menu';
 import { useAuth } from '@/lib/auth/use-auth';
@@ -74,10 +75,16 @@ export function Sidebar() {
       <div className="border-b border-gray-200 dark:border-gray-800 px-3 py-3 min-h-[56px] flex items-center">
         <div className="flex items-center gap-2.5 pl-0.5">
           <div
-            className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0"
+            className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0 overflow-hidden"
             onClick={() => router.push('/welcome')}
           >
-            <Droplet className="w-3.5 h-3.5 text-white fill-white" />
+            <Image
+              src="/logo-white.png"
+              alt="Nekter"
+              width={18}
+              height={18}
+              className="object-contain"
+            />
           </div>
           <span
             className={cn(

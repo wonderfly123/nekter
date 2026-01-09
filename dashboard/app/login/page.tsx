@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/use-auth';
-import { Droplet } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -182,8 +182,14 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md relative z-10">
         <div>
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-              <Droplet className="w-8 h-8 text-white fill-white" />
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image
+                src="/logo-white.png"
+                alt="Nekter"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
           </div>
           <h2 className="text-3xl font-bold text-center text-gray-900 flex items-center justify-center gap-2">

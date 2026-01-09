@@ -1,4 +1,5 @@
-import { Droplet, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 const footerLinks = {
   Product: [
@@ -60,8 +61,14 @@ export function Footer() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-                  <Droplet className="w-4 h-4 text-white fill-white" />
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center overflow-hidden">
+                  <Image
+                    src="/logo-white.png"
+                    alt="Nekter"
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
                 </div>
                 <span className="text-lg font-bold">Nekter</span>
               </a>

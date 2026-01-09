@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Droplet } from 'lucide-react';
+import Image from 'next/image';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -29,8 +29,14 @@ export function Header() {
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-            <Droplet className="w-4 h-4 text-white fill-white" />
+          <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center overflow-hidden">
+            <Image
+              src="/logo-white.png"
+              alt="Nekter"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
           </div>
           <span className="text-lg font-bold text-gray-900">Nekter</span>
         </a>
