@@ -34,7 +34,7 @@ function AdminContent() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [deleteModal, setDeleteModal] = useState<{ userId: string; email: string; name: string } | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ userId: string; email: string; name: string; action: 'reject' | 'delete' } | null>(null);
   const { user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
@@ -109,20 +109,20 @@ function AdminContent() {
     }
   };
 
-  const showDeleteConfirmation = (userId: string, email: string, firstName?: string, lastName?: string) => {
+  const showDeleteConfirmation = (userId: string, email: string, firstName?: string, lastName?: string, action: 'reject' | 'delete' = 'delete') => {
     // Prevent self-deletion
     if (userId === currentUser?.id) {
       setError('You cannot delete your own account');
       return;
     }
     const name = firstName && lastName ? `${firstName} ${lastName}` : email;
-    setDeleteModal({ userId, email, name });
+    setDeleteModal({ userId, email, name, action });
   };
 
   const handleDeleteUser = async () => {
     if (!deleteModal) return;
 
-    const { userId, email } = deleteModal;
+    const { userId, email, action } = deleteModal;
     setDeleteModal(null);
     setActionLoading(true);
     setError(null);
@@ -144,7 +144,7 @@ function AdminContent() {
         throw new Error(errorData.error || 'Failed to delete user');
       }
 
-      setSuccess(`Rejected ${email}`);
+      setSuccess(action === 'reject' ? `Rejected ${email}` : `Deleted ${email}`);
 
       // Clear cache and refetch
       clearApprovalCache();
@@ -258,7 +258,7 @@ function AdminContent() {
                           Approve as Admin
                         </button>
                         <button
-                          onClick={() => showDeleteConfirmation(user.id, user.email, user.first_name, user.last_name)}
+                          onClick={() => showDeleteConfirmation(user.id, user.email, user.first_name, user.last_name, 'reject')}
                           disabled={actionLoading}
                           className="px-3 py-1.5 text-red-600 dark:text-red-400 text-sm rounded-md border border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                         >
@@ -370,16 +370,19 @@ function AdminContent() {
         </>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete/Reject Confirmation Modal */}
       {deleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Confirm Rejection</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {deleteModal.action === 'reject' ? 'Reject User' : 'Delete User'}
+              </h3>
             </div>
             <div className="px-6 py-4">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Are you sure you want to reject <span className="font-medium text-gray-900 dark:text-white">{deleteModal.name}</span>?
+                Are you sure you want to {deleteModal.action === 'reject' ? 'reject' : 'delete'}{' '}
+                <span className="font-medium text-gray-900 dark:text-white">{deleteModal.name}</span>?
               </p>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 This will permanently delete their account. This action cannot be undone.
@@ -396,7 +399,7 @@ function AdminContent() {
                 onClick={handleDeleteUser}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
               >
-                Reject User
+                {deleteModal.action === 'reject' ? 'Reject User' : 'Delete User'}
               </button>
             </div>
           </div>
