@@ -31,10 +31,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          <div className="text-gray-600 font-medium">Convincing the bouncer you're on the list...</div>
+          <div className="text-gray-600 dark:text-gray-400 font-medium">Convincing the bouncer you're on the list...</div>
         </div>
       </div>
     );

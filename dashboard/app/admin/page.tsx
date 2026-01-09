@@ -34,6 +34,7 @@ function AdminContent() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ userId: string; email: string; name: string } | null>(null);
   const { user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
@@ -108,15 +109,21 @@ function AdminContent() {
     }
   };
 
-  const handleDeleteUser = async (userId: string, email: string) => {
+  const showDeleteConfirmation = (userId: string, email: string, firstName?: string, lastName?: string) => {
     // Prevent self-deletion
     if (userId === currentUser?.id) {
       setError('You cannot delete your own account');
       return;
     }
+    const name = firstName && lastName ? `${firstName} ${lastName}` : email;
+    setDeleteModal({ userId, email, name });
+  };
 
-    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+  const handleDeleteUser = async () => {
+    if (!deleteModal) return;
 
+    const { userId, email } = deleteModal;
+    setDeleteModal(null);
     setActionLoading(true);
     setError(null);
     setSuccess(null);
@@ -137,7 +144,7 @@ function AdminContent() {
         throw new Error(errorData.error || 'Failed to delete user');
       }
 
-      setSuccess(`Deleted user ${email}`);
+      setSuccess(`Rejected ${email}`);
 
       // Clear cache and refetch
       clearApprovalCache();
@@ -159,20 +166,20 @@ function AdminContent() {
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Approve pending users and manage existing user roles
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="mb-4 bg-status-error-bg border border-status-error-border text-status-error-text px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+        <div className="mb-4 bg-status-success-bg border border-status-success-border text-status-success-text px-4 py-3 rounded-lg">
           {success}
         </div>
       )}
@@ -180,19 +187,19 @@ function AdminContent() {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading users...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading users...</p>
         </div>
       ) : (
         <>
           {/* Pending Users */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pending Approvals</h2>
               {pendingUsers.length > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 rounded-full">
                   {pendingUsers.length}
                 </span>
               )}
@@ -200,38 +207,38 @@ function AdminContent() {
 
             {pendingUsers.length === 0 ? (
               <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-500">No pending approvals</p>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No pending approvals</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {pendingUsers.map((user) => (
-                  <div key={user.id} className="border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors">
+                  <div key={user.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-orange-300 dark:hover:border-orange-600 transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-semibold text-gray-900">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                             {user.first_name} {user.last_name}
                           </h3>
-                          <span className="px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">
+                          <span className="px-2 py-0.5 text-xs font-medium bg-status-warning-bg text-status-warning-text rounded">
                             Pending
                           </span>
                           {!user.email_confirmed_at && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+                            <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
                               Email unconfirmed
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">{user.email}</p>
-                        <p className="text-sm text-gray-600">{user.company}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{user.email}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{user.company}</p>
                         {user.signup_reason && (
-                          <div className="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-700">
+                          <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded text-sm text-gray-700 dark:text-gray-300">
                             <span className="font-medium">Reason:</span> {user.signup_reason}
                           </div>
                         )}
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                           Signed up: {new Date(user.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -251,9 +258,9 @@ function AdminContent() {
                           Approve as Admin
                         </button>
                         <button
-                          onClick={() => handleDeleteUser(user.id, user.email)}
+                          onClick={() => showDeleteConfirmation(user.id, user.email, user.first_name, user.last_name)}
                           disabled={actionLoading}
-                          className="px-3 py-1.5 text-red-600 text-sm rounded-md border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                          className="px-3 py-1.5 text-red-600 dark:text-red-400 text-sm rounded-md border border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                         >
                           Reject
                         </button>
@@ -266,67 +273,67 @@ function AdminContent() {
           </div>
 
           {/* Approved Users */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
               <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <h2 className="text-lg font-semibold text-gray-900">Approved Users</h2>
-              <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Approved Users</h2>
+              <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-status-success-bg text-status-success-text rounded-full">
                 {approvedUsers.length}
               </span>
             </div>
 
             {approvedUsers.length === 0 ? (
               <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-500">No approved users yet</p>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No approved users yet</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Email
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Company
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Created
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Role
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {approvedUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                           {user.first_name} {user.last_name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                           {user.email}
                           {user.email === currentUser?.email && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300">
                               You
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                           {user.company || '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                           {new Date(user.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -334,7 +341,7 @@ function AdminContent() {
                             value={user.role}
                             onChange={(e) => handleUpdateRole(user.id, user.email, e.target.value as UserRole)}
                             disabled={actionLoading}
-                            className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50"
+                            className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50"
                           >
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
@@ -342,12 +349,12 @@ function AdminContent() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {user.email === currentUser?.email ? (
-                            <span className="text-gray-400 text-sm">Can't delete yourself</span>
+                            <span className="text-gray-400 dark:text-gray-500 text-sm">Can't delete yourself</span>
                           ) : (
                             <button
-                              onClick={() => handleDeleteUser(user.id, user.email)}
+                              onClick={() => showDeleteConfirmation(user.id, user.email, user.first_name, user.last_name)}
                               disabled={actionLoading}
-                              className="text-red-600 hover:text-red-900 disabled:opacity-50 font-medium"
+                              className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:opacity-50 font-medium"
                             >
                               Delete
                             </button>
@@ -361,6 +368,39 @@ function AdminContent() {
             )}
           </div>
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Confirm Rejection</h3>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to reject <span className="font-medium text-gray-900 dark:text-white">{deleteModal.name}</span>?
+              </p>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                This will permanently delete their account. This action cannot be undone.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteModal(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Reject User
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </PageContainer>
   );
