@@ -69,6 +69,11 @@ export function Hero() {
             </video>
           </div>
 
+          {/* Description blurb */}
+          <p className="text-center text-gray-500 text-sm mt-6 max-w-2xl mx-auto">
+            Nekter is an AI-powered customer success platform that analyzes customer interactions and usage data to detect churn risk, surface expansion opportunities, and help CS teams proactively save and grow their accounts.
+          </p>
+
           {/* Decorative gradients */}
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-amber-200/30 rounded-full blur-3xl -z-10" />
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-orange-200/30 rounded-full blur-3xl -z-10" />
