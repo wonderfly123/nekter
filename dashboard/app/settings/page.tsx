@@ -67,7 +67,14 @@ function SettingsContent() {
       setFirstName(user.user_metadata?.first_name || '');
       setLastName(user.user_metadata?.last_name || '');
       setCompany(user.user_metadata?.company || '');
+      // Reset Slack state before loading to prevent stale data from previous user
+      setSlackInstallation(null);
+      setSlackSettings(null);
       loadSlackData();
+    } else {
+      // User logged out - reset all state
+      setSlackInstallation(null);
+      setSlackSettings(null);
     }
   }, [user]);
 
@@ -90,11 +97,20 @@ function SettingsContent() {
     try {
       // First, load user's Slack settings to see if they're linked to a team
       if (user) {
-        const { data: settings } = await supabase
+        // Use maybeSingle() instead of single() to avoid error when no rows exist
+        const { data: settings, error: settingsError } = await supabase
           .from('user_slack_settings')
           .select('slack_notifications_enabled, slack_user_id, slack_team_id')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
+
+        if (settingsError) {
+          console.error('Error loading user Slack settings:', settingsError);
+          // Reset state on error to avoid showing stale data from previous user
+          setSlackSettings(null);
+          setSlackInstallation(null);
+          return;
+        }
 
         setSlackSettings(settings);
 
@@ -104,16 +120,23 @@ function SettingsContent() {
             .from('slack_installations')
             .select('slack_team_id, slack_team_name')
             .eq('slack_team_id', settings.slack_team_id)
-            .single();
+            .maybeSingle();
 
           setSlackInstallation(installation);
         } else {
           // User has no linked team - show "Connect Slack" button
           setSlackInstallation(null);
         }
+      } else {
+        // No user - reset all state
+        setSlackSettings(null);
+        setSlackInstallation(null);
       }
     } catch (err) {
       console.error('Error loading Slack data:', err);
+      // Reset state on error to avoid showing stale data
+      setSlackSettings(null);
+      setSlackInstallation(null);
     } finally {
       setSlackLoading(false);
     }
