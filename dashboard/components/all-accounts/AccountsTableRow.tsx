@@ -111,7 +111,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Churn Signals */}
       <td className="py-4 px-6 text-center">
         {account.churn_signals_count > 0 ? (
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-status-error-bg text-status-error-text text-xs font-bold">
             {account.churn_signals_count}
           </span>
         ) : (
@@ -122,7 +122,7 @@ export function AccountsTableRow({ account }: AccountsTableRowProps) {
       {/* Expansion Signals */}
       <td className="py-4 px-6 text-center">
         {account.expansion_signals_count > 0 ? (
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-status-success-bg text-status-success-text text-xs font-bold">
             {account.expansion_signals_count}
           </span>
         ) : (

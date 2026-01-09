@@ -121,22 +121,22 @@ function WelcomeContent() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">What Nekter Does For You</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FeatureRow
-            icon={<Shield className="w-5 h-5 text-red-500" />}
+            icon={<Shield className="w-5 h-5 text-status-error-text" />}
             title="Churn Risk Detection"
             description="Automatically flags accounts showing churn signals from sentiment analysis, engagement patterns, and explicit mentions."
           />
           <FeatureRow
-            icon={<TrendingUp className="w-5 h-5 text-green-500" />}
+            icon={<TrendingUp className="w-5 h-5 text-status-success-text" />}
             title="Expansion Opportunities"
             description="Surfaces growth signals when customers mention needs for additional features, seats, or services."
           />
           <FeatureRow
-            icon={<Bell className="w-5 h-5 text-amber-500" />}
+            icon={<Bell className="w-5 h-5 text-status-warning-text" />}
             title="Smart Alerts"
             description="Get notified via email, Slack, or in-app when health drops, bad interactions occur, or opportunities arise."
           />
           <FeatureRow
-            icon={<BarChart3 className="w-5 h-5 text-blue-500" />}
+            icon={<BarChart3 className="w-5 h-5 text-status-info-text" />}
             title="Health Scoring"
             description="Composite health scores combine engagement, sentiment, support metrics, and activity to show true account health."
           />

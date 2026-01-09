@@ -239,7 +239,7 @@ export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSetti
 
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           <AlertRow
-            icon={<TrendingDown className="w-4 h-4 text-red-600" />}
+            icon={<TrendingDown className="w-4 h-4 text-status-error-text" />}
             title="Health Drop Alerts"
             description="When an account's health status drops (Healthy → At Risk or At Risk → Critical)"
             settings={settings.health_drop}
@@ -247,7 +247,7 @@ export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSetti
             slackDisabled={!hasSlackInstallation || !slackEnabled}
           />
           <AlertRow
-            icon={<AlertTriangle className="w-4 h-4 text-amber-600" />}
+            icon={<AlertTriangle className="w-4 h-4 text-status-warning-text" />}
             title="Bad Interaction Alerts"
             description="Churn risk detected or sentiment score below 60"
             settings={settings.bad_interaction}
@@ -255,7 +255,7 @@ export function AlertSettings({ hasSlackInstallation, slackEnabled }: AlertSetti
             slackDisabled={!hasSlackInstallation || !slackEnabled}
           />
           <AlertRow
-            icon={<TrendingUp className="w-4 h-4 text-green-600" />}
+            icon={<TrendingUp className="w-4 h-4 text-status-success-text" />}
             title="Expansion Opportunity Alerts"
             description="Growth signals detected in customer interactions"
             settings={settings.expansion_opportunity}

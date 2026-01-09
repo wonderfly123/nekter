@@ -82,7 +82,7 @@ export function getTrendColor(trend: TrendStatus): string {
     case 'Stable':
       return 'text-gray-600 dark:text-gray-400';
     default:
-      return 'text-gray-400';
+      return 'text-gray-400 dark:text-gray-500';
   }
 }
 
