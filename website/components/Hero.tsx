@@ -71,7 +71,7 @@ export function Hero() {
 
           {/* Description blurb */}
           <p className="text-center text-gray-500 text-sm mt-6 max-w-2xl mx-auto">
-            Nekter is an AI-powered customer success platform that analyzes customer interactions and usage data to detect churn risk, surface expansion opportunities, and help CS teams proactively save and grow their accounts.
+            Nekter is an AI-powered platform that analyzes customer interactions and usage data to detect churn risk, surface expansion opportunities, and help customer success and account management teams proactively save and grow accounts.
           </p>
 
           {/* Decorative gradients */}
